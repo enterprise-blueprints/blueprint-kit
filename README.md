@@ -35,6 +35,7 @@ The sample's two packages:
 
 ## Start
 
+On GitHub, choose **Use this template** to make a repository of your own from this one, and clone it.
 You need Node 22.12 or later and pnpm.
 
 ```sh

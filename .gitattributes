@@ -1,0 +1,5 @@
+# Keep LF line endings everywhere. The published package digest is a hash of
+# the file's bytes, so a checkout that converts line endings would change it.
+* text=auto eol=lf
+*.svg text eol=lf
+*.png binary

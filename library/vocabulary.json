@@ -1,0 +1,394 @@
+{
+  "schemaVersion": "0.6.0",
+  "types": {
+    "mission": {
+      "label": "Mission",
+      "plural": "Missions",
+      "definition": "An enduring public purpose or organizational responsibility.",
+      "page": "missions/{key}/"
+    },
+    "outcome": {
+      "label": "Outcome",
+      "plural": "Outcomes",
+      "definition": "A result a mission seeks: the change in the world that shows the work is paying off.",
+      "page": "outcomes/{key}/"
+    },
+    "measure": {
+      "label": "Measure",
+      "plural": "Measures",
+      "definition": "A way to tell how an outcome is going, such as a figure an office already reports.",
+      "page": "measures/{key}/"
+    },
+    "capability": {
+      "label": "Capability",
+      "plural": "Capabilities",
+      "definition": "An ability an organization needs or has: what must be possible.",
+      "page": "capabilities/{key}/"
+    },
+    "requirement": {
+      "label": "Requirement",
+      "plural": "Requirements",
+      "definition": "A condition or behavior that must be true: what a capability has to do or respect.",
+      "page": "requirements/{key}/"
+    },
+    "implementationPattern": {
+      "label": "Implementation pattern",
+      "plural": "Implementation patterns",
+      "definition": "An example approach that might realize a capability.",
+      "page": "patterns/{key}/"
+    },
+    "resource": {
+      "label": "Resource",
+      "plural": "Resources",
+      "definition": "Something that helps you learn about an item or act on it, such as a video, a course, or a guide.",
+      "page": "resources/{key}/"
+    },
+    "solution": {
+      "label": "Solution",
+      "plural": "Solutions",
+      "definition": "An example of how several patterns could fit together to support an agency’s missions.",
+      "page": "solutions/{key}/"
+    }
+  },
+  "predicates": {
+    "seeks": {
+      "from": [
+        "mission"
+      ],
+      "to": [
+        "outcome"
+      ],
+      "outgoing": "Outcomes it seeks",
+      "incoming": "Missions that seek it"
+    },
+    "contributes_to": {
+      "from": [
+        "capability"
+      ],
+      "to": [
+        "outcome"
+      ],
+      "outgoing": "Outcomes it contributes to",
+      "incoming": "Capabilities that contribute to it"
+    },
+    "measured_by": {
+      "from": [
+        "outcome"
+      ],
+      "to": [
+        "measure"
+      ],
+      "outgoing": "Measures",
+      "incoming": "Outcomes it measures"
+    },
+    "supports_mission": {
+      "from": [
+        "capability"
+      ],
+      "to": [
+        "mission"
+      ],
+      "outgoing": "Missions it supports",
+      "incoming": "Capabilities that support it"
+    },
+    "satisfies": {
+      "from": [
+        "capability"
+      ],
+      "to": [
+        "requirement"
+      ],
+      "outgoing": "Reference requirements",
+      "incoming": "Capabilities that satisfy it"
+    },
+    "candidate_pattern": {
+      "from": [
+        "capability"
+      ],
+      "to": [
+        "implementationPattern"
+      ],
+      "outgoing": "Candidate implementation patterns",
+      "incoming": "Capabilities it might help realize"
+    },
+    "includes": {
+      "from": [
+        "solution"
+      ],
+      "to": [
+        "implementationPattern"
+      ],
+      "outgoing": "Patterns it includes",
+      "incoming": "Solutions that include it"
+    },
+    "supports": {
+      "from": [
+        "solution"
+      ],
+      "to": [
+        "mission"
+      ],
+      "outgoing": "Missions it supports",
+      "incoming": "Example solutions"
+    },
+    "depends_on": {
+      "from": [
+        "implementationPattern"
+      ],
+      "to": [
+        "implementationPattern"
+      ],
+      "outgoing": "Needs",
+      "incoming": "Needed by"
+    },
+    "works_with": {
+      "from": [
+        "implementationPattern"
+      ],
+      "to": [
+        "implementationPattern"
+      ],
+      "outgoing": "Works well with",
+      "incoming": "Works well with"
+    },
+    "helps_with": {
+      "from": [
+        "resource"
+      ],
+      "to": [
+        "mission",
+        "outcome",
+        "capability",
+        "requirement",
+        "implementationPattern"
+      ],
+      "outgoing": "Helps with",
+      "incoming": "Resources"
+    }
+  },
+  "pattern": {
+    "layers": {
+      "public-facing": {
+        "label": "Public facing",
+        "hint": "How the public, applicants, vendors, and other agencies reach the office or find what it publishes."
+      },
+      "ai-insights": {
+        "label": "AI and insights",
+        "hint": "Reporting, analytics, and AI that turn the office’s records into insight and suggestions, for staff to act on."
+      },
+      "business-applications": {
+        "label": "Business applications",
+        "hint": "The system of record for each kind of work, where it’s tracked and done."
+      },
+      "worker-productivity": {
+        "label": "Worker productivity",
+        "hint": "What staff write, collaborate, and draft in, alongside the business applications."
+      },
+      "connections": {
+        "label": "Connections",
+        "hint": "Exchanges with government-wide services and other agencies’ systems, such as SAM.gov, Grants.gov, and Treasury’s."
+      },
+      "data-records": {
+        "label": "Data and records",
+        "hint": "Where the office’s records and content are stored, searched, and kept on their schedules."
+      },
+      "security-identity": {
+        "label": "Security and identity",
+        "hint": "Who gets into each system, and a watch on what they do there, under everything else."
+      }
+    },
+    "earlierLayers": {
+      "processing": {
+        "label": "Processing service",
+        "hint": "Specialized processing on the records, such as search and review."
+      },
+      "infrastructure": {
+        "label": "Infrastructure",
+        "hint": "Shared services every system relies on, such as sign-on."
+      }
+    },
+    "approaches": {
+      "product": "Configure a product",
+      "platform": "Extend a platform the agency has",
+      "combine": "Combine tools",
+      "build": "Build to fit"
+    },
+    "fields": {
+      "parts": {
+        "label": "What it’s made of",
+        "definition": "The main pieces of the pattern."
+      },
+      "strengths": {
+        "label": "Strengths",
+        "definition": "What the pattern does well."
+      },
+      "fitsWhen": {
+        "label": "Fits when",
+        "definition": "Situations where the pattern is a good fit."
+      },
+      "watchFor": {
+        "label": "Watch for",
+        "definition": "Tradeoffs and risks to plan for."
+      }
+    }
+  },
+  "outcome": {
+    "themes": {
+      "timely": {
+        "label": "Timely",
+        "hint": "Things happen when they should, and backlogs don’t pile up."
+      },
+      "fair-accessible": {
+        "label": "Fair and accessible",
+        "hint": "Open to everyone eligible, and judged on the stated rules."
+      },
+      "easy-to-use": {
+        "label": "Easy to use",
+        "hint": "People can find, use, and get help with the service."
+      },
+      "integrity": {
+        "label": "Integrity",
+        "hint": "Money and authority go to the right hands, and fraud is prevented."
+      },
+      "results": {
+        "label": "Results",
+        "hint": "The mission achieves its purpose, economically."
+      },
+      "accountable": {
+        "label": "Accountable",
+        "hint": "Decisions hold up, problems get fixed, and concerns can be raised safely."
+      },
+      "transparent": {
+        "label": "Transparent",
+        "hint": "The work and the spending are open to view."
+      }
+    }
+  },
+  "capability": {
+    "stages": {
+      "plan-prepare": {
+        "label": "Plan and prepare",
+        "hint": "Setting direction, programs, rules, and readiness."
+      },
+      "reach-take-in": {
+        "label": "Reach and take in",
+        "hint": "Telling people what’s offered, and taking in requests, applications, reports, and data."
+      },
+      "assess-decide": {
+        "label": "Assess and decide",
+        "hint": "Reviewing, evaluating, investigating, and determining."
+      },
+      "deliver-operate": {
+        "label": "Deliver and operate",
+        "hint": "Providing the service, paying, and running the operation."
+      },
+      "monitor-correct": {
+        "label": "Monitor and correct",
+        "hint": "Watching how things go, enforcing, and resolving disputes and appeals."
+      },
+      "report-close": {
+        "label": "Report and close",
+        "hint": "Closing out, publishing, reporting, and learning."
+      },
+      "across-the-work": {
+        "label": "Across the work",
+        "hint": "Shared foundations any mission uses."
+      }
+    }
+  },
+  "requirement": {
+    "kinds": {
+      "timeliness": {
+        "label": "Timeliness",
+        "hint": "Deadlines, time standards, and schedules."
+      },
+      "checks-controls": {
+        "label": "Checks and controls",
+        "hint": "Eligibility and identity checks, conflicts of interest, approvals, and payment holds."
+      },
+      "decisions-on-record": {
+        "label": "Decisions on the record",
+        "hint": "Documenting what was decided and why, and keeping it."
+      },
+      "privacy-security": {
+        "label": "Privacy and security",
+        "hint": "Protecting information, people’s identities, and access to them."
+      },
+      "transparency-reporting": {
+        "label": "Transparency and reporting",
+        "hint": "Publishing, posting, and reporting to oversight bodies."
+      },
+      "service-access": {
+        "label": "Service and access",
+        "hint": "Notices, help, status, plain language, and access for people with disabilities or limited English."
+      },
+      "fairness-due-process": {
+        "label": "Fairness and due process",
+        "hint": "Stated criteria, equal treatment, and rights to appeal, challenge, or be heard."
+      }
+    }
+  },
+  "resource": {
+    "kinds": {
+      "video": {
+        "label": "Video",
+        "hint": "Recorded talks, walkthroughs, and explainers."
+      },
+      "course": {
+        "label": "Course",
+        "hint": "Training, on demand or scheduled."
+      },
+      "guide": {
+        "label": "Guide",
+        "hint": "Handbooks, playbooks, and how-tos."
+      },
+      "site": {
+        "label": "Site",
+        "hint": "Program sites and portals to know."
+      },
+      "community": {
+        "label": "Community",
+        "hint": "Councils, communities of practice, and forums."
+      },
+      "dataset": {
+        "label": "Dataset",
+        "hint": "Data to explore, compare, or build on."
+      },
+      "tool": {
+        "label": "Tool",
+        "hint": "Free tools, calculators, and open-source software."
+      },
+      "template": {
+        "label": "Template",
+        "hint": "Templates, samples, and checklists to start from."
+      },
+      "demo": {
+        "label": "Demo",
+        "hint": "A working example to see or try."
+      },
+      "service": {
+        "label": "Service",
+        "hint": "Help a firm offers, such as an assessment or an implementation."
+      },
+      "product": {
+        "label": "Product",
+        "hint": "A product, or a feature of one, that fits."
+      },
+      "case-study": {
+        "label": "Case study",
+        "hint": "How an agency did it, and what it learned."
+      }
+    }
+  },
+  "sourceKinds": {
+    "official-reference": "Official reference",
+    "research": "Research",
+    "background": "Background",
+    "other": "Other"
+  },
+  "statuses": {
+    "reference": "Reference",
+    "draft": "Draft",
+    "deprecated": "Deprecated"
+  }
+}

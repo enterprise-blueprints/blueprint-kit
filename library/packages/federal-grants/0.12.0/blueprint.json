@@ -1,0 +1,2258 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "org.enterprise-blueprints.federal-grants",
+  "idPrefix": "eb",
+  "version": "0.12.0",
+  "title": "Grants Management — Awarding and Overseeing Financial Assistance",
+  "description": "U.S. federal grants management blueprint: one mission with the outcomes it seeks and ways to measure them, nine capabilities from program planning through closeout with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for grants results and for grants operations. It follows the Uniform Guidance in 2 CFR 200, and builds on Common Capabilities for case management, records, identity and access, data protection, and security logging.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-10-30",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies that award grants and cooperative agreements"
+  ],
+  "tags": [
+    "grants-management",
+    "financial-assistance",
+    "uniform-guidance",
+    "payment-integrity",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.12.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:uniform-guidance",
+      "title": "2 CFR Part 200 — Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards",
+      "url": "https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The Uniform Guidance. Among much else: notices of funding opportunity posted on Grants.gov and generally open at least 60 days (§ 200.204), merit review (§ 200.205), review of applicants’ risk (§ 200.206), payment (§ 200.305), performance reporting no more often than quarterly and no less than annually (§ 200.329), remedies for noncompliance (§ 200.339), closeout (§ 200.344), the single audit for entities spending $1,000,000 or more a year (§ 200.501), and management decisions within six months (§ 200.521)."
+    },
+    {
+      "id": "src:award-reporting-2-cfr-170",
+      "title": "2 CFR Part 170 — Reporting Subaward and Executive Compensation Information",
+      "url": "https://www.ecfr.gov/current/title-2/subtitle-A/chapter-I/part-170",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The award term that has recipients report first-tier subawards of $30,000 or more no later than the end of the month after the subaward is made, under the Federal Funding Accountability and Transparency Act."
+    },
+    {
+      "id": "src:sam-registration-2-cfr-25",
+      "title": "2 CFR Part 25 — Unique Entity Identifier and System for Award Management",
+      "url": "https://www.ecfr.gov/current/title-2/subtitle-A/chapter-I/part-25",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Applicants register in SAM.gov and have a Unique Entity Identifier before they apply, with limited exceptions, and keep their registration current while they hold an award."
+    },
+    {
+      "id": "src:payment-integrity-31-usc-3352",
+      "title": "31 U.S.C. § 3352 — Estimates of improper payments and reports on actions to reduce improper payments",
+      "url": "https://www.govinfo.gov/link/uscode/31/3352?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Part of the Payment Integrity Information Act. Agencies review their programs at least once every 3 fiscal years for risk of significant improper payments, estimate them for programs at risk, and report the causes, corrective actions, and recoveries."
+    },
+    {
+      "id": "src:grants-gov",
+      "title": "Grants.gov",
+      "url": "https://www.grants.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Where agencies post funding opportunities and where most applicants find them and apply."
+    },
+    {
+      "id": "src:sam-gov",
+      "title": "SAM.gov — System for Award Management",
+      "url": "https://sam.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Entity registrations, exclusions, and responsibility and qualification records agencies check before an award. Since March 2025, recipients also report subawards here, after FSRS.gov was retired."
+    },
+    {
+      "id": "src:do-not-pay",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — Do Not Pay",
+      "url": "https://fiscal.treasury.gov/dnp/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A free service that helps agencies check a recipient’s identity and eligibility before making an award or a payment."
+    },
+    {
+      "id": "src:asap-gov",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — ASAP.gov",
+      "url": "https://fiscal.treasury.gov/asap/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The electronic system many agencies use to pay recipients, who draw down federal funds by requesting payments against the accounts agencies fund."
+    },
+    {
+      "id": "src:usaspending",
+      "title": "USAspending.gov",
+      "url": "https://www.usaspending.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The official public source of federal spending data, including the financial assistance awards agencies report."
+    },
+    {
+      "id": "src:federal-audit-clearinghouse",
+      "title": "Federal Audit Clearinghouse",
+      "url": "https://www.fac.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Run by GSA, the place where single audits of federal award recipients are submitted, and where agencies and the public review them."
+    },
+    {
+      "id": "src:payment-accuracy",
+      "title": "PaymentAccuracy.gov",
+      "url": "https://www.paymentaccuracy.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Agencies’ reported improper payment rates, amounts, causes, and recoveries, by program."
+    },
+    {
+      "id": "src:gone-act",
+      "title": "Public Law 114-117 — Grants Oversight and New Efficiency Act (GONE Act)",
+      "url": "https://www.govinfo.gov/content/pkg/PLAW-114publ117/html/PLAW-114publ117.htm",
+      "kind": "background",
+      "publicationDate": "2016-01-28",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Had agencies report grant awards that had expired for 2 years or more without being closed out, and why, and then report which they closed. It shows how expired awards can pile up."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:awarding-overseeing-federal-grants",
+      "type": "mission",
+      "title": "Grants Management",
+      "description": "Award federal grants and cooperative agreements through fair, open competition to recipients able to manage them, pay them as their work needs funds, oversee how the money is used and what it achieves, resolve audit findings, close each award on time, and make the spending public.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "tagline": "Awarding and overseeing grants",
+        "sector": "public-sector",
+        "scope": "US-federal-grants",
+        "principles": [
+          "Each award is one record from the funding announcement to closeout",
+          "Applications arrive from Grants.gov, and award data goes to USAspending.gov, without retyping",
+          "Recipients have one place to apply, report, and ask for changes",
+          "Every applicant gets the same SAM.gov checks, recorded with the award decision",
+          "Payments go through Treasury, against accounts set up from each award",
+          "Analytics point monitoring at the highest risks, and staff decide"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:open-fair-competition",
+      "type": "outcome",
+      "title": "Funding is open to everyone eligible and fairly reviewed",
+      "description": "Funding opportunities are posted on Grants.gov with enough time to apply, generally at least 60 days, and applications are reviewed on their merits against criteria the notice describes.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:grants-gov"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "opportunities-open-60-days",
+            "title": "Funding opportunities open at least 60 days",
+            "description": "The share of the year’s funding opportunities that stayed open for applications at least 60 calendar days, the period the Uniform Guidance generally expects.",
+            "sourceIds": [
+              "src:uniform-guidance",
+              "src:grants-gov"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:awards-to-capable-recipients",
+      "type": "outcome",
+      "title": "Awards go to eligible recipients able to manage them",
+      "description": "Before each award, the agency checks the applicant’s eligibility and integrity records and the risk it poses, and sets conditions where the risk calls for them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:sam-gov",
+        "src:do-not-pay"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "awards-with-risk-review",
+            "title": "Awards with a documented risk review",
+            "description": "The share of new awards whose file shows the eligibility, integrity, and risk checks done before the award, and any conditions they led to.",
+            "sourceIds": [
+              "src:uniform-guidance",
+              "src:sam-gov"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:funds-used-as-allowed",
+      "type": "outcome",
+      "title": "Funds are paid as needed and used as the award allows",
+      "description": "Recipients get funds when their work needs them, and payments that shouldn’t have been made are prevented, or found and recovered.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:payment-integrity-31-usc-3352",
+        "src:payment-accuracy"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "improper-payment-rate",
+            "title": "Improper payment rate",
+            "description": "For programs at risk of significant improper payments, the estimated share of payments that were improper or couldn’t be verified. Agencies report it each year, and PaymentAccuracy.gov publishes it.",
+            "sourceIds": [
+              "src:payment-integrity-31-usc-3352",
+              "src:payment-accuracy"
+            ]
+          },
+          {
+            "id": "improper-payments-recovered",
+            "title": "Improper payments recovered",
+            "description": "The amount of identified overpayments recovered, compared with the amount identified for recovery.",
+            "sourceIds": [
+              "src:payment-integrity-31-usc-3352",
+              "src:payment-accuracy"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:applying-is-straightforward",
+      "type": "outcome",
+      "title": "Applying for and managing an award is straightforward",
+      "description": "Notices are written in plain language with everything applicants need, answers to questions are posted for everyone, and the agency asks for only what it needs, when it needs it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "applications-set-aside",
+            "title": "Applications set aside before review",
+            "description": "The share of applications set aside as ineligible or incomplete before merit review. A high share can mean a notice wasn’t clear about who can apply or what to send. The office sets its own target."
+          }
+        ],
+        "theme": "easy-to-use"
+      }
+    },
+    {
+      "id": "eb:outcome:program-results-achieved",
+      "type": "outcome",
+      "title": "Awards achieve what they were made for",
+      "description": "Recipients report their progress on schedule, the agency reviews it against the award’s goals, and problems are caught while there’s time to fix them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "performance-reports-on-time",
+            "title": "Performance reports received on time",
+            "description": "The share of required performance reports received by their due date, which is 30 days after a quarterly or semiannual period, or 90 days after an annual one.",
+            "sourceIds": [
+              "src:uniform-guidance"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:audit-findings-resolved",
+      "type": "outcome",
+      "title": "Audit findings are resolved promptly",
+      "description": "The agency decides what each audit finding about its awards requires within six months, and follows up until the recipient has corrected it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:federal-audit-clearinghouse"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "management-decisions-on-time",
+            "title": "Management decisions within six months",
+            "description": "The share of audit findings about the agency’s awards that got a management decision within six months of the Federal Audit Clearinghouse accepting the audit report.",
+            "sourceIds": [
+              "src:uniform-guidance",
+              "src:federal-audit-clearinghouse"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:awards-closed-on-time",
+      "type": "outcome",
+      "title": "Awards are closed out on time",
+      "description": "Recipients send their final reports within 120 days after the period of performance ends, and the agency closes each award within a year, returning unspent funds.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:gone-act"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "awards-closed-within-a-year",
+            "title": "Awards closed within a year",
+            "description": "The share of awards whose period of performance ended that were closed out within one year.",
+            "sourceIds": [
+              "src:uniform-guidance"
+            ]
+          },
+          {
+            "id": "expired-awards-open",
+            "title": "Expired awards not yet closed",
+            "description": "The number of awards whose period of performance ended 2 years ago or more that are still open, and their undisbursed balances.",
+            "sourceIds": [
+              "src:gone-act"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:spending-public",
+      "type": "outcome",
+      "title": "The spending is open to view",
+      "description": "Each award, and recipients’ first-tier subawards, are reported for publication on USAspending.gov, so the public can see who receives federal funds and for what.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usaspending",
+        "src:award-reporting-2-cfr-170"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "awards-published",
+            "title": "Awards published on USAspending.gov",
+            "description": "The share of the agency’s financial assistance awards that appear on USAspending.gov with complete, accurate data, and how soon after the award they appear.",
+            "sourceIds": [
+              "src:usaspending"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:capability:program-planning",
+      "type": "capability",
+      "title": "Program Planning & Notice Design",
+      "description": "Ability to design each grant program before announcing it, with clear goals and objectives, how performance will be measured, and its Assistance Listing, and to write each funding notice in plain language with everything applicants need to decide whether and how to apply.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "applicabilityNotes": "The program’s statute sets its purpose and often its eligibility. Formula and mandatory programs have less to design, but still set goals and measures.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:funding-opportunities-applications",
+      "type": "capability",
+      "title": "Funding Opportunities & Applications",
+      "description": "Ability to announce each funding opportunity on Grants.gov with its goals, eligibility, criteria, and deadlines, receive applications through Grants.gov and any other allowed channel, and check each one for eligibility and completeness.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:grants-gov",
+        "src:sam-registration-2-cfr-25"
+      ],
+      "applicabilityNotes": "Some programs are formula or mandatory awards with no competition; the program’s statute and regulations set who can apply and how.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:merit-review-selection",
+      "type": "capability",
+      "title": "Merit Review & Selection",
+      "description": "Ability to review discretionary applications on their merits against the written criteria the notice described, with reviewers free of conflicts of interest, and to record how each award decision was made.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "applicabilityNotes": "Merit review applies to discretionary awards unless a statute says otherwise. Agencies set their own written standards for it.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:risk-review-award",
+      "type": "capability",
+      "title": "Risk Review & Award",
+      "description": "Ability to check each applicant’s eligibility, integrity, and risk before an award, using SAM.gov, Do Not Pay, and its financial stability, management systems, past performance, and audit findings, and to issue the award with its terms and any specific conditions.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:sam-gov",
+        "src:do-not-pay"
+      ],
+      "applicabilityNotes": "Checks of responsibility and qualification records in SAM.gov are required when the federal share is expected to exceed the simplified acquisition threshold. An agency can still award to an applicant that falls short if conditions can address the risk.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:payments-to-recipients",
+      "type": "capability",
+      "title": "Payments to Recipients",
+      "description": "Ability to pay recipients in a way that keeps the time between payment and their spending short, by advance or by reimbursement, to review payment requests, and to hold or stop payments when the award’s terms call for it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:asap-gov",
+        "src:do-not-pay"
+      ],
+      "applicabilityNotes": "States are paid under their own Treasury agreements. Many agencies pay through ASAP.gov or another federal payment system.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:award-monitoring",
+      "type": "capability",
+      "title": "Monitoring & Performance Reporting",
+      "description": "Ability to collect recipients’ financial and performance reports on schedule, review them against the award’s goals and budget, monitor each award as its risk calls for, including site visits, and approve changes to awards.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "applicabilityNotes": "Reports can be required no more often than quarterly and no less often than annually, unless specific conditions apply.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:audit-resolution-remedies",
+      "type": "capability",
+      "title": "Audit Resolution & Remedies",
+      "description": "Ability to find the single audit findings about the agency’s awards, decide what each one requires within six months, follow up until the recipient corrects it, and take remedies for noncompliance when needed, such as conditions, withheld payments, or termination.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:federal-audit-clearinghouse"
+      ],
+      "applicabilityNotes": "A single audit is required of recipients that spend $1,000,000 or more a year in federal awards. Remedies must follow the steps the Uniform Guidance and the award’s terms set out.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:award-closeout",
+      "type": "capability",
+      "title": "Closeout",
+      "description": "Ability to collect each recipient’s final reports within 120 days after the period of performance ends, reconcile payments and costs, return or deobligate unspent funds, and close the award within a year.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:gone-act"
+      ],
+      "applicabilityNotes": "The agency can extend the time for final reports when the recipient asks and the reason supports it. Closing an award doesn’t end the right to disallow costs or collect amounts due.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:capability:award-transparency-reporting",
+      "type": "capability",
+      "title": "Award & Subaward Reporting",
+      "description": "Ability to report each financial assistance award for publication on USAspending.gov, keep the data accurate and complete, and see that recipients report their first-tier subawards in SAM.gov.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usaspending",
+        "src:award-reporting-2-cfr-170",
+        "src:sam-gov"
+      ],
+      "applicabilityNotes": "Some information is withheld from publication, such as details that would identify individual recipients.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:design-program-before-notice",
+      "type": "requirement",
+      "title": "Design each program before announcing it",
+      "description": "Before announcing a funding opportunity, set the program’s goals and objectives, how its performance will be measured against them, and its Assistance Listing, aligned with the agency’s strategic goals.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:write-notices-plainly",
+      "type": "requirement",
+      "title": "Write each funding notice in plain language",
+      "description": "Write each notice of funding opportunity in plain language, with a short plain-language summary, the information the Uniform Guidance’s Appendix I calls for, and no more than applicants need at the application stage, and post answers to applicants’ questions where everyone can see them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:grants-gov"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:post-opportunities",
+      "type": "requirement",
+      "title": "Post each funding opportunity on Grants.gov",
+      "description": "Post each notice of funding opportunity on Grants.gov with its goals, eligibility, review criteria, and deadlines, and keep it open at least 60 days unless a shorter period is justified.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:grants-gov"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:check-applications",
+      "type": "requirement",
+      "title": "Check each application for eligibility and completeness",
+      "description": "Confirm each applicant is eligible, is registered in SAM.gov, and has included its Unique Entity Identifier, and that the application has what the notice asks for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:sam-registration-2-cfr-25"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:review-against-criteria",
+      "type": "requirement",
+      "title": "Review applications against the published criteria",
+      "description": "Score each discretionary application against the criteria the notice described, following the agency’s written merit review standards, and keep the scores and comments.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:manage-reviewer-conflicts",
+      "type": "requirement",
+      "title": "Keep reviewers free of conflicts of interest",
+      "description": "Have each reviewer disclose conflicts before seeing applications, and keep anyone with a conflict away from those applications.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:check-eligibility-integrity",
+      "type": "requirement",
+      "title": "Check eligibility and integrity records before an award",
+      "description": "Check SAM.gov registration, exclusions, and, where required, responsibility and qualification records, and check Do Not Pay, before making an award.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:sam-gov",
+        "src:do-not-pay"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:document-risk-review",
+      "type": "requirement",
+      "title": "Document each applicant’s risk, and any conditions it calls for",
+      "description": "Record the review of the applicant’s financial stability, management systems, past performance, and audit findings, and any specific conditions added to the award because of them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:pay-as-needed",
+      "type": "requirement",
+      "title": "Pay recipients as their work needs funds",
+      "description": "Keep advances to the recipient’s immediate cash needs, and pay reimbursement requests within 30 days unless the request looks improper.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:asap-gov"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:review-payment-requests",
+      "type": "requirement",
+      "title": "Review payment requests, and hold them when the terms call for it",
+      "description": "Look at payment requests against the award’s budget and status, and hold or stop payments under the award’s terms, such as when required reports are overdue.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:collect-reports-on-schedule",
+      "type": "requirement",
+      "title": "Collect financial and performance reports on schedule",
+      "description": "Set each award’s reporting schedule, collect its financial and performance reports by their due dates, and follow up on late ones.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:monitor-by-risk",
+      "type": "requirement",
+      "title": "Monitor each award as its risk calls for",
+      "description": "Plan monitoring, such as desk reviews and site visits, by each award’s risk, review reports against the award’s goals and budget, and record what was found and done.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:decide-audit-findings",
+      "type": "requirement",
+      "title": "Issue a management decision on each audit finding within six months",
+      "description": "Find the single audit findings about the agency’s awards in the Federal Audit Clearinghouse, and decide within six months of the audit report’s acceptance what each one requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:federal-audit-clearinghouse"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:track-corrective-action",
+      "type": "requirement",
+      "title": "Follow up on corrective action, and take remedies when needed",
+      "description": "Track each recipient’s corrective action until it’s done, and when noncompliance isn’t corrected, take a remedy the Uniform Guidance allows, with notice to the recipient.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:collect-final-reports",
+      "type": "requirement",
+      "title": "Collect final reports within 120 days",
+      "description": "Remind recipients as the period of performance ends, collect their final financial and performance reports within 120 days, and decide requests for more time.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:close-within-a-year",
+      "type": "requirement",
+      "title": "Close each award within a year after it ends",
+      "description": "Reconcile payments and costs, settle any amounts due, deobligate what’s left, and complete closeout within one year after the period of performance ends.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:gone-act"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:report-awards",
+      "type": "requirement",
+      "title": "Report each award for publication on USAspending.gov",
+      "description": "Report each financial assistance award, and each change to it, for publication on USAspending.gov, and correct errors when they’re found.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usaspending"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:check-subaward-reporting",
+      "type": "requirement",
+      "title": "See that recipients report their subawards",
+      "description": "Include the subaward reporting term in each award, and follow up when recipients don’t report first-tier subawards of $30,000 or more in SAM.gov by the end of the month after they’re made.",
+      "status": "reference",
+      "sourceIds": [
+        "src:award-reporting-2-cfr-170",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grants-management",
+      "type": "implementationPattern",
+      "title": "Grants Management",
+      "description": "An example architecture: one grants system that carries each award from the funding announcement through applications, merit review, risk checks, award, payments, monitoring, and closeout, with a portal where recipients apply, report, and ask for changes.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Funding announcements prepared in the system and posted to Grants.gov",
+          "Applications received from Grants.gov, with eligibility and completeness checks",
+          "Reviewer assignments, conflict disclosures, and scoring against each notice’s criteria",
+          "Risk reviews and award documents with standard terms and any specific conditions",
+          "A recipient portal for reports, change requests, and closeout",
+          "Monitoring plans, site visit records, and audit findings for each award",
+          "The award data the agency reports to USAspending.gov"
+        ],
+        "strengths": [
+          "One record for each award, from announcement to closeout",
+          "Recipients have one place to apply, report, and ask for changes"
+        ],
+        "fitsWhen": [
+          "The agency runs grant programs with similar steps",
+          "Its current tools are spreadsheets, email, or an aging custom system"
+        ],
+        "watchFor": [
+          "Programs with unusual rules, such as formula awards, may not fit standard steps",
+          "Moving open awards from an old system mid-stream needs careful planning",
+          "Connections to the agency’s financial system and payment system often take the most work"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A grants management product",
+            "description": "A product made for grants, configured for the agency’s programs and run by the agency.",
+            "strengths": [
+              "Built around the Uniform Guidance, so much of the process comes ready"
+            ],
+            "fitsWhen": [
+              "The agency runs several grant programs, with staff to administer a system"
+            ],
+            "watchFor": [
+              "Another product to buy, secure, and keep up"
+            ]
+          },
+          {
+            "id": "shared-service",
+            "approach": "product",
+            "title": "A federal grants shared service",
+            "description": "A grants system another federal agency runs as a shared service, configured for the agency’s programs, under an agreement that sets the service, its costs, and who does what.",
+            "strengths": [
+              "The provider keeps the system current with federal rules and systems",
+              "The agency doesn’t buy, host, or secure a system of its own",
+              "Recipients may already know the system from other agencies’ awards"
+            ],
+            "fitsWhen": [
+              "The agency’s grant programs are small or few",
+              "A shared service already serves programs like the agency’s"
+            ],
+            "watchFor": [
+              "Changes for the agency’s programs wait on the provider’s priorities",
+              "Getting the agency’s data out, for reporting or a later move, needs agreeing up front",
+              "Costs can grow with the number of awards and users"
+            ]
+          },
+          {
+            "id": "agency-platform",
+            "approach": "platform",
+            "title": "The agency’s shared case platform",
+            "description": "Application and award records, their steps, and a recipient portal, built on the agency’s shared case platform.",
+            "strengths": [
+              "Uses licenses, skills, and security approvals the agency already has",
+              "Grants work can share a platform with the agency’s other case work"
+            ],
+            "fitsWhen": [
+              "The agency already runs a platform like this, with people who configure it",
+              "Its programs are fairly simple, with few awards each"
+            ],
+            "watchFor": [
+              "Merit review, reporting forms, and the recipient portal often take more building than expected",
+              "Federal reporting, such as to USAspending.gov, has to be built and kept up",
+              "Rules change with the Uniform Guidance, and someone has to update the platform each time"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grants-management-product",
+      "type": "implementationPattern",
+      "title": "Grants Management Product",
+      "description": "An example architecture: a grants management product, configured for the agency’s programs, that carries each award from the funding announcement through applications, review, risk checks, award, payments, monitoring, and closeout, with a portal where recipients apply and report.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:grants-management",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Funding announcements prepared in the product and posted to Grants.gov",
+          "Applications received from Grants.gov, with eligibility and completeness checks",
+          "Reviewer assignments, conflict disclosures, and scoring against each notice’s criteria",
+          "Risk reviews and award documents with standard terms and any specific conditions",
+          "A recipient portal for reports, change requests, and closeout",
+          "Monitoring plans, site visit records, and audit findings for each award",
+          "The award data the agency reports to USAspending.gov"
+        ],
+        "strengths": [
+          "One record for each award, from announcement to closeout",
+          "Built around the Uniform Guidance, so much of the process comes ready",
+          "Recipients have one place to apply, report, and ask for changes"
+        ],
+        "fitsWhen": [
+          "The agency runs several grant programs with similar steps",
+          "Its current tools are spreadsheets, email, or an aging custom system"
+        ],
+        "watchFor": [
+          "Programs with unusual rules, such as formula awards, may not fit the product’s standard steps",
+          "Moving open awards from an old system mid-stream needs careful planning",
+          "Connections to the agency’s financial system and payment system often take the most work"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A grants management product"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grants-shared-service",
+      "type": "implementationPattern",
+      "title": "A Federal Grants Shared Service",
+      "description": "An example architecture: the agency uses a grants management system another federal agency runs as a shared service, configured for its programs, instead of running its own.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:grants-management",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "The provider’s grants system, with the agency’s programs, forms, and workflows set up in it",
+          "An agreement that sets the service, its costs, and who does what",
+          "The provider’s connections to Grants.gov, payment systems, and USAspending.gov",
+          "The agency’s own staff for programs, awards, and monitoring"
+        ],
+        "strengths": [
+          "The provider keeps the system current with federal rules and systems",
+          "The agency doesn’t buy, host, or secure a system of its own",
+          "Recipients may already know the system from other agencies’ awards"
+        ],
+        "fitsWhen": [
+          "The agency’s grant programs are small or few",
+          "A shared service already serves programs like the agency’s"
+        ],
+        "watchFor": [
+          "Changes for the agency’s programs wait on the provider’s priorities",
+          "Getting the agency’s data out, for reporting or a later move, needs agreeing up front",
+          "Costs can grow with the number of awards and users"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A federal grants shared service"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grants-on-shared-platform",
+      "type": "implementationPattern",
+      "title": "Grants on the Agency’s Shared Platform",
+      "description": "An example architecture: grants management built on the agency’s shared case platform, with each application and award as a record that moves through review, award, monitoring, and closeout, and a portal for recipients.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:grants-management",
+      "sourceIds": [
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Application and award records, with their status, dates, amounts, and documents",
+          "Steps and approvals for review, risk checks, award, and closeout",
+          "A recipient portal for reports and change requests",
+          "A connection to Grants.gov for announcements and applications",
+          "Reports on each program’s awards, monitoring, and closeout"
+        ],
+        "strengths": [
+          "Uses licenses, skills, and security approvals the agency already has",
+          "Grants work can share a platform with the agency’s other case work",
+          "Each program can change its steps by configuration"
+        ],
+        "fitsWhen": [
+          "The agency already runs a platform like this, with people who configure it",
+          "Its programs are fairly simple, with few awards each"
+        ],
+        "watchFor": [
+          "Merit review, reporting forms, and the recipient portal often take more building than expected",
+          "Federal reporting, such as to USAspending.gov, has to be built and kept up",
+          "Rules change with the Uniform Guidance, and someone has to update the platform each time"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s shared case platform"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grants-gov-system-to-system",
+      "type": "implementationPattern",
+      "title": "Applications from Grants.gov by System-to-System Connection",
+      "description": "An example architecture: the agency’s grants system connects to Grants.gov’s system-to-system service, so funding opportunities are posted and applications arrive as records with their forms and attachments, instead of being downloaded by hand.",
+      "status": "reference",
+      "sourceIds": [
+        "src:grants-gov",
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A connection in the agency’s grants system to Grants.gov’s system-to-system service",
+          "Posting of funding opportunities from the grants system",
+          "Retrieval of each application, with its forms and attachments, into an application record",
+          "Status sent back to Grants.gov, so applicants can see where their application is",
+          "Monitoring for applications that fail to arrive"
+        ],
+        "strengths": [
+          "No downloading and retyping of applications",
+          "Applicants use the site most of them already know"
+        ],
+        "fitsWhen": [
+          "The agency runs its own grants system, product or built",
+          "It gets many applications for each opportunity"
+        ],
+        "watchFor": [
+          "Changes to Grants.gov’s forms and service need following",
+          "Applications that fail to arrive must be noticed before the deadline passes"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "A connection to Grants.gov’s system-to-system service"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:payments-through-asap",
+      "type": "implementationPattern",
+      "title": "Payments through Treasury’s ASAP.gov",
+      "description": "An example architecture: the agency enrolls each recipient in ASAP.gov, funds an account for each award from its financial system, and recipients draw down funds as they need them, within the controls the agency sets.",
+      "status": "reference",
+      "sourceIds": [
+        "src:asap-gov",
+        "src:uniform-guidance"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Recipient enrollment in ASAP.gov, with their banking details kept by Treasury",
+          "An account for each award, funded from the agency’s financial system as the award is obligated",
+          "Controls the agency sets, such as review of requests over a set amount",
+          "Drawdown data sent back to the agency’s financial and grants systems",
+          "Suspension of an account when the award’s terms call for it"
+        ],
+        "strengths": [
+          "Treasury runs the payment system and holds recipients’ banking details",
+          "Recipients draw funds as they need them, which keeps the time before they spend short",
+          "Many recipients already use it for other agencies’ awards"
+        ],
+        "fitsWhen": [
+          "The agency pays recipients by advance or drawdown",
+          "Its financial system can send obligations to ASAP.gov"
+        ],
+        "watchFor": [
+          "Drawdown data has to be reconciled with the agency’s financial and grants records",
+          "Controls on requests need setting for each award, or large drawdowns go through unchecked"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "Treasury’s ASAP.gov"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:grant-risk-analytics",
+      "type": "implementationPattern",
+      "title": "Grant Risk Analytics",
+      "description": "An example architecture: an analytics workspace that brings together SAM.gov and Do Not Pay results, single audit findings, past performance, and drawdown patterns for each applicant and recipient, and suggests where risk reviews and monitoring should look first, with the reasons.",
+      "status": "reference",
+      "sourceIds": [
+        "src:uniform-guidance",
+        "src:sam-gov",
+        "src:do-not-pay",
+        "src:federal-audit-clearinghouse"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Regular feeds from SAM.gov, Do Not Pay, the Federal Audit Clearinghouse, and the agency’s grants and payment systems",
+          "A risk profile for each applicant and recipient, with the facts behind it",
+          "Flags for patterns worth a closer look, such as late reports or large drawdowns near an award’s end",
+          "Suggested monitoring priorities for the year, which program staff accept or change",
+          "A record of what was flagged, what staff decided, and what came of it"
+        ],
+        "strengths": [
+          "Risk reviews start from the facts already known about an applicant",
+          "Monitoring goes where the risk is, instead of being spread evenly",
+          "Results show which risk signals are worth keeping"
+        ],
+        "fitsWhen": [
+          "The agency makes many awards, too many to monitor each one closely",
+          "Its grants and payment data can be brought together regularly"
+        ],
+        "watchFor": [
+          "A flag isn’t a finding, so staff decide each award, condition, and monitoring step",
+          "Risk scores can be unfair to new or small applicants with little history, so how they’re used needs care",
+          "Combining data sets may need agreements, and privacy rules apply to information about individuals"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "An analytics workspace"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:award-data-to-usaspending",
+      "type": "implementationPattern",
+      "title": "Award Data to USAspending.gov from the Grants System",
+      "description": "An example architecture: the grants system produces the agency’s financial assistance award data on a schedule, checks it against the agency’s financial records, and submits it for publication on USAspending.gov, with errors sent back to the staff who can fix them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usaspending",
+        "src:award-reporting-2-cfr-170"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "An extract of new awards and changes from the grants system, on a schedule",
+          "Checks against the agency’s financial records before each submission",
+          "Submission for publication on USAspending.gov, with the results recorded",
+          "A list of errors and missing data, sent to the staff who own each award",
+          "A list of awards whose recipients haven’t reported subawards"
+        ],
+        "strengths": [
+          "Award data is reported on time without a manual scramble",
+          "Errors are found and fixed at the source"
+        ],
+        "fitsWhen": [
+          "The agency’s grants system holds the award data, but reporting is manual today"
+        ],
+        "watchFor": [
+          "The data standard changes from time to time, and the extract has to follow",
+          "Fixes made in the submission instead of the grants system come back next time"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "Scheduled submissions from the grants system"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:applying-on-grants-gov",
+      "type": "resource",
+      "title": "Intro to Grants.gov — Applying for a Federal Grant",
+      "description": "A few minutes on how an organization applies for a federal grant through a Grants.gov workspace, from finding the opportunity to submitting. Some screens have changed since it was recorded in 2018.",
+      "status": "reference",
+      "attributes": {
+        "kind": "video",
+        "url": "https://www.youtube.com/watch?v=fIZZH74021I",
+        "by": "Grants.gov",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:grants-gov-applicant-training",
+      "type": "resource",
+      "title": "Grants.gov applicant training",
+      "description": "Grants.gov’s videos and guides for applicants, step by step through registering, creating a workspace, adding participants, and completing forms. Useful to point applicants to, and to see what they go through.",
+      "status": "reference",
+      "attributes": {
+        "kind": "course",
+        "url": "https://grants.gov/applicants/applicant-training",
+        "by": "Grants.gov",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:simpler-grants-gov",
+      "type": "resource",
+      "title": "Simpler.Grants.gov",
+      "description": "Where the next generation of Grants.gov is being built in the open, with open-source code, a simpler search of opportunities, and ways for applicants and agencies to give feedback and vote on features.",
+      "status": "reference",
+      "attributes": {
+        "kind": "tool",
+        "url": "https://simpler.grants.gov/",
+        "by": "U.S. Department of Health and Human Services",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:fac-audit-search",
+      "type": "resource",
+      "title": "Federal Audit Clearinghouse search",
+      "description": "Single audits of grant recipients, searchable by recipient, year, state, program, and findings. Reviewers check an applicant’s audit history here before an award, and follow findings after one.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://app.fac.gov/dissemination/search/",
+        "by": "General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:usaspending-api",
+      "type": "resource",
+      "title": "USAspending API",
+      "description": "The free, documented API behind USAspending.gov, to check what the public sees about an office’s awards against its own records, or to build reports from award data.",
+      "status": "reference",
+      "attributes": {
+        "kind": "tool",
+        "url": "https://api.usaspending.gov/",
+        "by": "Bureau of the Fiscal Service, U.S. Department of the Treasury",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-open-fair-competition",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:open-fair-competition"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-awards-to-capable-recipients",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:awards-to-capable-recipients"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-funds-used-as-allowed",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-applying-is-straightforward",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:applying-is-straightforward"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-program-results-achieved",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:program-results-achieved"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-audit-findings-resolved",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:audit-findings-resolved"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-awards-closed-on-time",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:awards-closed-on-time"
+    },
+    {
+      "id": "rel:awarding-overseeing-federal-grants-seeks-spending-public",
+      "from": "eb:mission:awarding-overseeing-federal-grants",
+      "predicate": "seeks",
+      "to": "eb:outcome:spending-public"
+    },
+    {
+      "id": "rel:program-planning-contributes-to-program-results-achieved",
+      "from": "eb:capability:program-planning",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:program-results-achieved"
+    },
+    {
+      "id": "rel:program-planning-contributes-to-open-fair-competition",
+      "from": "eb:capability:program-planning",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:open-fair-competition"
+    },
+    {
+      "id": "rel:program-planning-contributes-to-applying-is-straightforward",
+      "from": "eb:capability:program-planning",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:applying-is-straightforward"
+    },
+    {
+      "id": "rel:program-planning-satisfies-design-program-before-notice",
+      "from": "eb:capability:program-planning",
+      "predicate": "satisfies",
+      "to": "eb:requirement:design-program-before-notice"
+    },
+    {
+      "id": "rel:program-planning-satisfies-write-notices-plainly",
+      "from": "eb:capability:program-planning",
+      "predicate": "satisfies",
+      "to": "eb:requirement:write-notices-plainly"
+    },
+    {
+      "id": "rel:program-planning-candidate-pattern-grants-management",
+      "from": "eb:capability:program-planning",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management",
+      "coverage": "partial",
+      "description": "Holds each program’s goals and measures, and builds its notices from them. Designing the program is the office’s work with the program’s community."
+    },
+    {
+      "id": "rel:funding-opportunities-applications-contributes-to-open-fair-competition",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:open-fair-competition"
+    },
+    {
+      "id": "rel:funding-opportunities-applications-contributes-to-applying-is-straightforward",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:applying-is-straightforward"
+    },
+    {
+      "id": "rel:funding-opportunities-applications-satisfies-post-opportunities",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "satisfies",
+      "to": "eb:requirement:post-opportunities"
+    },
+    {
+      "id": "rel:funding-opportunities-applications-satisfies-check-applications",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-applications"
+    },
+    {
+      "id": "rel:funding-opportunities-applications-candidate-pattern-grants-management",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:funding-opportunities-applications-candidate-pattern-grants-gov-system-to-system",
+      "from": "eb:capability:funding-opportunities-applications",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-gov-system-to-system",
+      "coverage": "partial",
+      "description": "Brings applications in from Grants.gov. Announcements and eligibility checks happen in the grants system."
+    },
+    {
+      "id": "rel:merit-review-selection-contributes-to-open-fair-competition",
+      "from": "eb:capability:merit-review-selection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:open-fair-competition"
+    },
+    {
+      "id": "rel:merit-review-selection-contributes-to-program-results-achieved",
+      "from": "eb:capability:merit-review-selection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:program-results-achieved"
+    },
+    {
+      "id": "rel:merit-review-selection-satisfies-review-against-criteria",
+      "from": "eb:capability:merit-review-selection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-against-criteria"
+    },
+    {
+      "id": "rel:merit-review-selection-satisfies-manage-reviewer-conflicts",
+      "from": "eb:capability:merit-review-selection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:manage-reviewer-conflicts"
+    },
+    {
+      "id": "rel:merit-review-selection-candidate-pattern-grants-management",
+      "from": "eb:capability:merit-review-selection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:risk-review-award-contributes-to-awards-to-capable-recipients",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:awards-to-capable-recipients"
+    },
+    {
+      "id": "rel:risk-review-award-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:risk-review-award-satisfies-check-eligibility-integrity",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-eligibility-integrity"
+    },
+    {
+      "id": "rel:risk-review-award-satisfies-document-risk-review",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "satisfies",
+      "to": "eb:requirement:document-risk-review"
+    },
+    {
+      "id": "rel:risk-review-award-candidate-pattern-grants-management",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:risk-review-award-candidate-pattern-grant-risk-analytics",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grant-risk-analytics",
+      "coverage": "partial",
+      "description": "Brings the risk information together and suggests where to look. Staff decide each award and its conditions."
+    },
+    {
+      "id": "rel:risk-review-award-candidate-pattern-sam-gov-entity-checks",
+      "from": "eb:capability:risk-review-award",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:sam-gov-entity-checks",
+      "coverage": "partial",
+      "description": "Checks registration, exclusions, and integrity records automatically. Do Not Pay and the rest of the risk review happen elsewhere."
+    },
+    {
+      "id": "rel:payments-to-recipients-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:payments-to-recipients",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:payments-to-recipients-satisfies-pay-as-needed",
+      "from": "eb:capability:payments-to-recipients",
+      "predicate": "satisfies",
+      "to": "eb:requirement:pay-as-needed"
+    },
+    {
+      "id": "rel:payments-to-recipients-satisfies-review-payment-requests",
+      "from": "eb:capability:payments-to-recipients",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-payment-requests"
+    },
+    {
+      "id": "rel:payments-to-recipients-candidate-pattern-payments-through-asap",
+      "from": "eb:capability:payments-to-recipients",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:payments-through-asap"
+    },
+    {
+      "id": "rel:payments-to-recipients-candidate-pattern-grant-risk-analytics",
+      "from": "eb:capability:payments-to-recipients",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grant-risk-analytics",
+      "coverage": "partial",
+      "description": "Flags unusual drawdowns, such as large requests near the end of an award, for a closer look."
+    },
+    {
+      "id": "rel:award-monitoring-contributes-to-program-results-achieved",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:program-results-achieved"
+    },
+    {
+      "id": "rel:award-monitoring-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:award-monitoring-satisfies-collect-reports-on-schedule",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:collect-reports-on-schedule"
+    },
+    {
+      "id": "rel:award-monitoring-satisfies-monitor-by-risk",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:monitor-by-risk"
+    },
+    {
+      "id": "rel:award-monitoring-candidate-pattern-grants-management",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:award-monitoring-candidate-pattern-grant-risk-analytics",
+      "from": "eb:capability:award-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grant-risk-analytics",
+      "coverage": "partial",
+      "description": "Suggests which awards to monitor more closely. The monitoring itself happens in the grants system."
+    },
+    {
+      "id": "rel:audit-resolution-remedies-contributes-to-audit-findings-resolved",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:audit-findings-resolved"
+    },
+    {
+      "id": "rel:audit-resolution-remedies-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:audit-resolution-remedies-satisfies-decide-audit-findings",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "satisfies",
+      "to": "eb:requirement:decide-audit-findings"
+    },
+    {
+      "id": "rel:audit-resolution-remedies-satisfies-track-corrective-action",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-corrective-action"
+    },
+    {
+      "id": "rel:audit-resolution-remedies-candidate-pattern-grants-management",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management",
+      "coverage": "partial",
+      "description": "Where the system tracks audit findings. Many offices track them separately."
+    },
+    {
+      "id": "rel:audit-resolution-remedies-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:audit-resolution-remedies",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Each finding tracked as its own case, from management decision to closure."
+    },
+    {
+      "id": "rel:award-closeout-contributes-to-awards-closed-on-time",
+      "from": "eb:capability:award-closeout",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:awards-closed-on-time"
+    },
+    {
+      "id": "rel:award-closeout-satisfies-collect-final-reports",
+      "from": "eb:capability:award-closeout",
+      "predicate": "satisfies",
+      "to": "eb:requirement:collect-final-reports"
+    },
+    {
+      "id": "rel:award-closeout-satisfies-close-within-a-year",
+      "from": "eb:capability:award-closeout",
+      "predicate": "satisfies",
+      "to": "eb:requirement:close-within-a-year"
+    },
+    {
+      "id": "rel:award-closeout-candidate-pattern-grants-management",
+      "from": "eb:capability:award-closeout",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:award-transparency-reporting-contributes-to-spending-public",
+      "from": "eb:capability:award-transparency-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:spending-public"
+    },
+    {
+      "id": "rel:award-transparency-reporting-satisfies-report-awards",
+      "from": "eb:capability:award-transparency-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-awards"
+    },
+    {
+      "id": "rel:award-transparency-reporting-satisfies-check-subaward-reporting",
+      "from": "eb:capability:award-transparency-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-subaward-reporting"
+    },
+    {
+      "id": "rel:award-transparency-reporting-candidate-pattern-award-data-to-usaspending",
+      "from": "eb:capability:award-transparency-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:award-data-to-usaspending"
+    },
+    {
+      "id": "rel:award-transparency-reporting-candidate-pattern-grants-management",
+      "from": "eb:capability:award-transparency-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management",
+      "coverage": "partial",
+      "description": "Where the system produces the agency’s award submission. Checking it and following up on subaward reporting often happen outside it."
+    },
+    {
+      "id": "rel:grants-management-depends-on-shared-case-platform",
+      "from": "eb:implementationPattern:grants-management",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "way": "agency-platform",
+      "description": "The award records and steps are the shared platform, set up for grants."
+    },
+    {
+      "id": "rel:grants-management-works-with-grants-gov-system-to-system",
+      "from": "eb:implementationPattern:grants-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:grants-gov-system-to-system",
+      "description": "Applications arrive from Grants.gov through the system’s connection."
+    },
+    {
+      "id": "rel:grants-management-works-with-payments-through-asap",
+      "from": "eb:implementationPattern:grants-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:payments-through-asap",
+      "description": "Awards and their amounts feed the payment system’s accounts."
+    },
+    {
+      "id": "rel:grants-management-works-with-grant-risk-analytics",
+      "from": "eb:implementationPattern:grants-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:grant-risk-analytics",
+      "description": "Risk scores show in the system’s review and monitoring screens."
+    },
+    {
+      "id": "rel:grants-gov-system-to-system-works-with-grants-management",
+      "from": "eb:implementationPattern:grants-gov-system-to-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:payments-through-asap-works-with-grant-risk-analytics",
+      "from": "eb:implementationPattern:payments-through-asap",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:grant-risk-analytics",
+      "description": "Drawdown patterns feed the risk analytics."
+    },
+    {
+      "id": "rel:grant-risk-analytics-works-with-sam-gov-entity-checks",
+      "from": "eb:implementationPattern:grant-risk-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:sam-gov-entity-checks",
+      "description": "The same SAM.gov checks feed each applicant’s and recipient’s risk profile."
+    },
+    {
+      "id": "rel:award-data-to-usaspending-works-with-grants-management",
+      "from": "eb:implementationPattern:award-data-to-usaspending",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:applying-on-grants-gov-helps-with-funding-opportunities-applications",
+      "from": "eb:resource:applying-on-grants-gov",
+      "predicate": "helps_with",
+      "to": "eb:capability:funding-opportunities-applications"
+    },
+    {
+      "id": "rel:applying-on-grants-gov-helps-with-applying-is-straightforward",
+      "from": "eb:resource:applying-on-grants-gov",
+      "predicate": "helps_with",
+      "to": "eb:outcome:applying-is-straightforward"
+    },
+    {
+      "id": "rel:grants-gov-applicant-training-helps-with-funding-opportunities-applications",
+      "from": "eb:resource:grants-gov-applicant-training",
+      "predicate": "helps_with",
+      "to": "eb:capability:funding-opportunities-applications"
+    },
+    {
+      "id": "rel:simpler-grants-gov-helps-with-funding-opportunities-applications",
+      "from": "eb:resource:simpler-grants-gov",
+      "predicate": "helps_with",
+      "to": "eb:capability:funding-opportunities-applications"
+    },
+    {
+      "id": "rel:simpler-grants-gov-helps-with-applying-is-straightforward",
+      "from": "eb:resource:simpler-grants-gov",
+      "predicate": "helps_with",
+      "to": "eb:outcome:applying-is-straightforward"
+    },
+    {
+      "id": "rel:fac-audit-search-helps-with-risk-review-award",
+      "from": "eb:resource:fac-audit-search",
+      "predicate": "helps_with",
+      "to": "eb:capability:risk-review-award"
+    },
+    {
+      "id": "rel:fac-audit-search-helps-with-audit-resolution-remedies",
+      "from": "eb:resource:fac-audit-search",
+      "predicate": "helps_with",
+      "to": "eb:capability:audit-resolution-remedies"
+    },
+    {
+      "id": "rel:usaspending-api-helps-with-award-transparency-reporting",
+      "from": "eb:resource:usaspending-api",
+      "predicate": "helps_with",
+      "to": "eb:capability:award-transparency-reporting"
+    },
+    {
+      "id": "rel:usaspending-api-helps-with-award-data-to-usaspending",
+      "from": "eb:resource:usaspending-api",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:award-data-to-usaspending"
+    },
+    {
+      "id": "rel:case-management-contributes-to-awards-closed-on-time",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:awards-closed-on-time"
+    },
+    {
+      "id": "rel:case-management-contributes-to-audit-findings-resolved",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:audit-findings-resolved"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-grants-management",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:grants-management"
+    },
+    {
+      "id": "rel:records-management-contributes-to-audit-findings-resolved",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:audit-findings-resolved"
+    },
+    {
+      "id": "rel:records-management-contributes-to-awards-closed-on-time",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:awards-closed-on-time"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-spending-public",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:spending-public"
+    },
+    {
+      "id": "rel:security-logging-monitoring-contributes-to-funds-used-as-allowed",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:funds-used-as-allowed"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:grants-results",
+      "title": "Grants results discovery",
+      "questions": [
+        {
+          "id": "question:grants-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "open-fair-competition",
+              "label": "Funding is open to everyone eligible and fairly reviewed"
+            },
+            {
+              "value": "applying-is-straightforward",
+              "label": "Applying for and managing an award is straightforward"
+            },
+            {
+              "value": "awards-to-capable-recipients",
+              "label": "Awards go to eligible recipients able to manage them"
+            },
+            {
+              "value": "funds-used-as-allowed",
+              "label": "Funds are paid as needed and used as the award allows"
+            },
+            {
+              "value": "program-results-achieved",
+              "label": "Awards achieve what they were made for"
+            },
+            {
+              "value": "audit-findings-resolved",
+              "label": "Audit findings are resolved promptly"
+            },
+            {
+              "value": "awards-closed-on-time",
+              "label": "Awards are closed out on time"
+            },
+            {
+              "value": "spending-public",
+              "label": "The spending is open to view"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "open-fair-competition",
+              "elementId": "eb:outcome:open-fair-competition",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "applying-is-straightforward",
+              "elementId": "eb:outcome:applying-is-straightforward",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "awards-to-capable-recipients",
+              "elementId": "eb:outcome:awards-to-capable-recipients",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "funds-used-as-allowed",
+              "elementId": "eb:outcome:funds-used-as-allowed",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "program-results-achieved",
+              "elementId": "eb:outcome:program-results-achieved",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "audit-findings-resolved",
+              "elementId": "eb:outcome:audit-findings-resolved",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "awards-closed-on-time",
+              "elementId": "eb:outcome:awards-closed-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "spending-public",
+              "elementId": "eb:outcome:spending-public",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-tracked-measures",
+          "prompt": "Which of these does the office track during the year?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "reports-on-time",
+              "label": "How many performance reports arrive on time"
+            },
+            {
+              "value": "management-decisions",
+              "label": "How long audit findings wait for a management decision"
+            },
+            {
+              "value": "closeout",
+              "label": "How many awards are closed within a year"
+            },
+            {
+              "value": "improper-payments",
+              "label": "Improper payments found and recovered"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "reports-on-time",
+              "elementId": "eb:measure:performance-reports-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "management-decisions",
+              "elementId": "eb:measure:management-decisions-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "closeout",
+              "elementId": "eb:measure:awards-closed-within-a-year",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "improper-payments",
+              "elementId": "eb:measure:improper-payment-rate",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "improper-payments",
+              "elementId": "eb:measure:improper-payments-recovered",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-expired-awards-known",
+          "prompt": "Does the office know how many awards have ended but aren’t closed out?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:measure:expired-awards-open",
+              "interpretation": "The office knows this number, so there may be a value for today."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:measure:expired-awards-open",
+              "interpretation": "Not knowing how many expired awards remain open often means closeout is falling behind."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:award-closeout",
+              "interpretation": "Not knowing how many expired awards remain open often means closeout is falling behind."
+            }
+          ]
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the agency’s grant programs and how the office tells how it’s doing. They ask about the programs’ operations, never about individual awards, applicants, or recipients. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:grants-operations",
+      "title": "Grants operations discovery",
+      "questions": [
+        {
+          "id": "question:grants-award-tracking",
+          "prompt": "Where does the office track its awards today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "grants-product",
+              "label": "A grants management product the agency runs"
+            },
+            {
+              "value": "shared-service",
+              "label": "A grants system another agency runs as a shared service"
+            },
+            {
+              "value": "agency-platform",
+              "label": "The agency’s shared case or low-code platform"
+            },
+            {
+              "value": "spreadsheets",
+              "label": "Spreadsheets, email, and shared drives"
+            },
+            {
+              "value": "custom-system",
+              "label": "A custom system built for the agency"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:implementationPattern:grants-management",
+              "interpretation": "These are example ways to bring each award onto one record, from announcement to closeout."
+            },
+            {
+              "answerValue": "custom-system",
+              "elementId": "eb:implementationPattern:grants-management",
+              "interpretation": "These are example ways to bring each award onto one record, from announcement to closeout."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-application-intake",
+          "prompt": "How do applications from Grants.gov reach the office’s system?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "system-to-system",
+              "label": "Automatically, through a system-to-system connection"
+            },
+            {
+              "value": "downloaded",
+              "label": "Staff download them and enter or upload them by hand"
+            },
+            {
+              "value": "email",
+              "label": "Applications come by email instead"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "downloaded",
+              "elementId": "eb:capability:funding-opportunities-applications",
+              "interpretation": "Handling applications by hand takes time and risks missing some before the deadline."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:funding-opportunities-applications",
+              "interpretation": "Handling applications by hand takes time and risks missing some before the deadline."
+            },
+            {
+              "answerValue": "downloaded",
+              "elementId": "eb:implementationPattern:grants-gov-system-to-system",
+              "interpretation": "Handling applications by hand takes time and risks missing some before the deadline."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:implementationPattern:grants-gov-system-to-system",
+              "interpretation": "Handling applications by hand takes time and risks missing some before the deadline."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-risk-review",
+          "prompt": "How does the office review an applicant’s risk before an award?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "A standard review recorded in the grants system"
+            },
+            {
+              "value": "checklist",
+              "label": "A checklist or spreadsheet kept with the award file"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by program or by person"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "checklist",
+              "elementId": "eb:capability:risk-review-award",
+              "interpretation": "A review that varies, or lives outside the system, is hard to show and hard to build on in monitoring."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:risk-review-award",
+              "interpretation": "A review that varies, or lives outside the system, is hard to show and hard to build on in monitoring."
+            },
+            {
+              "answerValue": "checklist",
+              "elementId": "eb:implementationPattern:grant-risk-analytics",
+              "interpretation": "A review that varies, or lives outside the system, is hard to show and hard to build on in monitoring."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:grant-risk-analytics",
+              "interpretation": "A review that varies, or lives outside the system, is hard to show and hard to build on in monitoring."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-payment-method",
+          "prompt": "How are recipients paid?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "asap",
+              "label": "Through Treasury’s ASAP.gov"
+            },
+            {
+              "value": "other-federal",
+              "label": "Through another federal payment system"
+            },
+            {
+              "value": "agency-process",
+              "label": "Through the agency’s own payment process"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "agency-process",
+              "elementId": "eb:capability:payments-to-recipients",
+              "interpretation": "A federal payment system can take on recipient banking details and drawdown controls."
+            },
+            {
+              "answerValue": "agency-process",
+              "elementId": "eb:implementationPattern:payments-through-asap",
+              "interpretation": "A federal payment system can take on recipient banking details and drawdown controls."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-audit-findings-tracked",
+          "prompt": "Does the office track each single audit finding about its awards until it has a management decision and is corrected?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:audit-resolution-remedies",
+              "interpretation": "Findings not tracked to a decision are where the six-month deadline slips."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:measure:management-decisions-on-time",
+              "interpretation": "Findings not tracked to a decision are where the six-month deadline slips."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-usaspending-by-hand",
+          "prompt": "Is the award data for USAspending.gov put together by hand?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:award-transparency-reporting",
+              "interpretation": "Reporting by hand is slow and error-prone, and errors show up in public."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:implementationPattern:award-data-to-usaspending",
+              "interpretation": "Reporting by hand is slow and error-prone, and errors show up in public."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-program-design",
+          "prompt": "When a program is designed, are its goals and performance measures set before the notice goes out?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "always",
+              "label": "Yes, for every program"
+            },
+            {
+              "value": "some",
+              "label": "For some programs"
+            },
+            {
+              "value": "later",
+              "label": "Measures come later, or not at all"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "some",
+              "elementId": "eb:capability:program-planning",
+              "interpretation": "Measures set after awards are made are hard to hold recipients to, and hard to report results against."
+            },
+            {
+              "answerValue": "later",
+              "elementId": "eb:capability:program-planning",
+              "interpretation": "Measures set after awards are made are hard to hold recipients to, and hard to report results against."
+            },
+            {
+              "answerValue": "some",
+              "elementId": "eb:requirement:design-program-before-notice",
+              "interpretation": "Measures set after awards are made are hard to hold recipients to, and hard to report results against."
+            },
+            {
+              "answerValue": "later",
+              "elementId": "eb:requirement:design-program-before-notice",
+              "interpretation": "Measures set after awards are made are hard to hold recipients to, and hard to report results against."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-notice-writing",
+          "prompt": "How are funding notices written?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "template",
+              "label": "From a plain-language template with the required sections built in"
+            },
+            {
+              "value": "last-year",
+              "label": "By copying and editing the last notice"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by program"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "last-year",
+              "elementId": "eb:requirement:write-notices-plainly",
+              "interpretation": "Notices copied forward tend to grow, and applicants pay for what isn’t clear."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:requirement:write-notices-plainly",
+              "interpretation": "Notices copied forward tend to grow, and applicants pay for what isn’t clear."
+            },
+            {
+              "answerValue": "last-year",
+              "elementId": "eb:outcome:applying-is-straightforward",
+              "interpretation": "Notices copied forward tend to grow, and applicants pay for what isn’t clear."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:outcome:applying-is-straightforward",
+              "interpretation": "Notices copied forward tend to grow, and applicants pay for what isn’t clear."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-merit-review",
+          "prompt": "How do reviewers score applications?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "In the grants system, against the published criteria"
+            },
+            {
+              "value": "forms",
+              "label": "On forms or spreadsheets that staff collect"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by program"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "forms",
+              "elementId": "eb:capability:merit-review-selection",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:merit-review-selection",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            },
+            {
+              "answerValue": "forms",
+              "elementId": "eb:requirement:manage-reviewer-conflicts",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:requirement:manage-reviewer-conflicts",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            },
+            {
+              "answerValue": "forms",
+              "elementId": "eb:implementationPattern:grants-management",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:grants-management",
+              "interpretation": "Scores gathered by hand are hard to check against the criteria, and conflicts are easy to miss."
+            }
+          ]
+        },
+        {
+          "id": "question:grants-monitoring-approach",
+          "prompt": "How does the office decide how closely to monitor each award?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "by-risk",
+              "label": "By the award’s risk, from the review before it was made"
+            },
+            {
+              "value": "same",
+              "label": "Every award gets the same monitoring"
+            },
+            {
+              "value": "reports-only",
+              "label": "Mostly by reading the reports recipients send"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "same",
+              "elementId": "eb:capability:award-monitoring",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            },
+            {
+              "answerValue": "reports-only",
+              "elementId": "eb:capability:award-monitoring",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            },
+            {
+              "answerValue": "same",
+              "elementId": "eb:requirement:monitor-by-risk",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            },
+            {
+              "answerValue": "reports-only",
+              "elementId": "eb:requirement:monitor-by-risk",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            },
+            {
+              "answerValue": "same",
+              "elementId": "eb:implementationPattern:grant-risk-analytics",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            },
+            {
+              "answerValue": "reports-only",
+              "elementId": "eb:implementationPattern:grant-risk-analytics",
+              "interpretation": "Monitoring every award the same way spends effort where risk is low and misses it where it’s high."
+            }
+          ]
+        }
+      ],
+      "description": "Questions about how the office runs its grant programs today, from announcements to closeout. They ask about the office’s tools and steps, never about individual awards, applicants, or recipients. Answers point to capabilities and example patterns worth exploring."
+    }
+  ]
+}

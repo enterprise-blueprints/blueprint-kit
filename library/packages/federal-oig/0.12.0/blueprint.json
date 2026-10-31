@@ -1,0 +1,2599 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "org.enterprise-blueprints.federal-oig",
+  "idPrefix": "eb",
+  "version": "0.12.0",
+  "title": "Office of Inspector General — Independent Oversight",
+  "description": "U.S. federal Office of Inspector General mission blueprint: one mission with the outcomes it seeks and ways to measure them, eight capabilities, from planning oversight work to reporting it, with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for mission results and for intake and case handling. It builds on Common Capabilities for identity, access, data protection, and case management.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-10-30",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal Offices of Inspector General"
+  ],
+  "tags": [
+    "office-of-inspector-general",
+    "federal-oversight",
+    "accountability",
+    "audits",
+    "investigations",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.12.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:ig-act-404",
+      "title": "5 U.S.C. § 404 — Duties and responsibilities of Inspectors General",
+      "url": "https://www.govinfo.gov/link/uscode/5/404?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Principal statutory duties of federal Inspectors General, among them following the Comptroller General’s standards for audits (§ 404(b)(1)(A)) and reporting expeditiously to the Attorney General whenever there are reasonable grounds to believe federal criminal law was violated (§ 404(d))."
+    },
+    {
+      "id": "src:oversight-mission",
+      "title": "Oversight.gov — Mission of Inspectors General",
+      "url": "https://www.oversight.gov/about/inspectors-general/mission",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-25",
+      "note": "Describes independent oversight, prevention of fraud, waste and abuse, and reporting."
+    },
+    {
+      "id": "src:cigie-faq",
+      "title": "Council of the Inspectors General on Integrity and Efficiency — Frequently Asked Questions",
+      "url": "https://www.ignet.gov/node/54",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-26",
+      "note": "General description of OIG missions, independence, audits, investigations, and reporting."
+    },
+    {
+      "id": "src:oversight-hotline",
+      "title": "Oversight.gov — Report Fraud, Waste, Abuse or Retaliation",
+      "url": "https://www.oversight.gov/where-report-fraud-waste-abuse-or-retaliation",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-26",
+      "note": "Official routing information for reports of fraud, waste, abuse, or retaliation."
+    },
+    {
+      "id": "src:ig-act-403",
+      "title": "5 U.S.C. § 403 — Appointment of Inspectors General",
+      "url": "https://www.govinfo.gov/link/uscode/5/403?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Among other things, each Inspector General designates a Whistleblower Protection Coordinator (§ 403(d)(1)(C)), who educates agency employees about the prohibitions on retaliation for protected disclosures, and about their rights and remedies, including the roles of the Office of Inspector General, the Office of Special Counsel, and the Merit Systems Protection Board. The coordinator doesn’t act as the employee’s representative or advocate."
+    },
+    {
+      "id": "src:ig-act-406",
+      "title": "5 U.S.C. § 406 — Authority of Inspector General",
+      "url": "https://www.govinfo.gov/link/uscode/5/406?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Timely access to all records, reports, audits, reviews, documents, and other material of the agency (§ 406(a)(1)); subpoenas for information and documents (§ 406(a)(4)); and, when information or assistance is unreasonably refused, a report of the circumstances to the agency head without delay (§ 406(c)(2))."
+    },
+    {
+      "id": "src:contractor-whistleblower-41-usc-4712",
+      "title": "41 U.S.C. § 4712 — Enhancement of contractor protection from reprisal for disclosure of certain information",
+      "url": "https://www.law.cornell.edu/uscode/text/41/4712",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Employees of contractors, subcontractors, grantees, and subgrantees may complain of reprisal to the agency’s Inspector General, within three years of it. Within 180 days the Inspector General either determines the complaint doesn’t need investigating or reports its findings to the complainant, the employer, and the agency head, with up to 180 more days if the complainant agrees."
+    },
+    {
+      "id": "src:reports-consolidation-31-usc-3516",
+      "title": "31 U.S.C. § 3516 — Reports consolidation",
+      "url": "https://www.law.cornell.edu/uscode/text/31/3516",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "An agency’s annual consolidated report includes a statement by its Inspector General summarizing what the Inspector General considers the most serious management and performance challenges facing the agency, and the agency’s progress on them (§ 3516(d))."
+    },
+    {
+      "id": "src:omb-a-50",
+      "title": "OMB Circular A-50 — Audit Followup",
+      "url": "https://obamawhitehouse.archives.gov/omb/circulars_a050/",
+      "kind": "official-reference",
+      "publicationDate": "1982-09-29",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Agencies resolve audit recommendations within six months of the final report, and carry out corrective action as quickly as possible, with an audit followup official responsible for timely responses and for seeing that corrective actions are taken."
+    },
+    {
+      "id": "src:cigie-qar-investigations",
+      "title": "Council of the Inspectors General on Integrity and Efficiency — Quality Assurance Review Guidelines for Offices of Investigations (July 2025)",
+      "url": "https://www.ignet.gov/sites/default/files/files/QAR%20Guide%20July-2025.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "The peer review of investigative operations for Offices of Inspector General with statutory law enforcement authority, which checks that CIGIE’s Quality Standards for Investigations and the Attorney General’s guidelines are followed. CIGIE keeps the schedule of reviews."
+    },
+    {
+      "id": "src:ig-act-402",
+      "title": "5 U.S.C. § 402 — Establishment and purpose of Offices of Inspector General",
+      "url": "https://www.govinfo.gov/link/uscode/5/402?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The purposes of Offices of Inspector General: audits and investigations; economy, efficiency, and effectiveness; preventing and detecting fraud and abuse; and keeping the agency head and Congress fully and currently informed."
+    },
+    {
+      "id": "src:ig-act-405",
+      "title": "5 U.S.C. § 405 — Reports",
+      "url": "https://www.govinfo.gov/link/uscode/5/405?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "What each semiannual report must include, such as questioned costs, funds put to better use, open recommendations, investigative statistics, and peer review results, with its deadlines, and the report of particularly serious or flagrant problems, which goes to Congress within 7 calendar days (§ 405(e))."
+    },
+    {
+      "id": "src:ig-act-407",
+      "title": "5 U.S.C. § 407 — Complaints by employees",
+      "url": "https://www.govinfo.gov/link/uscode/5/407?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Receiving employee complaints, keeping a complainant’s identity confidential, and protection from reprisal."
+    },
+    {
+      "id": "src:ig-act-420",
+      "title": "5 U.S.C. § 420 — Information on websites of Offices of Inspectors General",
+      "url": "https://www.govinfo.gov/link/uscode/5/420?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Posting audit, inspection, and evaluation reports within 3 days, and a direct link for reporting fraud, waste, and abuse."
+    },
+    {
+      "id": "src:cigie-silver-book",
+      "title": "Council of the Inspectors General on Integrity and Efficiency — Quality Standards for Federal Offices of Inspector General (Silver Book)",
+      "url": "https://www.ignet.gov/sites/default/files/files/Silver%20Book%20Revision%20-%208-20-12r.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2012-08-20",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The overall standards for OIGs, including independence in fact and in appearance, confidentiality, and following the professional standards for audits, investigations, inspections, and evaluations."
+    },
+    {
+      "id": "src:cigie-investigation-standards",
+      "title": "Council of the Inspectors General on Integrity and Efficiency — Quality Standards for Investigations (July 2025)",
+      "url": "https://www.ignet.gov/sites/default/files/files/Quality%20Standards%20for%20Investigations%20July-2025.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-07-15",
+      "lastReviewedAt": "2026-10-30",
+      "note": "Standards for investigations in OIGs, replacing the 2011 edition. Among them, investigative information is to be stored securely so it can be retrieved effectively, with personal and other sensitive information protected."
+    },
+    {
+      "id": "src:cigie-blue-book",
+      "title": "Council of the Inspectors General on Integrity and Efficiency — Quality Standards for Inspection and Evaluation (Blue Book)",
+      "url": "https://www.ignet.gov/sites/default/files/files/QualityStandardsforInspectionandEvaluation-2020.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2020-12-01",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Standards for planning, evidence, documentation, supervision, and reporting in inspections and evaluations."
+    },
+    {
+      "id": "src:gao-yellow-book",
+      "title": "U.S. Government Accountability Office — Government Auditing Standards (Yellow Book)",
+      "url": "https://www.gao.gov/yellowbook",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The standards for audits of government entities, including audit documentation, supervision, and quality management. The 2024 revision applies to audits beginning on or after December 15, 2025."
+    },
+    {
+      "id": "src:gao-ig-act",
+      "title": "Public Law 115-414 — Good Accounting Obligation in Government Act (GAO-IG Act)",
+      "url": "https://www.govinfo.gov/app/details/PLAW-115publ414",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Agencies report, in their annual budget justifications, on public GAO and Inspector General recommendations that remain open."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:independent-government-oversight",
+      "type": "mission",
+      "title": "Office of Inspector General",
+      "description": "Provide independent and objective oversight to prevent and detect fraud, waste, and abuse; promote economy, efficiency, and effectiveness; and communicate findings and recommendations concerning federal programs and operations.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-mission",
+        "src:cigie-faq"
+      ],
+      "attributes": {
+        "tagline": "Independent oversight of government programs and operations",
+        "sector": "public-sector",
+        "scope": "US-federal-OIG",
+        "principles": [
+          "The office runs its own systems, administering them and deciding who sees its work, as its independence requires",
+          "Each matter is one record from intake to closure, and each engagement one record from plan to its last recommendation",
+          "The identity of people who report is kept apart from the allegation from the first contact",
+          "Statistics for the semiannual report come from the systems of record, not from spreadsheets",
+          "Agency officials send corrective action updates into the office’s tracker through their own access",
+          "Analytics and AI suggest, and staff decide"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:effective-programs",
+      "type": "outcome",
+      "title": "Programs and operations run economically, efficiently, and effectively",
+      "description": "Agency programs and operations make good use of public money and do what they’re meant to do, helped by the office’s audits, inspections, evaluations, and recommendations.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-402"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "funds-put-to-better-use",
+            "title": "Funds recommended for better use",
+            "description": "The dollar value of recommendations that funds be put to better use, and how much of it management agreed to. Semiannual reports to Congress include these figures.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:fraud-waste-abuse-prevented",
+      "type": "outcome",
+      "title": "Fraud, waste, and abuse are prevented and detected",
+      "description": "Wrongdoing in agency programs and operations is deterred, found, and acted on, through audits, investigations, and referrals for prosecution where warranted.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-402",
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "questioned-costs",
+            "title": "Questioned and unsupported costs",
+            "description": "Costs that audit, inspection, and evaluation reports question, including unsupported costs, and how much of them management disallowed. Semiannual reports to Congress include these figures.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          },
+          {
+            "id": "investigative-results",
+            "title": "Investigative results",
+            "description": "Investigative reports issued, people referred to the Department of Justice and to state and local prosecutors, and the indictments and criminal informations that followed. Semiannual reports to Congress include these counts and how they were counted.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:leaders-congress-informed",
+      "type": "outcome",
+      "title": "Agency leaders and Congress are fully and currently informed",
+      "description": "The head of the agency and Congress learn about serious problems and deficiencies promptly, with what’s being done to correct them, and the public can read the office’s reports.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-402",
+        "src:ig-act-405",
+        "src:ig-act-420"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "semiannual-reports-on-time",
+            "title": "Semiannual reports on time",
+            "description": "Whether each semiannual report reaches the agency head by April 30 and October 31, for the six months ending March 31 and September 30.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          },
+          {
+            "id": "reports-posted-within-3-days",
+            "title": "Reports posted within 3 days",
+            "description": "The share of final audit, inspection, and evaluation reports posted on the office’s website within 3 days of being submitted in final form.",
+            "sourceIds": [
+              "src:ig-act-420"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:outcome:problems-corrected",
+      "type": "outcome",
+      "title": "Problems that are found get corrected",
+      "description": "Recommendations get a management decision, and agreed corrective actions are carried out and tracked until they’re complete.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-402",
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "open-recommendations",
+            "title": "Open recommendations",
+            "description": "Significant recommendations from earlier reports whose corrective action isn’t complete yet, with how long they’ve been open and any potential cost savings. Semiannual reports to Congress list them.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          },
+          {
+            "id": "reports-awaiting-decision",
+            "title": "Reports awaiting a management decision",
+            "description": "Reports from earlier periods with no management decision yet, with the reasons and a target date for one. Semiannual reports to Congress list them.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:concerns-raised-safely",
+      "type": "outcome",
+      "title": "People can raise concerns safely",
+      "description": "Employees and the public can report possible wrongdoing through clear channels, with their identities kept confidential and protection from reprisal.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-407",
+        "src:ig-act-420",
+        "src:oversight-hotline"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "time-to-route",
+            "title": "Time to review and route a matter",
+            "description": "How long it takes from when a complaint, allegation, or disclosure arrives until it’s reviewed and routed. The office sets its own target."
+          },
+          {
+            "id": "retaliation-found",
+            "title": "Whistleblower retaliation found",
+            "description": "Cases of whistleblower retaliation the office establishes, with the consequences imposed. Semiannual reports to Congress include them.",
+            "sourceIds": [
+              "src:ig-act-405"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:work-meets-standards",
+      "type": "outcome",
+      "title": "The office’s work is independent and meets professional standards",
+      "description": "Audits, inspections, evaluations, and investigations follow the professional standards that apply to them, free of impairments to the office’s independence, and external peer reviews confirm it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-silver-book",
+        "src:gao-yellow-book",
+        "src:cigie-qar-investigations"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "peer-review-results",
+            "title": "Peer review results",
+            "description": "The rating of the latest external peer review of the office’s audit work, the results of its investigations peer review, and any peer review recommendations still open. Semiannual reports to Congress include them.",
+            "sourceIds": [
+              "src:ig-act-405",
+              "src:gao-yellow-book"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:capability:oversight-planning",
+      "type": "capability",
+      "title": "Oversight Planning",
+      "description": "Ability to decide what the office will audit, inspect, evaluate, and look into, from the agency’s risks, its most serious management and performance challenges, the work the law requires, and requests from Congress and agency leaders, and to keep a plan with each project’s scope, schedule, and status.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-silver-book",
+        "src:reports-consolidation-31-usc-3516"
+      ],
+      "applicabilityNotes": "Offices plan for a year or several, and change the plan as new risks and requests arrive. Some work, such as financial statement audits and reviews the law requires, is in every plan.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:complaint-allegation-disclosure-intake",
+      "type": "capability",
+      "title": "Complaint, Allegation & Disclosure Intake",
+      "description": "Ability to receive, acknowledge, classify, and appropriately route allegations of wrongdoing, fraud, waste, abuse, and relevant disclosures through authorized channels.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-hotline",
+        "src:cigie-faq"
+      ],
+      "applicabilityNotes": "Confidentiality and routing rules vary. Specific retaliation complaints or protected disclosures may need referral to another legally authorized entity.",
+      "attributes": {
+        "scope": "US-federal-OIG",
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:audit-inspection-evaluation",
+      "type": "capability",
+      "title": "Audit, Inspection & Evaluation",
+      "description": "Ability to plan, conduct, supervise, or coordinate independent, objective examinations of programs, operations, performance, and controls.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-mission",
+        "src:cigie-faq"
+      ],
+      "applicabilityNotes": "Methodologies, mandatory reviews, professional standards, and jurisdiction depend on the OIG and engagement.",
+      "attributes": {
+        "scope": "US-federal-OIG",
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:investigation-management",
+      "type": "capability",
+      "title": "Investigation Management",
+      "description": "Ability to assess allegations within jurisdiction, plan authorized investigative work, manage evidence and case progress, and document investigative results or referrals.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-mission",
+        "src:cigie-faq"
+      ],
+      "applicabilityNotes": "Law enforcement powers, case types, investigative jurisdiction, evidence handling, and disclosure restrictions vary by legal authority.",
+      "attributes": {
+        "scope": "US-federal-OIG",
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:whistleblower-protection",
+      "type": "capability",
+      "title": "Whistleblower Protection",
+      "description": "Ability to educate agency employees about the protections against retaliation for protected disclosures and the ways to seek review, and to receive, investigate, and decide complaints of reprisal, including those from employees of contractors and grantees, within the time the law allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-403",
+        "src:ig-act-407",
+        "src:contractor-whistleblower-41-usc-4712"
+      ],
+      "applicabilityNotes": "Federal employees can also take reprisal complaints to the Office of Special Counsel, and some go on to the Merit Systems Protection Board. The Whistleblower Protection Coordinator explains the routes but doesn’t represent the employee. Intelligence community elements follow their own provisions.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:recommendations-corrective-action-monitoring",
+      "type": "capability",
+      "title": "Recommendations & Corrective Action Monitoring",
+      "description": "Ability to issue findings or recommendations where authorized, track responses and progress, and monitor implementation of corrective measures.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-mission"
+      ],
+      "applicabilityNotes": "OIGs generally recommend and monitor; they do not universally possess authority to implement or compel agency corrective actions.",
+      "attributes": {
+        "scope": "US-federal-OIG",
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:quality-assurance",
+      "type": "capability",
+      "title": "Quality Assurance & Peer Review",
+      "description": "Ability to check the office’s own audits, inspections, evaluations, and investigations against the standards they follow, to take part in external peer reviews of the office and by it, and to act on what the reviews find.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-silver-book",
+        "src:gao-yellow-book",
+        "src:cigie-qar-investigations"
+      ],
+      "applicabilityNotes": "Audit work under the Yellow Book has an external peer review at least once every 3 years. Investigations peer reviews apply to offices with statutory law enforcement authority, on the schedule CIGIE sets.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:oversight-reporting-communication",
+      "type": "capability",
+      "title": "Oversight Reporting & Communication",
+      "description": "Ability to communicate independent oversight findings, recommendations, material risks, and work results to the appropriate officials and public audiences consistent with law.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:oversight-mission",
+        "src:cigie-faq"
+      ],
+      "applicabilityNotes": "Reporting cadence, content, recipients, and confidentiality depend on legal requirements and the sensitivity of the work. Whistleblower education and coordination may be separate supporting functions.",
+      "attributes": {
+        "scope": "US-federal-OIG",
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:triage-and-route",
+      "type": "requirement",
+      "title": "Review and route each matter",
+      "description": "Review each matter for jurisdiction and priority, and route it to the right team or to another authority, recording the decision and the reason.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:protect-reporter-identity",
+      "type": "requirement",
+      "title": "Protect the identity of people who report",
+      "description": "Limit who can see the identity of a person who reports to the people who need it. The Inspector General doesn’t disclose an employee complainant’s identity without consent, unless it becomes unavoidable during the investigation.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-407",
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:link-evidence",
+      "type": "requirement",
+      "title": "Keep evidence linked to its case",
+      "description": "Link evidence and records to the case they belong to, with a record of who handled them and when.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-investigation-standards"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:restrict-case-access",
+      "type": "requirement",
+      "title": "Restrict access to case information",
+      "description": "Limit access to case information to the people assigned to the case or otherwise authorized, and keep a record of access.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-investigation-standards"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:refer-possible-crimes",
+      "type": "requirement",
+      "title": "Report possible federal crimes to the Attorney General promptly",
+      "description": "When there are reasonable grounds to believe federal criminal law was violated, report it to the Attorney General expeditiously, and record the referral and what came of it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:cigie-investigation-standards"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:get-timely-access-to-records",
+      "type": "requirement",
+      "title": "Get timely access to the records the work needs",
+      "description": "Request the agency records, documents, and information an audit, inspection, evaluation, or investigation needs, and when they’re unreasonably refused or not provided, report it to the agency head without delay.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-406"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:plan-oversight-work",
+      "type": "requirement",
+      "title": "Plan oversight work",
+      "description": "Keep a plan of audits, inspections, and evaluations, with each one’s scope, schedule, and status.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:summarize-management-challenges",
+      "type": "requirement",
+      "title": "Summarize the agency’s most serious challenges each year",
+      "description": "Each year, write the statement of what the office considers the most serious management and performance challenges facing the agency, and the agency’s progress on them, for the agency’s annual report.",
+      "status": "reference",
+      "sourceIds": [
+        "src:reports-consolidation-31-usc-3516"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:follow-professional-standards",
+      "type": "requirement",
+      "title": "Follow the professional standards for each kind of work",
+      "description": "Conduct audits under the Comptroller General’s Government Auditing Standards, and inspections and evaluations under CIGIE’s Quality Standards for Inspection and Evaluation, and document which standards each engagement followed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:gao-yellow-book",
+        "src:cigie-blue-book"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:document-findings",
+      "type": "requirement",
+      "title": "Document work and findings",
+      "description": "Keep the work papers and evidence behind each finding, so a reviewer can trace how it was reached.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gao-yellow-book",
+        "src:cigie-blue-book"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:quality-assurance-peer-review",
+      "type": "requirement",
+      "title": "Keep a quality program, with external peer reviews",
+      "description": "Check the quality of audits, inspections, and evaluations against the standards they follow, and for audits under the Yellow Book, have an external peer review at least once every 3 years.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gao-yellow-book",
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:investigations-peer-review",
+      "type": "requirement",
+      "title": "Have investigative operations peer reviewed",
+      "description": "For an office with statutory law enforcement authority, take part in CIGIE’s peer reviews of investigative operations on the schedule CIGIE sets, with case files and policies ready for the reviewers.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-qar-investigations"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:report-peer-review-results",
+      "type": "requirement",
+      "title": "Report peer review results and what’s still open",
+      "description": "Include the results of peer reviews of the office, and of those it conducted of other offices, in its semiannual reports, with any peer review recommendations not yet carried out.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:educate-about-retaliation-protections",
+      "type": "requirement",
+      "title": "Teach employees about protections against retaliation",
+      "description": "Through the Whistleblower Protection Coordinator, explain to agency employees the prohibitions on retaliation for protected disclosures, and to those who have made or are thinking of making one, their rights and remedies and where to seek review.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-403"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:decide-contractor-reprisal-complaints",
+      "type": "requirement",
+      "title": "Decide contractor and grantee reprisal complaints within 180 days",
+      "description": "For each reprisal complaint from an employee of a contractor, subcontractor, grantee, or subgrantee, report the findings to the complainant, the employer, and the agency head within 180 days, or within the extension the complainant agrees to, unless the complaint doesn’t need investigating.",
+      "status": "reference",
+      "sourceIds": [
+        "src:contractor-whistleblower-41-usc-4712"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:track-recommendations",
+      "type": "requirement",
+      "title": "Track each recommendation until it’s closed",
+      "description": "Record each recommendation with its owner, the response, target dates, and status, until it’s closed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405",
+        "src:omb-a-50"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:follow-to-management-decision",
+      "type": "requirement",
+      "title": "Follow each report to a management decision within six months",
+      "description": "Track whether agency management has decided what to do about each report’s recommendations within six months of the final report, and list in the semiannual report any that haven’t, with the reasons.",
+      "status": "reference",
+      "sourceIds": [
+        "src:omb-a-50",
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:report-open-recommendations",
+      "type": "requirement",
+      "title": "Report on open recommendations",
+      "description": "Produce a current list of open recommendations and their status whenever it’s needed, for the semiannual report, for the agency’s budget justification, and for the public.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405",
+        "src:gao-ig-act"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:periodic-reporting",
+      "type": "requirement",
+      "title": "Compile periodic reports",
+      "description": "Gather the results of each six months’ work, with the statistics the law lists, into the semiannual report the agency head receives by April 30 and October 31.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:report-serious-problems",
+      "type": "requirement",
+      "title": "Report particularly serious problems right away",
+      "description": "Report particularly serious or flagrant problems, abuses, or deficiencies to the agency head immediately, for transmittal to Congress within 7 calendar days.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:publish-reports",
+      "type": "requirement",
+      "title": "Publish reports",
+      "description": "Post each final audit, inspection, and evaluation report on the office’s website within 3 days of its submission in final form, in accessible formats, except what the law keeps from public release.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-420"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:oversight-intake-case-tracking",
+      "type": "implementationPattern",
+      "title": "Oversight Case Management",
+      "description": "An example architecture: one case system for the office’s oversight and investigative work, administered by the office, that carries each matter from intake through triage, referral, investigation, and closure, with access limited by assignment and the statistics oversight reporting needs.",
+      "status": "reference",
+      "sourceIds": [
+        "src:oversight-hotline",
+        "src:cigie-faq",
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Intake forms for the hotline and for staff, feeding one intake queue",
+          "Triage with recorded decisions, and referrals to other authorities",
+          "Case records with assignment, status, and investigative steps",
+          "Evidence records with chain of custody",
+          "Access limited by case assignment, with the identities of people who report restricted further",
+          "Statistics for the semiannual report"
+        ],
+        "strengths": [
+          "Each matter is one record, from intake to closure",
+          "The office controls who administers it and who sees what",
+          "Statistics for oversight reporting come from the records themselves"
+        ],
+        "fitsWhen": [
+          "The office runs investigations with evidence and referrals for prosecution",
+          "Independence from the agency’s own systems matters"
+        ],
+        "watchFor": [
+          "Early configuration choices, such as case types, are hard to change later",
+          "Data from older systems needs moving and cleaning up",
+          "A hosted system needs a security authorization before it can hold case information"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "An oversight case product",
+            "description": "A case management product made for oversight and investigative work, configured for the office and administered by it.",
+            "strengths": [
+              "Built around investigative work, such as evidence handling and referrals",
+              "Comes with reports shaped for oversight reporting"
+            ],
+            "fitsWhen": [
+              "There’s budget for licenses and an administrator in the office"
+            ],
+            "watchFor": [
+              "Another product to buy, secure, and keep up"
+            ]
+          },
+          {
+            "id": "agency-platform",
+            "approach": "platform",
+            "title": "The agency’s shared case platform",
+            "description": "The office’s own case types on the agency’s shared case platform, with administration and access the office controls.",
+            "strengths": [
+              "Uses licenses, skills, and security approvals the agency already has"
+            ],
+            "fitsWhen": [
+              "The agency runs a case platform, and the office can control who administers its part"
+            ],
+            "watchFor": [
+              "The office’s independence depends on keeping its administration and access apart from the agency’s",
+              "Evidence handling, such as chain of custody, usually needs building"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:confidential-hotline-intake",
+      "type": "implementationPattern",
+      "title": "Confidential Online Hotline",
+      "description": "An example architecture: a public web form and phone line for reporting fraud, waste, and abuse that can take anonymous reports, keeps the identity of the person reporting apart from the allegation, and gives them a code to check back or add information.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-420",
+        "src:ig-act-407",
+        "src:oversight-hotline"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "A public web form linked directly from the office’s home page, and a phone line",
+          "A choice to report anonymously, or to ask that one’s identity be kept confidential",
+          "Contact details stored apart from the allegation, visible only to the people who need them",
+          "A report code the person can use to check back or add information without identifying themselves",
+          "Delivery of each report into the intake queue"
+        ],
+        "strengths": [
+          "Makes reporting easy, through the direct link the law asks for",
+          "Protects identities by design rather than by habit",
+          "Lets the office follow up with people who report anonymously"
+        ],
+        "fitsWhen": [
+          "The office receives reports from the public or from employees",
+          "The office’s current form sends reports to a shared inbox"
+        ],
+        "watchFor": [
+          "Anonymous reports are hard to act on without a way to follow up",
+          "Spam and duplicate reports need screening before triage",
+          "What people type must not be recorded anywhere outside the intake system, such as in web analytics"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A hotline product"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:audit-management-system",
+      "type": "implementationPattern",
+      "title": "Audit Management & Work Papers",
+      "description": "An example architecture: one place for the office’s plan of audits, inspections, and evaluations, the work papers and evidence behind each finding, supervisors’ review sign-offs, and the recommendations each report makes.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gao-yellow-book",
+        "src:cigie-blue-book",
+        "src:cigie-silver-book"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "A plan of oversight work with each engagement’s scope, schedule, and status",
+          "Electronic work papers with evidence attached, cross-referenced to the report",
+          "Supervisors’ review notes and sign-offs, kept with the work papers",
+          "Findings and recommendations recorded once, then tracked to closure",
+          "Records retention for closed engagements"
+        ],
+        "strengths": [
+          "Supports the documentation and supervision that professional standards require",
+          "Peer reviewers can trace each finding to its evidence",
+          "Recommendations start in the same place they’re tracked"
+        ],
+        "fitsWhen": [
+          "The office follows the Yellow Book or the Blue Book for its audits, inspections, and evaluations",
+          "Work papers live in shared drives today"
+        ],
+        "watchFor": [
+          "Teams need time to adopt a new way of documenting their work",
+          "Evidence with sensitive personal information needs the same protection it has elsewhere",
+          "Older engagements usually stay where they are, so there are two places to look for a while"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "An audit management product",
+            "description": "A product made for audit work, with electronic work papers, review sign-offs, and recommendations built in.",
+            "strengths": [
+              "The documentation and supervision steps come built in",
+              "Reporting across engagements, such as on open recommendations, is part of it"
+            ],
+            "fitsWhen": [
+              "The office has many engagements at a time"
+            ],
+            "watchFor": [
+              "Another product to buy, secure, and keep up"
+            ]
+          },
+          {
+            "id": "workspace",
+            "approach": "combine",
+            "title": "Work papers in the collaboration workspace",
+            "description": "A workspace for each engagement in the agency’s collaboration suite, with work paper templates, and supervisors’ sign-offs recorded through document approvals.",
+            "strengths": [
+              "Uses tools the office already has and knows",
+              "Costs little to start, and is easy to change"
+            ],
+            "fitsWhen": [
+              "The office is small, with a few engagements at a time"
+            ],
+            "watchFor": [
+              "Cross-references and review sign-offs depend on discipline, which peer reviews will test",
+              "Reporting across engagements, such as on open recommendations, takes manual work"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:shared-recommendation-tracker",
+      "type": "implementationPattern",
+      "title": "Shared Recommendation Tracker",
+      "description": "An example architecture: a recommendation tracker the office owns, where agency officials submit corrective action plans, updates, and evidence through their own access, and the office decides when each recommendation is closed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405",
+        "src:gao-ig-act"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "One record per recommendation, with its report, owner, agreed action, target date, and status",
+          "Agency access limited to their own recommendations, for submitting plans, updates, and evidence",
+          "The office’s review of each submission, with the decision to close recorded",
+          "Reminders before target dates",
+          "Lists of open recommendations for the semiannual report, the website, and the agency’s budget justification"
+        ],
+        "strengths": [
+          "Replaces email and spreadsheets traded back and forth with the agency",
+          "The office keeps the decision to close, and the agency keeps responsibility for acting",
+          "The same data serves the semiannual report and the agency’s GAO-IG Act report"
+        ],
+        "fitsWhen": [
+          "The office has many open recommendations across several parts of the agency",
+          "Status is gathered by email before each semiannual report"
+        ],
+        "watchFor": [
+          "Agency users need accounts and guidance, which takes coordination",
+          "Giving agency officials access must not expose anything else the office holds",
+          "What it takes to close a recommendation needs agreeing with the agency up front"
+        ],
+        "ways": [
+          {
+            "id": "audit-module",
+            "approach": "product",
+            "title": "A module of the audit product",
+            "description": "The audit product’s recommendation module, opened to agency officials for their own recommendations.",
+            "fitsWhen": [
+              "The office’s audit product has a module like this"
+            ],
+            "watchFor": [
+              "Agency officials need access to the office’s product, limited to their own recommendations"
+            ]
+          },
+          {
+            "id": "owned-app",
+            "approach": "platform",
+            "title": "An app the office owns on a platform",
+            "description": "A tracker the office builds and administers on a platform, kept apart from the agency’s other apps.",
+            "fitsWhen": [
+              "The office’s audit tools have no module agency officials can use"
+            ],
+            "watchFor": [
+              "The office keeps the app working, and in step with its audit tools"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:oversight-reporting-from-source-data",
+      "type": "implementationPattern",
+      "title": "Oversight Reporting from Source Data",
+      "description": "An example architecture: a reporting store fed by the case, audit, and recommendation systems that produces the semiannual report’s statistics, with a publishing step that posts final reports to the office’s website and Oversight.gov within 3 days.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-405",
+        "src:ig-act-420",
+        "src:oversight-mission"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Feeds from the case, audit, and recommendation systems into one reporting store",
+          "A definition of each statistic the semiannual report needs, kept with the data",
+          "Draft tables for each reporting period, for review",
+          "A publishing step that posts final reports to the website and Oversight.gov, recording the date"
+        ],
+        "strengths": [
+          "Statistics are counted the same way every period",
+          "Less gathering by hand before each deadline",
+          "The date each report was posted is on record"
+        ],
+        "fitsWhen": [
+          "Each semiannual report takes weeks of gathering by hand",
+          "Counts get questioned because they’re compiled differently each time"
+        ],
+        "watchFor": [
+          "It’s only as good as the data in the systems that feed it",
+          "Each definition needs an owner for when the law or guidance changes",
+          "Sensitive details must stay out of anything published"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "A reporting store fed by the office’s systems"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:oversight-data-analytics",
+      "type": "implementationPattern",
+      "title": "Data Analytics for Oversight Planning",
+      "description": "An example architecture: the office’s data team brings agency financial, payment, and program data into an analytics workspace, where rules and models point to risks, such as unusual payments or duplicate vendors, that help plan audits and open investigations.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ig-act-404",
+        "src:nist-ai-rmf",
+        "src:gao-yellow-book"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Agreements and regular feeds for the agency data the office has a right to, such as payments, contracts, and grants",
+          "Rules and models that flag risks, each with the reason it was flagged",
+          "A review step where auditors or investigators decide what to look into",
+          "A record of what was flagged, what was decided, and what came of it",
+          "Controls that keep each use of the data within the office’s authority"
+        ],
+        "strengths": [
+          "Points audits and investigations at the highest risks",
+          "Finds patterns across large data sets that sampling misses",
+          "Results show which risk indicators are worth keeping"
+        ],
+        "fitsWhen": [
+          "The office has, or can get, regular access to agency data",
+          "It has staff who can build and check analytics, or can hire them"
+        ],
+        "watchFor": [
+          "A flag isn’t a finding, so every lead needs review and evidence before anything is done",
+          "Models can carry gaps or bias in the data, so their results need checking over time",
+          "Data sharing agreements and privacy rules limit what can be combined"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "An analytics workspace"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:audit-workpapers-collaboration",
+      "type": "implementationPattern",
+      "title": "Audit Work Papers in the Collaboration Workspace",
+      "description": "An example architecture: each engagement gets a workspace in the agency’s collaboration suite, with folders and templates for work papers, cross-references to the report, and supervisors’ review recorded through document approvals.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:audit-management-system",
+      "sourceIds": [
+        "src:gao-yellow-book",
+        "src:cigie-blue-book"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "A workspace for each engagement, made from a template with standard folders",
+          "Work paper templates with fields for purpose, source, conclusion, and cross-references",
+          "Supervisors’ review and sign-off through document approvals, with dates",
+          "A shared list that tracks each engagement’s plan, status, and recommendations",
+          "Retention labels for closed engagements, with access limited to the team"
+        ],
+        "strengths": [
+          "Uses tools the office already has and knows",
+          "Costs little to start, and is easy to change"
+        ],
+        "fitsWhen": [
+          "The office is small, with a few engagements at a time",
+          "It isn’t ready to buy and set up an audit product"
+        ],
+        "watchFor": [
+          "Cross-references and review sign-offs depend on discipline, which peer reviews will test",
+          "Reporting across engagements, such as on open recommendations, takes manual work",
+          "Collaboration tools make sharing easy, so access to engagement workspaces needs limiting"
+        ],
+        "ways": [
+          {
+            "id": "combine",
+            "approach": "combine",
+            "title": "Workspaces in the collaboration suite"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:digital-evidence-store",
+      "type": "implementationPattern",
+      "title": "Digital Evidence Store",
+      "description": "An example architecture: secure storage for investigations’ digital evidence, such as forensic images, video, and large email collections, with each item linked to its case and a record of everyone who handled it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cigie-investigation-standards"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "Storage for large files, such as forensic images and video, kept apart from everyday systems",
+          "Each item linked to its case, with where and when it was collected",
+          "A custody log of every access, copy, and transfer",
+          "Hashes that show an item hasn’t changed since it was collected",
+          "Retention and disposal by the case’s records schedule, with holds during litigation"
+        ],
+        "strengths": [
+          "Shows that evidence hasn’t been altered",
+          "Handles files too large for the case system",
+          "Evidence can go to prosecutors as a controlled copy"
+        ],
+        "fitsWhen": [
+          "The office collects digital evidence, such as devices or email",
+          "Evidence sits on drives or in shared folders today"
+        ],
+        "watchFor": [
+          "Storage costs grow with forensic images and video",
+          "Access needs to be as tightly limited as the cases themselves",
+          "Sharing with prosecutors and courts needs a defined process"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A digital evidence management product",
+            "description": "A product made for managing digital evidence, with custody logs and hashing built in.",
+            "fitsWhen": [
+              "The office handles large amounts of digital evidence"
+            ],
+            "watchFor": [
+              "Another product to buy, secure, and keep up"
+            ]
+          },
+          {
+            "id": "secure-storage",
+            "approach": "build",
+            "title": "Secure storage with a custody log",
+            "description": "Encrypted storage in the agency’s cloud or data center, kept apart for the office, with a custody log the office builds and links to its case system.",
+            "fitsWhen": [
+              "The office handles digital evidence now and then"
+            ],
+            "watchFor": [
+              "The custody log and hashing carry the evidence’s weight, so they must be built and checked with care"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:cigie-training-institute",
+      "type": "resource",
+      "title": "CIGIE Training Institute",
+      "description": "Training for Inspector General staff from three academies, for audit, inspection, and evaluation, for criminal investigation, including hotline operators, and for leadership and mission support. Agencies outside CIGIE can register as space allows.",
+      "status": "reference",
+      "attributes": {
+        "kind": "course",
+        "url": "https://www.ignet.gov/content/cigie-training-institute",
+        "by": "Council of the Inspectors General on Integrity and Efficiency",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:open-ig-recommendations",
+      "type": "resource",
+      "title": "Inspector General open recommendations",
+      "description": "Open recommendations from Inspectors General across government, searchable by agency and report, with how long each has been open. A view of how one office’s follow-up compares with others’.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://www.oversight.gov/reports/recommendations",
+        "by": "Council of the Inspectors General on Integrity and Efficiency",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:osc-2302c-certification",
+      "type": "resource",
+      "title": "2302(c) Certification Program",
+      "description": "How an agency meets its duty to tell employees about whistleblower protections and to train supervisors on them, through the Office of Special Counsel’s certification steps, renewed every three years.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://osc.gov/services/outreach/2302cert-process/",
+        "by": "U.S. Office of Special Counsel",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:oig-mission-seeks-effective-programs",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:effective-programs"
+    },
+    {
+      "id": "rel:oig-mission-seeks-fraud-waste-abuse-prevented",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:oig-mission-seeks-leaders-congress-informed",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:leaders-congress-informed"
+    },
+    {
+      "id": "rel:oig-mission-seeks-problems-corrected",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:problems-corrected"
+    },
+    {
+      "id": "rel:oig-mission-seeks-concerns-raised-safely",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:independent-government-oversight-seeks-work-meets-standards",
+      "from": "eb:mission:independent-government-oversight",
+      "predicate": "seeks",
+      "to": "eb:outcome:work-meets-standards"
+    },
+    {
+      "id": "rel:oversight-planning-contributes-to-effective-programs",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:effective-programs"
+    },
+    {
+      "id": "rel:oversight-planning-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:oversight-planning-satisfies-plan-oversight-work",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "satisfies",
+      "to": "eb:requirement:plan-oversight-work"
+    },
+    {
+      "id": "rel:oversight-planning-satisfies-summarize-management-challenges",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "satisfies",
+      "to": "eb:requirement:summarize-management-challenges"
+    },
+    {
+      "id": "rel:oversight-planning-candidate-pattern-audit-management-system",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:audit-management-system",
+      "coverage": "partial",
+      "description": "Holds the plan, with each project’s scope, schedule, and status. Choosing the work is the office’s judgment."
+    },
+    {
+      "id": "rel:oversight-planning-candidate-pattern-oversight-data-analytics",
+      "from": "eb:capability:oversight-planning",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-data-analytics",
+      "coverage": "partial",
+      "description": "Shows where the risk is in the agency’s own data, to inform what goes in the plan."
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-satisfies-multi-channel-intake",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:multi-channel-intake"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-satisfies-acknowledge-receipt",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:acknowledge-receipt"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-satisfies-triage-and-route",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:triage-and-route"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-satisfies-protect-reporter-identity",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-reporter-identity"
+    },
+    {
+      "id": "rel:oig-candidate-pattern-1",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking"
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-candidate-pattern-confidential-hotline-intake",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:confidential-hotline-intake",
+      "coverage": "partial",
+      "description": "Takes reports from the public, including anonymous ones. Classifying and routing them happens in the case system it feeds."
+    },
+    {
+      "id": "rel:complaint-allegation-disclosure-intake-candidate-pattern-ai-assisted-intake-sorting",
+      "from": "eb:capability:complaint-allegation-disclosure-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "coverage": "partial",
+      "description": "Suggests a category and where to route each allegation, and intake staff decide. What the model sees must keep the identity of people who report confidential."
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-contributes-to-effective-programs",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:effective-programs"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-satisfies-follow-professional-standards",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "satisfies",
+      "to": "eb:requirement:follow-professional-standards"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-satisfies-document-findings",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "satisfies",
+      "to": "eb:requirement:document-findings"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-satisfies-get-timely-access-to-records",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "satisfies",
+      "to": "eb:requirement:get-timely-access-to-records"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-candidate-pattern-audit-management-system",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:audit-management-system"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-candidate-pattern-oversight-data-analytics",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-data-analytics",
+      "coverage": "partial",
+      "description": "Helps choose and scope audits, inspections, and evaluations. Doing and documenting them happens elsewhere."
+    },
+    {
+      "id": "rel:investigation-management-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:investigation-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:investigation-management-satisfies-track-case-status",
+      "from": "eb:capability:investigation-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-case-status"
+    },
+    {
+      "id": "rel:investigation-management-satisfies-link-evidence",
+      "from": "eb:capability:investigation-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:link-evidence"
+    },
+    {
+      "id": "rel:investigation-management-satisfies-restrict-case-access",
+      "from": "eb:capability:investigation-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:restrict-case-access"
+    },
+    {
+      "id": "rel:investigation-management-satisfies-refer-possible-crimes",
+      "from": "eb:capability:investigation-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:refer-possible-crimes"
+    },
+    {
+      "id": "rel:oig-candidate-pattern-2",
+      "from": "eb:capability:investigation-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking"
+    },
+    {
+      "id": "rel:investigation-management-candidate-pattern-oversight-data-analytics",
+      "from": "eb:capability:investigation-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-data-analytics",
+      "coverage": "partial",
+      "description": "Finds leads. Each one is assessed and investigated in the case system."
+    },
+    {
+      "id": "rel:investigation-management-candidate-pattern-digital-evidence-store",
+      "from": "eb:capability:investigation-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:digital-evidence-store",
+      "coverage": "partial",
+      "description": "Keeps digital evidence and its custody. The case itself is managed in the case system."
+    },
+    {
+      "id": "rel:whistleblower-protection-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:whistleblower-protection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:whistleblower-protection-satisfies-educate-about-retaliation-protections",
+      "from": "eb:capability:whistleblower-protection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:educate-about-retaliation-protections"
+    },
+    {
+      "id": "rel:whistleblower-protection-satisfies-decide-contractor-reprisal-complaints",
+      "from": "eb:capability:whistleblower-protection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:decide-contractor-reprisal-complaints"
+    },
+    {
+      "id": "rel:whistleblower-protection-candidate-pattern-oversight-intake-case-tracking",
+      "from": "eb:capability:whistleblower-protection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking",
+      "coverage": "partial",
+      "description": "Reprisal complaints as a case type of their own, with the 180-day clock. Educating employees happens elsewhere."
+    },
+    {
+      "id": "rel:whistleblower-protection-candidate-pattern-confidential-hotline-intake",
+      "from": "eb:capability:whistleblower-protection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:confidential-hotline-intake",
+      "coverage": "partial",
+      "description": "Takes reprisal complaints, and links to the rights and routes employees need to know."
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-contributes-to-effective-programs",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:effective-programs"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-contributes-to-problems-corrected",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:problems-corrected"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-satisfies-track-recommendations",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-recommendations"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-satisfies-follow-to-management-decision",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:follow-to-management-decision"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-satisfies-report-open-recommendations",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-open-recommendations"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-candidate-pattern-audit-management-system",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:audit-management-system"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-candidate-pattern-shared-recommendation-tracker",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-recommendation-tracker"
+    },
+    {
+      "id": "rel:quality-assurance-contributes-to-work-meets-standards",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:work-meets-standards"
+    },
+    {
+      "id": "rel:quality-assurance-satisfies-quality-assurance-peer-review",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:quality-assurance-peer-review"
+    },
+    {
+      "id": "rel:quality-assurance-satisfies-investigations-peer-review",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:investigations-peer-review"
+    },
+    {
+      "id": "rel:quality-assurance-satisfies-report-peer-review-results",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-peer-review-results"
+    },
+    {
+      "id": "rel:quality-assurance-candidate-pattern-audit-management-system",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:audit-management-system",
+      "coverage": "partial",
+      "description": "Keeps quality control reviews and their results with the engagements they cover, and gives peer reviewers the work papers they sample."
+    },
+    {
+      "id": "rel:quality-assurance-candidate-pattern-oversight-intake-case-tracking",
+      "from": "eb:capability:quality-assurance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking",
+      "coverage": "partial",
+      "description": "Gives investigations peer reviewers the case files they sample, with each case’s history."
+    },
+    {
+      "id": "rel:oversight-reporting-communication-contributes-to-leaders-congress-informed",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:leaders-congress-informed"
+    },
+    {
+      "id": "rel:oversight-reporting-communication-satisfies-periodic-reporting",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "satisfies",
+      "to": "eb:requirement:periodic-reporting"
+    },
+    {
+      "id": "rel:oversight-reporting-communication-satisfies-report-serious-problems",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-serious-problems"
+    },
+    {
+      "id": "rel:oversight-reporting-communication-satisfies-publish-reports",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "satisfies",
+      "to": "eb:requirement:publish-reports"
+    },
+    {
+      "id": "rel:oversight-reporting-communication-candidate-pattern-shared-recommendation-tracker",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-recommendation-tracker",
+      "coverage": "partial",
+      "description": "Lists of open recommendations for the semiannual report and the website. The rest of the report comes from elsewhere."
+    },
+    {
+      "id": "rel:oversight-reporting-communication-candidate-pattern-oversight-reporting-from-source-data",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-reporting-from-source-data"
+    },
+    {
+      "id": "rel:oversight-reporting-communication-candidate-pattern-letters-from-case-data",
+      "from": "eb:capability:oversight-reporting-communication",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "coverage": "partial",
+      "description": "Drafts of routine notices and report sections, with the office’s wording, from the case and audit data."
+    },
+    {
+      "id": "rel:oversight-intake-case-tracking-depends-on-shared-case-platform",
+      "from": "eb:implementationPattern:oversight-intake-case-tracking",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "way": "agency-platform",
+      "description": "The office’s case types and steps are the shared platform, set up for oversight."
+    },
+    {
+      "id": "rel:oversight-intake-case-tracking-works-with-digital-evidence-store",
+      "from": "eb:implementationPattern:oversight-intake-case-tracking",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:digital-evidence-store",
+      "description": "Each item of digital evidence is linked to its case."
+    },
+    {
+      "id": "rel:confidential-hotline-intake-works-with-oversight-intake-case-tracking",
+      "from": "eb:implementationPattern:confidential-hotline-intake",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking",
+      "description": "Each report lands in the product’s intake queue."
+    },
+    {
+      "id": "rel:confidential-hotline-intake-works-with-shared-case-platform",
+      "from": "eb:implementationPattern:confidential-hotline-intake",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Each report lands in the office’s intake queue on the platform, kept apart from other offices."
+    },
+    {
+      "id": "rel:audit-management-system-depends-on-records-aware-collaboration",
+      "from": "eb:implementationPattern:audit-management-system",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:records-aware-collaboration",
+      "way": "workspace",
+      "description": "The workspaces, approvals, and retention labels are the agency’s collaboration suite."
+    },
+    {
+      "id": "rel:shared-recommendation-tracker-works-with-audit-management-system",
+      "from": "eb:implementationPattern:shared-recommendation-tracker",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:audit-management-system",
+      "description": "Recommendations start in the audit reports and are tracked to closure here."
+    },
+    {
+      "id": "rel:oversight-reporting-from-source-data-works-with-oversight-intake-case-tracking",
+      "from": "eb:implementationPattern:oversight-reporting-from-source-data",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking",
+      "description": "Case statistics for the semiannual report."
+    },
+    {
+      "id": "rel:oversight-reporting-from-source-data-works-with-audit-management-system",
+      "from": "eb:implementationPattern:oversight-reporting-from-source-data",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:audit-management-system",
+      "description": "Audit, inspection, and evaluation results."
+    },
+    {
+      "id": "rel:oversight-reporting-from-source-data-works-with-shared-recommendation-tracker",
+      "from": "eb:implementationPattern:oversight-reporting-from-source-data",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:shared-recommendation-tracker",
+      "description": "Open and closed recommendations."
+    },
+    {
+      "id": "rel:oversight-data-analytics-works-with-audit-management-system",
+      "from": "eb:implementationPattern:oversight-data-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:audit-management-system",
+      "description": "Risks it finds feed the plan of oversight work."
+    },
+    {
+      "id": "rel:cigie-training-institute-helps-with-independent-government-oversight",
+      "from": "eb:resource:cigie-training-institute",
+      "predicate": "helps_with",
+      "to": "eb:mission:independent-government-oversight"
+    },
+    {
+      "id": "rel:cigie-training-institute-helps-with-audit-inspection-evaluation",
+      "from": "eb:resource:cigie-training-institute",
+      "predicate": "helps_with",
+      "to": "eb:capability:audit-inspection-evaluation"
+    },
+    {
+      "id": "rel:cigie-training-institute-helps-with-investigation-management",
+      "from": "eb:resource:cigie-training-institute",
+      "predicate": "helps_with",
+      "to": "eb:capability:investigation-management"
+    },
+    {
+      "id": "rel:open-ig-recommendations-helps-with-recommendations-corrective-action-monitoring",
+      "from": "eb:resource:open-ig-recommendations",
+      "predicate": "helps_with",
+      "to": "eb:capability:recommendations-corrective-action-monitoring"
+    },
+    {
+      "id": "rel:open-ig-recommendations-helps-with-problems-corrected",
+      "from": "eb:resource:open-ig-recommendations",
+      "predicate": "helps_with",
+      "to": "eb:outcome:problems-corrected"
+    },
+    {
+      "id": "rel:osc-2302c-certification-helps-with-whistleblower-protection",
+      "from": "eb:resource:osc-2302c-certification",
+      "predicate": "helps_with",
+      "to": "eb:capability:whistleblower-protection"
+    },
+    {
+      "id": "rel:osc-2302c-certification-helps-with-educate-about-retaliation-protections",
+      "from": "eb:resource:osc-2302c-certification",
+      "predicate": "helps_with",
+      "to": "eb:requirement:educate-about-retaliation-protections"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:identity-access-management-satisfies-restrict-case-access",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:restrict-case-access"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:data-protection-privacy-satisfies-protect-reporter-identity",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-reporter-identity"
+    },
+    {
+      "id": "rel:records-management-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:records-management-contributes-to-leaders-congress-informed",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:leaders-congress-informed"
+    },
+    {
+      "id": "rel:security-logging-monitoring-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:case-management-contributes-to-fraud-waste-abuse-prevented",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fraud-waste-abuse-prevented"
+    },
+    {
+      "id": "rel:case-management-contributes-to-concerns-raised-safely",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:concerns-raised-safely"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-oversight-intake-case-tracking",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:mission-results",
+      "title": "Mission results discovery",
+      "questions": [
+        {
+          "id": "question:priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "effective-programs",
+              "label": "Programs and operations run economically, efficiently, and effectively"
+            },
+            {
+              "value": "fraud-waste-abuse-prevented",
+              "label": "Fraud, waste, and abuse are prevented and detected"
+            },
+            {
+              "value": "leaders-congress-informed",
+              "label": "Agency leaders and Congress are fully and currently informed"
+            },
+            {
+              "value": "problems-corrected",
+              "label": "Problems that are found get corrected"
+            },
+            {
+              "value": "concerns-raised-safely",
+              "label": "People can raise concerns safely"
+            },
+            {
+              "value": "work-meets-standards",
+              "label": "The office’s work is independent and meets professional standards"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "effective-programs",
+              "elementId": "eb:outcome:effective-programs",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "fraud-waste-abuse-prevented",
+              "elementId": "eb:outcome:fraud-waste-abuse-prevented",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "leaders-congress-informed",
+              "elementId": "eb:outcome:leaders-congress-informed",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "problems-corrected",
+              "elementId": "eb:outcome:problems-corrected",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "concerns-raised-safely",
+              "elementId": "eb:outcome:concerns-raised-safely",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "work-meets-standards",
+              "elementId": "eb:outcome:work-meets-standards",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:tracked-measures",
+          "prompt": "Which of these does the office track today?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "semiannual-statistics",
+              "label": "The statistics in the semiannual report to Congress"
+            },
+            {
+              "value": "recommendation-status",
+              "label": "Open recommendations and how long they’ve been open"
+            },
+            {
+              "value": "report-posting",
+              "label": "How soon reports are posted publicly"
+            },
+            {
+              "value": "intake-times",
+              "label": "How long new matters take to review and route"
+            },
+            {
+              "value": "peer-reviews",
+              "label": "Peer review ratings and their open recommendations"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "semiannual-statistics",
+              "elementId": "eb:measure:questioned-costs",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "semiannual-statistics",
+              "elementId": "eb:measure:funds-put-to-better-use",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "semiannual-statistics",
+              "elementId": "eb:measure:investigative-results",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "recommendation-status",
+              "elementId": "eb:measure:open-recommendations",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "recommendation-status",
+              "elementId": "eb:measure:reports-awaiting-decision",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "report-posting",
+              "elementId": "eb:measure:reports-posted-within-3-days",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "intake-times",
+              "elementId": "eb:measure:time-to-route",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "peer-reviews",
+              "elementId": "eb:measure:peer-review-results",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:measure-sources",
+          "prompt": "Where do those figures come from today, and who puts them together?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most and how the office tells how it’s doing. They ask about the office’s operations, never about individual matters or the people involved. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:intake-and-case-handling",
+      "title": "Intake and case handling discovery",
+      "questions": [
+        {
+          "id": "question:intake-channels",
+          "prompt": "Through which channels does the office receive complaints, allegations, and disclosures?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "online-form",
+              "label": "An online form"
+            },
+            {
+              "value": "hotline-phone",
+              "label": "A hotline phone number"
+            },
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "mail",
+              "label": "Postal mail"
+            },
+            {
+              "value": "in-person",
+              "label": "In person"
+            },
+            {
+              "value": "referrals",
+              "label": "Referrals from the agency, other offices, or Congress"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "online-form",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "hotline-phone",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "in-person",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "referrals",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Matters reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "online-form",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "hotline-phone",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "in-person",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "referrals",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel the office offers needs to feed the same intake record."
+            },
+            {
+              "answerValue": "online-form",
+              "elementId": "eb:implementationPattern:confidential-hotline-intake",
+              "interpretation": "An online form is the front door of a confidential hotline."
+            },
+            {
+              "answerValue": "hotline-phone",
+              "elementId": "eb:implementationPattern:confidential-hotline-intake",
+              "interpretation": "A phone line can feed the same confidential intake as the form."
+            }
+          ]
+        },
+        {
+          "id": "question:intake-triage",
+          "prompt": "After a matter arrives, how is it reviewed and routed?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "staff-review",
+              "label": "Staff review each one and route it by hand"
+            },
+            {
+              "value": "rules-assisted",
+              "label": "Staff review with the help of defined criteria or tooling"
+            },
+            {
+              "value": "informal",
+              "label": "It varies; there’s no consistent process"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "staff-review",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Review and routing are manual, which may be worth improving within intake."
+            },
+            {
+              "answerValue": "informal",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Review and routing vary, which suggests a gap within intake."
+            },
+            {
+              "answerValue": "informal",
+              "elementId": "eb:implementationPattern:oversight-intake-case-tracking",
+              "interpretation": "A consistent intake and assignment flow is part of the case tracking pattern."
+            },
+            {
+              "answerValue": "staff-review",
+              "elementId": "eb:requirement:triage-and-route",
+              "interpretation": "Routing by hand works best with recorded decisions and reasons."
+            },
+            {
+              "answerValue": "informal",
+              "elementId": "eb:requirement:triage-and-route",
+              "interpretation": "Review and routing vary, so a consistent way to triage is worth defining."
+            }
+          ]
+        },
+        {
+          "id": "question:case-tracking",
+          "prompt": "Where is the status of investigative work tracked today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "case-system",
+              "label": "A dedicated case management system"
+            },
+            {
+              "value": "shared-system",
+              "label": "A system shared with the wider agency"
+            },
+            {
+              "value": "documents",
+              "label": "Spreadsheets, documents, or email"
+            },
+            {
+              "value": "several",
+              "label": "Several of these, depending on the team"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "case-system",
+              "elementId": "eb:capability:investigation-management",
+              "interpretation": "Investigative work is tracked in a dedicated system."
+            },
+            {
+              "answerValue": "shared-system",
+              "elementId": "eb:capability:investigation-management",
+              "interpretation": "Investigative work is tracked in a shared system, which may raise access questions."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:investigation-management",
+              "interpretation": "Investigative work is tracked in documents, which may be a gap in investigation management."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:oversight-intake-case-tracking",
+              "interpretation": "Tracking in documents suggests the case tracking pattern is worth exploring."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:capability:investigation-management",
+              "interpretation": "Investigative work is tracked in several places, which may make status hard to see."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:implementationPattern:oversight-intake-case-tracking",
+              "interpretation": "Tracking in several places suggests the case tracking pattern is worth exploring."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in documents is hard to see in one place."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in several places is hard to see in one place."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Work tracked in documents may be a gap in case management."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Work tracked in several places may make status hard to see."
+            },
+            {
+              "answerValue": "shared-system",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "A shared platform can work if the office controls administration and access."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Building on the agency’s platform is another way out of documents."
+            }
+          ]
+        },
+        {
+          "id": "question:evidence-linkage",
+          "prompt": "Do investigators need to keep evidence and records linked to the work they belong to?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:investigation-management",
+              "interpretation": "Evidence management is part of investigation management."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:implementationPattern:oversight-intake-case-tracking",
+              "interpretation": "Evidence linkage and audit trails are part of the case tracking pattern."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:link-evidence",
+              "interpretation": "Evidence needs to stay linked to its case."
+            }
+          ]
+        },
+        {
+          "id": "question:identity-protection",
+          "prompt": "Must the identity of people who report be kept from staff who don’t need to know it?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:complaint-allegation-disclosure-intake",
+              "interpretation": "Protecting the identity of people who report shapes how intake works."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:implementationPattern:oversight-intake-case-tracking",
+              "interpretation": "Appropriate access controls are part of the case tracking pattern."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:protect-reporter-identity",
+              "interpretation": "This is a requirement on intake."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:restrict-case-access",
+              "interpretation": "Case access needs to protect the identity of people who report."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:identity-access-management",
+              "interpretation": "Keeping identities from staff who don’t need them depends on access by role and need."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:data-protection-privacy",
+              "interpretation": "Reporters’ identities are sensitive personal information."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:implementationPattern:confidential-hotline-intake",
+              "interpretation": "A confidential hotline keeps reporters’ identities apart by design."
+            }
+          ]
+        },
+        {
+          "id": "question:audit-work",
+          "prompt": "Does the office plan and carry out audits, inspections, or evaluations?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:audit-inspection-evaluation",
+              "interpretation": "The office does audit, inspection, or evaluation work."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:plan-oversight-work",
+              "interpretation": "Audit, inspection, and evaluation work needs a plan."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:implementationPattern:audit-management-system",
+              "interpretation": "Audit management with electronic work papers is worth exploring."
+            }
+          ]
+        },
+        {
+          "id": "question:recommendation-tracking",
+          "prompt": "How does the office follow recommendations until they’re closed?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "system",
+              "label": "In a system built for it"
+            },
+            {
+              "value": "documents",
+              "label": "In spreadsheets or documents"
+            },
+            {
+              "value": "inconsistent",
+              "label": "Not consistently"
+            },
+            {
+              "value": "not-applicable",
+              "label": "The office doesn’t issue recommendations"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "system",
+              "elementId": "eb:capability:recommendations-corrective-action-monitoring",
+              "interpretation": "Recommendations are tracked in a system."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:recommendations-corrective-action-monitoring",
+              "interpretation": "Recommendations are tracked in documents, which may make follow-up hard to see."
+            },
+            {
+              "answerValue": "inconsistent",
+              "elementId": "eb:capability:recommendations-corrective-action-monitoring",
+              "interpretation": "Recommendations aren’t followed consistently, which suggests a gap in monitoring."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:requirement:track-recommendations",
+              "interpretation": "Recommendations tracked in documents are hard to follow to closure."
+            },
+            {
+              "answerValue": "inconsistent",
+              "elementId": "eb:requirement:track-recommendations",
+              "interpretation": "Recommendations aren’t followed consistently, so tracking them to closure is a need."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:shared-recommendation-tracker",
+              "interpretation": "A shared tracker replaces documents traded with the agency."
+            },
+            {
+              "answerValue": "inconsistent",
+              "elementId": "eb:implementationPattern:shared-recommendation-tracker",
+              "interpretation": "A shared tracker gives follow-up a single place."
+            }
+          ]
+        },
+        {
+          "id": "question:reporting",
+          "prompt": "Which reports and communications does the office produce?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "semiannual",
+              "label": "Semiannual reports to Congress"
+            },
+            {
+              "value": "work-reports",
+              "label": "Audit, inspection, and evaluation reports"
+            },
+            {
+              "value": "investigative-summaries",
+              "label": "Summaries of investigative results"
+            },
+            {
+              "value": "public-updates",
+              "label": "Public website updates"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "semiannual",
+              "elementId": "eb:capability:oversight-reporting-communication",
+              "interpretation": "The office reports to Congress."
+            },
+            {
+              "answerValue": "work-reports",
+              "elementId": "eb:capability:oversight-reporting-communication",
+              "interpretation": "The office publishes reports on its work."
+            },
+            {
+              "answerValue": "investigative-summaries",
+              "elementId": "eb:capability:oversight-reporting-communication",
+              "interpretation": "The office communicates investigative results."
+            },
+            {
+              "answerValue": "public-updates",
+              "elementId": "eb:capability:oversight-reporting-communication",
+              "interpretation": "The office communicates with the public."
+            },
+            {
+              "answerValue": "semiannual",
+              "elementId": "eb:requirement:periodic-reporting",
+              "interpretation": "Reports to Congress draw on the period’s results."
+            },
+            {
+              "answerValue": "public-updates",
+              "elementId": "eb:requirement:publish-reports",
+              "interpretation": "The office publishes to the public."
+            },
+            {
+              "answerValue": "semiannual",
+              "elementId": "eb:implementationPattern:oversight-reporting-from-source-data",
+              "interpretation": "Reporting from source data cuts the gathering before each semiannual report."
+            }
+          ]
+        },
+        {
+          "id": "question:work-planning",
+          "prompt": "How does the office decide what to audit, inspect, and evaluate?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "risk-based",
+              "label": "From a written risk assessment and the agency’s top challenges"
+            },
+            {
+              "value": "requests",
+              "label": "Mostly from what the law requires and what’s requested"
+            },
+            {
+              "value": "informal",
+              "label": "Informally, without a written plan"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "risk-based",
+              "elementId": "eb:capability:oversight-planning",
+              "interpretation": "The office plans its work from risk."
+            },
+            {
+              "answerValue": "requests",
+              "elementId": "eb:capability:oversight-planning",
+              "interpretation": "The plan is mostly set by mandates and requests, which leaves little room to choose by risk."
+            },
+            {
+              "answerValue": "informal",
+              "elementId": "eb:capability:oversight-planning",
+              "interpretation": "Work is chosen without a written plan, which suggests a gap in planning."
+            },
+            {
+              "answerValue": "informal",
+              "elementId": "eb:requirement:plan-oversight-work",
+              "interpretation": "A written plan, with each project’s scope, schedule, and status, is a need."
+            },
+            {
+              "answerValue": "requests",
+              "elementId": "eb:implementationPattern:oversight-data-analytics",
+              "interpretation": "The agency’s own data can show where the risk is, to weigh against the mandates."
+            }
+          ]
+        },
+        {
+          "id": "question:reprisal-complaints",
+          "prompt": "Does the office receive complaints of reprisal, from agency employees or from employees of contractors and grantees?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "agency-employees",
+              "label": "From agency employees"
+            },
+            {
+              "value": "contractor-employees",
+              "label": "From employees of contractors or grantees"
+            },
+            {
+              "value": "neither",
+              "label": "Neither, or not that we know of"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "agency-employees",
+              "elementId": "eb:capability:whistleblower-protection",
+              "interpretation": "The office handles reprisal complaints from employees."
+            },
+            {
+              "answerValue": "contractor-employees",
+              "elementId": "eb:capability:whistleblower-protection",
+              "interpretation": "The office handles reprisal complaints from contractor and grantee employees."
+            },
+            {
+              "answerValue": "contractor-employees",
+              "elementId": "eb:requirement:decide-contractor-reprisal-complaints",
+              "interpretation": "These complaints have a 180-day clock."
+            },
+            {
+              "answerValue": "agency-employees",
+              "elementId": "eb:requirement:educate-about-retaliation-protections",
+              "interpretation": "Employees need to know their protections and where to seek review."
+            }
+          ]
+        },
+        {
+          "id": "question:peer-review-readiness",
+          "prompt": "How does the office get ready for its external peer reviews?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "ongoing",
+              "label": "Its own quality reviews run all year"
+            },
+            {
+              "value": "gathered",
+              "label": "It gathers what reviewers need when a review comes up"
+            },
+            {
+              "value": "not-yet",
+              "label": "It hasn’t had one yet"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "ongoing",
+              "elementId": "eb:capability:quality-assurance",
+              "interpretation": "The office reviews the quality of its own work."
+            },
+            {
+              "answerValue": "gathered",
+              "elementId": "eb:capability:quality-assurance",
+              "interpretation": "Gathering for each review suggests quality assurance isn’t part of the everyday work."
+            },
+            {
+              "answerValue": "not-yet",
+              "elementId": "eb:capability:quality-assurance",
+              "interpretation": "A first peer review is ahead."
+            },
+            {
+              "answerValue": "gathered",
+              "elementId": "eb:requirement:quality-assurance-peer-review",
+              "interpretation": "An ongoing quality program makes each peer review easier."
+            },
+            {
+              "answerValue": "gathered",
+              "elementId": "eb:implementationPattern:audit-management-system",
+              "interpretation": "Work papers in one system are ready for reviewers to sample."
+            }
+          ]
+        },
+        {
+          "id": "question:monthly-volume",
+          "prompt": "About how many new matters does the office receive in a typical month?",
+          "kind": "number"
+        },
+        {
+          "id": "question:hardest-part",
+          "prompt": "What’s the hardest part of taking a matter from intake to closure today?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the first conversations about how an office receives matters, works them, and reports on them. They ask about the office’s operations, never about individual matters or the people involved. Some answers point to capabilities or patterns worth exploring."
+    }
+  ]
+}

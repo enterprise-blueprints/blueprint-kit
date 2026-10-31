@@ -1,0 +1,1379 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "org.enterprise-blueprints.common",
+  "idPrefix": "eb",
+  "version": "0.12.0",
+  "title": "Common Capabilities — Shared Across Missions",
+  "description": "Capabilities nearly every public organization relies on, whatever its mission: identity and access, data protection and privacy, records, security logging, and case management, with their reference requirements, example patterns for them, such as a shared case platform, agency sign-on, security monitoring, and checks of SAM.gov, and a short discovery question set. Mission packages build on this one.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-10-30",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies"
+  ],
+  "tags": [
+    "shared-capabilities",
+    "identity",
+    "privacy",
+    "records-management",
+    "case-management",
+    "security",
+    "reference-architecture"
+  ],
+  "sources": [
+    {
+      "id": "src:nist-sp-800-53",
+      "title": "NIST SP 800-53 Rev. 5 — Security and Privacy Controls for Information Systems and Organizations",
+      "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-27",
+      "note": "Control catalog, including the access control, identification and authentication, audit and accountability, and system and communications protection families."
+    },
+    {
+      "id": "src:nist-sp-800-63-4",
+      "title": "NIST SP 800-63-4 — Digital Identity Guidelines",
+      "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+      "kind": "official-reference",
+      "publicationDate": "2025-07-31",
+      "lastReviewedAt": "2026-10-27",
+      "note": "Requirements for identity proofing, authenticators, and authentication for people who use government systems."
+    },
+    {
+      "id": "src:privacy-act",
+      "title": "5 U.S.C. § 552a — Records maintained on individuals (Privacy Act of 1974)",
+      "url": "https://www.govinfo.gov/link/uscode/5/552a?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-27",
+      "note": "Limits how agencies disclose records about individuals, with listed exceptions, and requires an accounting of many disclosures."
+    },
+    {
+      "id": "src:nist-privacy-framework",
+      "title": "NIST Privacy Framework",
+      "url": "https://www.nist.gov/privacy-framework",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-27",
+      "note": "A voluntary framework for identifying and managing privacy risk, including knowing what personal data is processed and where."
+    },
+    {
+      "id": "src:records-44-usc-3101",
+      "title": "44 U.S.C. § 3101 — Records management by agency heads; general duties",
+      "url": "https://www.govinfo.gov/link/uscode/44/3101?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-27",
+      "note": "Agencies must make and keep records that document their organization, functions, policies, decisions, procedures, and essential transactions."
+    },
+    {
+      "id": "src:nara-grs",
+      "title": "National Archives — General Records Schedules",
+      "url": "https://www.archives.gov/records-mgmt/grs",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-27",
+      "note": "Approved disposition authorities for records common to many federal agencies."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    },
+    {
+      "id": "src:sam-gov",
+      "title": "SAM.gov — System for Award Management",
+      "url": "https://sam.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Where businesses and other entities register to receive federal awards, and where agencies check registrations, exclusions, and responsibility and qualification records before awarding contracts and grants."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:capability:identity-access-management",
+      "type": "capability",
+      "title": "Identity & Access Management",
+      "description": "Ability to know who is using the office’s systems and to grant, review, and remove their access to information according to their role and need.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53",
+        "src:nist-sp-800-63-4"
+      ],
+      "applicabilityNotes": "Shared across missions. Many offices rely on an agency-wide identity service; the office may still own who gets access to its own systems and records.",
+      "attributes": {
+        "stage": "across-the-work"
+      }
+    },
+    {
+      "id": "eb:capability:data-protection-privacy",
+      "type": "capability",
+      "title": "Data Protection & Privacy",
+      "description": "Ability to protect sensitive and personal information wherever it’s kept: knowing where it is, limiting who sees it, sharing it only as allowed, and keeping it safe in storage and in transit.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53",
+        "src:privacy-act",
+        "src:nist-privacy-framework"
+      ],
+      "applicabilityNotes": "Shared across missions. What counts as sensitive, and which disclosures are allowed, depends on the laws and notices that apply to each office.",
+      "attributes": {
+        "stage": "across-the-work"
+      }
+    },
+    {
+      "id": "eb:capability:records-management",
+      "type": "capability",
+      "title": "Records Management",
+      "description": "Ability to make and keep records of the office’s work and decisions, and to keep or dispose of each kind of record on an approved schedule.",
+      "status": "reference",
+      "sourceIds": [
+        "src:records-44-usc-3101",
+        "src:nara-grs"
+      ],
+      "applicabilityNotes": "Shared across missions. Schedules for mission-specific records are approved for each agency; the General Records Schedules cover records common to many.",
+      "attributes": {
+        "stage": "across-the-work"
+      }
+    },
+    {
+      "id": "eb:capability:security-logging-monitoring",
+      "type": "capability",
+      "title": "Security Logging & Monitoring",
+      "description": "Ability to record what happens in the office’s systems, such as sign-ins, access to sensitive information, and changes, and to review those records and act on what they show.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "applicabilityNotes": "Shared across missions. Logging is often run agency-wide; the office decides what in its own systems needs watching.",
+      "attributes": {
+        "stage": "across-the-work"
+      }
+    },
+    {
+      "id": "eb:capability:case-management",
+      "type": "capability",
+      "title": "Case Management",
+      "description": "Ability to track each matter the office handles, such as a request, a complaint, or a case, from the time it arrives until it’s closed: who has it, where it stands, what’s due when, and what belongs to it.",
+      "status": "reference",
+      "applicabilityNotes": "Shared across missions. Each mission adds its own steps, such as triage or review, on top of the same way of tracking work.",
+      "attributes": {
+        "stage": "across-the-work"
+      }
+    },
+    {
+      "id": "eb:requirement:access-by-role",
+      "type": "requirement",
+      "title": "Grant access by role and need",
+      "description": "Give each person access to the information and systems their role needs, and no more, and change or remove it when their role changes or they leave.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:strong-sign-in",
+      "type": "requirement",
+      "title": "Require strong sign-in",
+      "description": "Confirm who people are when they sign in, with more than a password for staff and for anything sensitive.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-63-4",
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:review-access",
+      "type": "requirement",
+      "title": "Review access regularly",
+      "description": "Check who has access to what on a regular schedule, and remove access that’s no longer needed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:encrypt-sensitive-information",
+      "type": "requirement",
+      "title": "Encrypt sensitive information",
+      "description": "Protect sensitive information with encryption while it’s stored and while it moves between systems.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:know-where-personal-information-is",
+      "type": "requirement",
+      "title": "Know where personal information is kept",
+      "description": "Keep track of which systems hold personal information, what kinds, and why it was collected.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-privacy-framework",
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:share-personal-information-as-allowed",
+      "type": "requirement",
+      "title": "Share personal information only as allowed",
+      "description": "Disclose records about people only with their consent or under an exception the law allows, and keep an account of disclosures where the law requires one.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:document-decisions",
+      "type": "requirement",
+      "title": "Keep records of decisions and actions",
+      "description": "Make and keep records that show how the office is organized and what it decided and did.",
+      "status": "reference",
+      "sourceIds": [
+        "src:records-44-usc-3101"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:follow-records-schedules",
+      "type": "requirement",
+      "title": "Keep and dispose of records on approved schedules",
+      "description": "Keep each kind of record for as long as its approved schedule says, then dispose of it or transfer it as the schedule directs.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nara-grs",
+        "src:records-44-usc-3101"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:log-system-activity",
+      "type": "requirement",
+      "title": "Record who did what in systems",
+      "description": "Keep a record of sign-ins, access to sensitive information, and changes, with enough detail to tell who did what and when.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:review-logs",
+      "type": "requirement",
+      "title": "Review logs and act on them",
+      "description": "Look at logged events regularly, by hand or automatically, and follow up on anything unusual.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:multi-channel-intake",
+      "type": "requirement",
+      "title": "Receive matters through several channels",
+      "description": "Accept matters, such as requests, complaints, and referrals, through each channel the office offers, like an online form, email, mail, and phone, and record each one in one place.",
+      "status": "reference",
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:acknowledge-receipt",
+      "type": "requirement",
+      "title": "Acknowledge receipt",
+      "description": "Let the person who sent a matter in know it was received, with a number they can use to ask about it, where that’s possible and appropriate.",
+      "status": "reference",
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:track-case-status",
+      "type": "requirement",
+      "title": "Show the status of every case in one place",
+      "description": "Keep each case’s status, assignment, and next steps current and visible to the people who manage the work.",
+      "status": "reference",
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:track-deadlines",
+      "type": "requirement",
+      "title": "Track deadlines",
+      "description": "Know when each case is due, including deadlines set by law, and warn the people who have it before a deadline passes.",
+      "status": "reference",
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-case-file",
+      "type": "requirement",
+      "title": "Keep a case’s documents with it",
+      "description": "Keep the documents, correspondence, and notes that belong to a case linked to it, so anyone who picks the case up sees its whole history.",
+      "status": "reference",
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:report-on-caseload",
+      "type": "requirement",
+      "title": "Report on the caseload",
+      "description": "Count cases by type, status, and age whenever they’re needed, for managers and for required reports.",
+      "status": "reference",
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:shared-case-platform",
+      "type": "implementationPattern",
+      "title": "Case Management on a Shared Platform",
+      "description": "An example architecture: case management built on a low-code or CRM platform the agency already runs, with each office getting its own case types, forms, queues, and permissions on the shared foundation.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "A case record with status, assignment, due dates, and linked documents, set up for each case type",
+          "Intake forms and an email channel that create cases",
+          "Work queues and dashboards for each team",
+          "Permissions by role that keep one office’s cases apart from another’s",
+          "Reports and exports from the same case data",
+          "Sign-in through the agency’s identity service, with activity logs sent to agency monitoring"
+        ],
+        "strengths": [
+          "Uses licenses, skills, and security approvals the agency already has",
+          "Offices share one way of tracking work, so reporting across them is easier",
+          "New fields and steps can often be added by configuration instead of code"
+        ],
+        "fitsWhen": [
+          "The agency already runs a platform like this, with people who configure it",
+          "The office’s cases are fairly standard, without specialized tools such as redaction or evidence handling",
+          "Several offices need similar tracking"
+        ],
+        "watchFor": [
+          "Platform administrators can often see every office’s data unless permissions and administration are set up to prevent it",
+          "Specialized rules, such as deadlines counted in working days, may need custom work that’s costly to keep up",
+          "Upgrades and licensing are decided for the whole agency, not for the office"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s low-code or CRM platform"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:agency-sign-on",
+      "type": "implementationPattern",
+      "title": "Agency Sign-On with Phishing-Resistant Authentication",
+      "description": "An example architecture: every system signs staff in through the agency’s identity provider, with phishing-resistant authenticators such as PIV cards or FIDO2 security keys, and grants access through role groups that are reviewed on a schedule.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-63-4",
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "layer": "security-identity",
+        "parts": [
+          "The agency’s identity provider, with single sign-on to each system",
+          "Phishing-resistant authenticators for staff, such as PIV cards or FIDO2 security keys",
+          "Role groups that grant access, each owned by the office that owns the system",
+          "Steps for people who join, change roles, or leave, tied to personnel actions",
+          "Access reviews on a schedule, signed off by system owners",
+          "Sign-in and access events sent to security logging"
+        ],
+        "strengths": [
+          "One strong sign-in for every system instead of a password for each",
+          "Removing a person’s access in one place removes it everywhere",
+          "Access reviews work from the same groups that grant access"
+        ],
+        "fitsWhen": [
+          "The agency’s identity provider can connect to the office’s systems",
+          "Staff already carry PIV cards or can be issued security keys"
+        ],
+        "watchFor": [
+          "Systems that can’t use single sign-on keep their own accounts, which need their own reviews",
+          "Each role group needs an owner in the office, or access drifts",
+          "Members of the public, such as requesters or people who report, need a different way to sign in, or none"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s identity provider"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:records-aware-collaboration",
+      "type": "implementationPattern",
+      "title": "Collaboration Workspace with Records and Sensitivity Labels",
+      "description": "An example architecture: the agency’s office suite and collaboration workspace, for documents, chat, and meetings, with retention labels that keep work on approved records schedules and sensitivity labels that limit who can open, share, or copy sensitive information.",
+      "status": "reference",
+      "sourceIds": [
+        "src:records-44-usc-3101",
+        "src:nara-grs",
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "layer": "worker-productivity",
+        "parts": [
+          "Shared documents, chat, and meetings for each team, signed in through the agency",
+          "Retention labels that apply an approved records schedule to files and messages",
+          "Sensitivity labels that limit opening, sharing, and copying, and protect files that leave the agency",
+          "Rules that warn or block when personal or sensitive information is shared outside the team",
+          "Search across files and messages for records requests and legal holds"
+        ],
+        "strengths": [
+          "Records and protection go wherever staff already work, instead of in a separate system",
+          "Messages and drafts that are records are kept on schedule, not left to each person",
+          "The same labels serve records requests, legal holds, and investigations"
+        ],
+        "fitsWhen": [
+          "Much of the office’s work happens in documents, email, and chat outside its business applications",
+          "Records schedules and sensitivity rules are hard to apply by hand"
+        ],
+        "watchFor": [
+          "Labels only help if they’re applied, so defaults and automatic labeling matter",
+          "Chat and meeting recordings can be records too, which surprises people",
+          "Work kept here and in a business application needs one answer to which copy is the record"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s office and collaboration suite"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:letters-from-case-data",
+      "type": "implementationPattern",
+      "title": "Letters and Notices from Case Data",
+      "description": "An example architecture: letters, notices, and report sections drafted from approved templates filled in with a case’s data, reviewed and signed by staff, then saved back to the case file.",
+      "status": "reference",
+      "sourceIds": [
+        "src:records-44-usc-3101"
+      ],
+      "attributes": {
+        "layer": "worker-productivity",
+        "parts": [
+          "A library of approved templates, each with an owner",
+          "Fields filled in from the case, such as names, dates, and decisions",
+          "Review and signature by the responsible person before anything goes out",
+          "The sent version saved to the case file, with when and how it was sent"
+        ],
+        "strengths": [
+          "Required wording, such as appeal rights, is in every letter",
+          "Less retyping of what the case already knows",
+          "Every letter sent is on the record with its case"
+        ],
+        "fitsWhen": [
+          "Staff send many similar letters or notices",
+          "Letters are written from scratch or copied from old ones today"
+        ],
+        "watchFor": [
+          "Templates need an owner to keep them current when the law or policy changes",
+          "A filled-in letter still needs a person to read it before it goes out"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "Templates filled from case data"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:agency-security-monitoring",
+      "type": "implementationPattern",
+      "title": "Activity Logs in the Agency’s Security Monitoring",
+      "description": "An example architecture: each of the office’s systems sends its sign-in, access, and change logs to the agency’s security monitoring, where the security operations team watches for threats, and the office adds alerts for what matters to it, such as someone opening a restricted case.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "layer": "security-identity",
+        "parts": [
+          "Log forwarding from each system to the agency’s security monitoring",
+          "Sign-in, access, and change events that say who did what, and when",
+          "Alerts the office defines, such as access to restricted cases or large exports",
+          "A way for the office to review its own systems’ activity, apart from other offices’",
+          "Retention that follows the agency’s logging policy and records schedule"
+        ],
+        "strengths": [
+          "Uses monitoring the agency already runs, often around the clock",
+          "Events from several systems can be followed together, such as a sign-in followed by a large export",
+          "Logs are kept apart from the systems that make them, so they’re harder to alter"
+        ],
+        "fitsWhen": [
+          "The agency runs a security operations center that collects logs centrally",
+          "The office’s systems can send logs in a standard format"
+        ],
+        "watchFor": [
+          "Agency security staff may see activity in sensitive systems, so who can search the office’s logs needs agreeing",
+          "Logs can hold sensitive details, such as names in search terms, and need the same protection as the data",
+          "Alerts nobody reviews add cost without adding safety"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s security monitoring"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:built-in-audit-trails",
+      "type": "implementationPattern",
+      "title": "Each System’s Own Audit Trail, Reviewed by the Office",
+      "description": "An example architecture: each product’s built-in audit trail records who viewed or changed what, and the office’s system owners run its reports on a schedule and look into anything unusual.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-53"
+      ],
+      "attributes": {
+        "layer": "security-identity",
+        "parts": [
+          "The audit trail each product keeps of views, changes, and exports",
+          "Reports run on a schedule, such as access to restricted records or changes to permissions",
+          "A record of each review and of what was looked into"
+        ],
+        "strengths": [
+          "Needs no new tools, and the office controls who reads its logs",
+          "Audit trails often show views of single records that general logs miss"
+        ],
+        "fitsWhen": [
+          "The agency doesn’t collect logs centrally, or can’t keep the office’s logs apart",
+          "The office runs a few products with good audit trails"
+        ],
+        "watchFor": [
+          "Activity can’t be followed from one system to another",
+          "Reviews depend on someone remembering to run them",
+          "A product’s administrators may be able to change or delete its audit trail"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "Each product’s built-in audit trail"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "type": "implementationPattern",
+      "title": "AI Suggestions for Sorting What Comes In",
+      "description": "An example architecture: as each new matter arrives, such as a request or a complaint, an AI model suggests its category, how urgent it looks, and where it should go, with its reasons, and the person doing intake accepts or changes each suggestion before anything moves.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-ai-rmf"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "A model that reads each new matter and suggests a category, an urgency, and where to route it",
+          "The reasons for each suggestion, shown beside it",
+          "A person who accepts or changes each suggestion, with the decision recorded",
+          "Regular checks of how often suggestions are changed, by category",
+          "Limits on what the model sees, so sensitive details stay within the office’s systems"
+        ],
+        "strengths": [
+          "Intake staff start from a suggestion instead of reading everything cold",
+          "Urgent matters can come to the top sooner",
+          "Recorded decisions show where the suggestions help and where they don’t"
+        ],
+        "fitsWhen": [
+          "Intake volume is high and the categories are well defined",
+          "The case system can show suggestions on the intake screen"
+        ],
+        "watchFor": [
+          "Suggestions can be wrong, or better for some kinds of matters than others, so people decide and accuracy is checked over time",
+          "The agency’s AI governance may require an impact assessment and a listing in its AI use case inventory first",
+          "What’s sent to a model may include personal or sensitive information, so where it’s processed and kept matters"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "An AI model the agency approves"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:sam-gov-entity-checks",
+      "type": "implementationPattern",
+      "title": "Entity Checks through SAM.gov’s APIs",
+      "description": "An example architecture: the agency’s award systems check each applicant’s or offeror’s SAM.gov registration, exclusions, and responsibility and qualification records through SAM.gov’s APIs, before an award and on a schedule while it’s open, and show the results, with their dates, where staff make the decision.",
+      "status": "reference",
+      "sourceIds": [
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Calls to SAM.gov’s entity and exclusions services by Unique Entity Identifier",
+          "A check before each award, with the results and their date saved to the award file",
+          "Rechecks on a schedule for open awards, such as for expiring registrations or new exclusions",
+          "Alerts to the responsible staff when a result changes",
+          "A record of each check, for audits and file reviews"
+        ],
+        "strengths": [
+          "Checks happen every time, with proof in the file",
+          "Changes after an award, such as a new exclusion, are noticed",
+          "Grants and contract systems can share the same checks"
+        ],
+        "fitsWhen": [
+          "Staff check SAM.gov by hand and save screenshots today",
+          "The agency’s award systems can call outside services"
+        ],
+        "watchFor": [
+          "A check only shows the records, and the award decision, such as a responsibility determination, is still a person’s",
+          "SAM.gov’s services and keys change, and someone has to keep the connection working",
+          "Some records need a federal user’s access, so how the system signs in to SAM.gov needs approval"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "A connection to SAM.gov’s APIs"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:records-in-business-systems",
+      "type": "implementationPattern",
+      "title": "Records Schedules in Each Business System",
+      "description": "An example architecture: each business system, such as a case or audit system, applies the agency’s records schedules to what it holds, keeping each record for its retention period, holding records during litigation or an investigation, and disposing of or transferring them when the schedule says.",
+      "status": "reference",
+      "sourceIds": [
+        "src:records-44-usc-3101",
+        "src:nara-grs"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "Each kind of record in the system mapped to its records schedule item",
+          "Retention periods that start from the right event, such as a case’s closure",
+          "Holds that stop disposal during litigation, audits, or investigations",
+          "Disposal with the records officer’s approval, or transfer of permanent records to the National Archives",
+          "A report of what was disposed of or transferred, and when"
+        ],
+        "strengths": [
+          "Records are kept as long as required, and not much longer",
+          "A cleanup can’t remove records under a hold",
+          "Permanent records reach the National Archives in a form it accepts"
+        ],
+        "fitsWhen": [
+          "Business systems keep records with no retention rules today",
+          "The agency is moving to fully electronic records"
+        ],
+        "watchFor": [
+          "Mapping each kind of record to a schedule item takes records officers’ time",
+          "Older systems may not support holds or disposal, so records pile up",
+          "Disposal needs the records officer’s approval, and a record of it"
+        ],
+        "ways": [
+          {
+            "id": "built-in",
+            "approach": "product",
+            "title": "Each system’s own retention features",
+            "description": "Retention rules, holds, and disposal set up in each system that supports them.",
+            "fitsWhen": [
+              "The office’s systems have good retention features"
+            ],
+            "watchFor": [
+              "Each system is set up and checked on its own"
+            ]
+          },
+          {
+            "id": "records-service",
+            "approach": "platform",
+            "title": "An agency records service",
+            "description": "An agency records management service that applies schedules and holds across the systems connected to it.",
+            "fitsWhen": [
+              "The agency runs a records service its systems can connect to"
+            ],
+            "watchFor": [
+              "Each system needs a connection, and offices must agree who can place and see holds on their records"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:what-is-login-gov",
+      "type": "resource",
+      "title": "What is Login.gov?",
+      "description": "A short introduction to Login.gov, the government’s shared sign-in and identity verification service for the public, and how people use one account across agencies. Login.gov suggests partner agencies use it in their own onboarding and outreach.",
+      "status": "reference",
+      "attributes": {
+        "kind": "video",
+        "url": "https://www.youtube.com/watch?v=ayDtFd5Ugyk",
+        "by": "Login.gov, General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:login-gov-developer-docs",
+      "type": "resource",
+      "title": "Login.gov developer documentation",
+      "description": "How to connect a system the public signs in to with Login.gov, over OpenID Connect or SAML, including identity verification, testing in the sandbox, and going live.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://developers.login.gov/",
+        "by": "Login.gov, General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:nara-records-management-training",
+      "type": "resource",
+      "title": "Records Management Training Program",
+      "description": "Free, self-paced records management training for federal employees, with lessons, short videos, webinars for records managers, and job aids. Designated agency records officers earn their required credential here.",
+      "status": "reference",
+      "attributes": {
+        "kind": "course",
+        "url": "https://www.archives.gov/records-mgmt/training",
+        "by": "National Archives and Records Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:universal-erm-requirements",
+      "type": "resource",
+      "title": "Universal Electronic Records Management Requirements",
+      "description": "A spreadsheet of baseline requirements for managing electronic records, from capture through disposal, transfer, metadata, and reporting, each marked must-have or should-have. Agencies tailor it into the records requirements for a system they build or buy.",
+      "status": "reference",
+      "attributes": {
+        "kind": "template",
+        "url": "https://www.archives.gov/records-mgmt/policy/universalermrequirements",
+        "by": "National Archives and Records Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:event-logging-best-practices",
+      "type": "resource",
+      "title": "Best Practices for Event Logging and Threat Detection",
+      "description": "International guidance on what to log, how to protect and keep logs, and how to use them to detect threats, as a baseline an organization can meet within its resources.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.cisa.gov/resources-tools/resources/best-practices-event-logging-and-threat-detection",
+        "by": "Australian Signals Directorate and partners, including CISA, the FBI, and NSA",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:identity-access-management-satisfies-access-by-role",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:access-by-role"
+    },
+    {
+      "id": "rel:identity-access-management-satisfies-strong-sign-in",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:strong-sign-in"
+    },
+    {
+      "id": "rel:identity-access-management-satisfies-review-access",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-access"
+    },
+    {
+      "id": "rel:identity-access-management-candidate-pattern-agency-sign-on",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
+      "id": "rel:data-protection-privacy-satisfies-encrypt-sensitive-information",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "satisfies",
+      "to": "eb:requirement:encrypt-sensitive-information"
+    },
+    {
+      "id": "rel:data-protection-privacy-satisfies-know-where-personal-information-is",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "satisfies",
+      "to": "eb:requirement:know-where-personal-information-is"
+    },
+    {
+      "id": "rel:data-protection-privacy-satisfies-share-personal-information-as-allowed",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "satisfies",
+      "to": "eb:requirement:share-personal-information-as-allowed"
+    },
+    {
+      "id": "rel:data-protection-privacy-candidate-pattern-records-aware-collaboration",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:records-aware-collaboration",
+      "coverage": "partial",
+      "description": "Labels and sharing rules protect what’s in the office suite. Information kept in the office’s other systems needs its own protection."
+    },
+    {
+      "id": "rel:records-management-satisfies-document-decisions",
+      "from": "eb:capability:records-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:document-decisions"
+    },
+    {
+      "id": "rel:records-management-satisfies-follow-records-schedules",
+      "from": "eb:capability:records-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:follow-records-schedules"
+    },
+    {
+      "id": "rel:records-management-candidate-pattern-records-aware-collaboration",
+      "from": "eb:capability:records-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:records-aware-collaboration",
+      "coverage": "partial",
+      "description": "Retention labels keep documents and messages on schedule. Records in case and other business systems need their schedules applied there."
+    },
+    {
+      "id": "rel:records-management-candidate-pattern-records-in-business-systems",
+      "from": "eb:capability:records-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:records-in-business-systems",
+      "coverage": "partial",
+      "description": "Applies schedules in the business systems. Documents and messages in the office suite need retention labels too."
+    },
+    {
+      "id": "rel:security-logging-monitoring-satisfies-log-system-activity",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:log-system-activity"
+    },
+    {
+      "id": "rel:security-logging-monitoring-satisfies-review-logs",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-logs"
+    },
+    {
+      "id": "rel:security-logging-monitoring-candidate-pattern-agency-security-monitoring",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:agency-security-monitoring"
+    },
+    {
+      "id": "rel:security-logging-monitoring-candidate-pattern-built-in-audit-trails",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:built-in-audit-trails",
+      "coverage": "partial",
+      "description": "Records and reviews what happens in each system, but doesn’t follow activity across systems or alert as it happens."
+    },
+    {
+      "id": "rel:case-management-satisfies-multi-channel-intake",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:multi-channel-intake"
+    },
+    {
+      "id": "rel:case-management-satisfies-acknowledge-receipt",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:acknowledge-receipt"
+    },
+    {
+      "id": "rel:case-management-satisfies-track-case-status",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-case-status"
+    },
+    {
+      "id": "rel:case-management-satisfies-track-deadlines",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-deadlines"
+    },
+    {
+      "id": "rel:case-management-satisfies-keep-case-file",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-case-file"
+    },
+    {
+      "id": "rel:case-management-satisfies-report-on-caseload",
+      "from": "eb:capability:case-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-on-caseload"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-letters-from-case-data",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "coverage": "partial",
+      "description": "Only the correspondence. The cases themselves are tracked elsewhere."
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-ai-assisted-intake-sorting",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "coverage": "partial",
+      "description": "Helps sort what arrives. Each matter is tracked in the case system."
+    },
+    {
+      "id": "rel:shared-case-platform-depends-on-agency-sign-on",
+      "from": "eb:implementationPattern:shared-case-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on",
+      "description": "Staff sign in through the agency, and access follows its role groups."
+    },
+    {
+      "id": "rel:records-aware-collaboration-depends-on-agency-sign-on",
+      "from": "eb:implementationPattern:records-aware-collaboration",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
+      "id": "rel:letters-from-case-data-works-with-shared-case-platform",
+      "from": "eb:implementationPattern:letters-from-case-data",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Fills templates from the case record and saves what’s sent back to it."
+    },
+    {
+      "id": "rel:agency-security-monitoring-works-with-agency-sign-on",
+      "from": "eb:implementationPattern:agency-security-monitoring",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:agency-sign-on",
+      "description": "Sign-in events come from the agency’s identity provider."
+    },
+    {
+      "id": "rel:ai-assisted-intake-sorting-works-with-shared-case-platform",
+      "from": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Suggestions appear in the platform’s intake queue."
+    },
+    {
+      "id": "rel:records-in-business-systems-works-with-records-aware-collaboration",
+      "from": "eb:implementationPattern:records-in-business-systems",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:records-aware-collaboration",
+      "description": "Business systems keep their records on schedule, and the collaboration workspace keeps documents and messages on schedule."
+    },
+    {
+      "id": "rel:what-is-login-gov-helps-with-identity-access-management",
+      "from": "eb:resource:what-is-login-gov",
+      "predicate": "helps_with",
+      "to": "eb:capability:identity-access-management"
+    },
+    {
+      "id": "rel:login-gov-developer-docs-helps-with-identity-access-management",
+      "from": "eb:resource:login-gov-developer-docs",
+      "predicate": "helps_with",
+      "to": "eb:capability:identity-access-management"
+    },
+    {
+      "id": "rel:nara-records-management-training-helps-with-records-management",
+      "from": "eb:resource:nara-records-management-training",
+      "predicate": "helps_with",
+      "to": "eb:capability:records-management"
+    },
+    {
+      "id": "rel:universal-erm-requirements-helps-with-records-management",
+      "from": "eb:resource:universal-erm-requirements",
+      "predicate": "helps_with",
+      "to": "eb:capability:records-management"
+    },
+    {
+      "id": "rel:universal-erm-requirements-helps-with-records-in-business-systems",
+      "from": "eb:resource:universal-erm-requirements",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:records-in-business-systems",
+      "way": "built-in"
+    },
+    {
+      "id": "rel:event-logging-best-practices-helps-with-security-logging-monitoring",
+      "from": "eb:resource:event-logging-best-practices",
+      "predicate": "helps_with",
+      "to": "eb:capability:security-logging-monitoring"
+    },
+    {
+      "id": "rel:event-logging-best-practices-helps-with-agency-security-monitoring",
+      "from": "eb:resource:event-logging-best-practices",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:agency-security-monitoring"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:shared-foundations",
+      "title": "Shared foundations discovery",
+      "questions": [
+        {
+          "id": "question:sign-in",
+          "prompt": "How do staff sign in to the office’s systems?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "password",
+              "label": "A password only"
+            },
+            {
+              "value": "second-factor",
+              "label": "A password and a second step, such as a code or an app"
+            },
+            {
+              "value": "smart-card",
+              "label": "A smart card or another phishing-resistant method"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by system"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "password",
+              "elementId": "eb:capability:identity-access-management",
+              "interpretation": "Sign-in is the front door to every system, so identity and access is part of the picture."
+            },
+            {
+              "answerValue": "password",
+              "elementId": "eb:requirement:strong-sign-in",
+              "interpretation": "A password alone falls short of strong sign-in."
+            },
+            {
+              "answerValue": "second-factor",
+              "elementId": "eb:capability:identity-access-management",
+              "interpretation": "Sign-in is the front door to every system, so identity and access is part of the picture."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:identity-access-management",
+              "interpretation": "Sign-in is the front door to every system, so identity and access is part of the picture."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:requirement:strong-sign-in",
+              "interpretation": "Some systems may fall short of strong sign-in."
+            },
+            {
+              "answerValue": "password",
+              "elementId": "eb:implementationPattern:agency-sign-on",
+              "interpretation": "Agency sign-on with phishing-resistant authentication is worth exploring."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:agency-sign-on",
+              "interpretation": "Bringing every system onto agency sign-on would make sign-in consistent."
+            }
+          ]
+        },
+        {
+          "id": "question:access-reviews",
+          "prompt": "Does the office review who has access to its systems on a regular schedule?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:review-access",
+              "interpretation": "Access reviews happen; it’s worth knowing how and how often."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:identity-access-management",
+              "interpretation": "Without reviews, access tends to outlast the need for it."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:review-access",
+              "interpretation": "Access isn’t reviewed on a schedule yet."
+            }
+          ]
+        },
+        {
+          "id": "question:personal-information",
+          "prompt": "Does the office’s work involve personal information about members of the public or staff?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:data-protection-privacy",
+              "interpretation": "Personal information needs protecting wherever it’s kept."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:know-where-personal-information-is",
+              "interpretation": "Knowing where it’s kept comes first."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:share-personal-information-as-allowed",
+              "interpretation": "Sharing it is limited by law."
+            }
+          ]
+        },
+        {
+          "id": "question:records-schedules",
+          "prompt": "Are the office’s main records covered by approved records schedules?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes, all of them"
+            },
+            {
+              "value": "some",
+              "label": "Some of them"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "some",
+              "elementId": "eb:capability:records-management",
+              "interpretation": "Records management is part of the picture."
+            },
+            {
+              "answerValue": "some",
+              "elementId": "eb:requirement:follow-records-schedules",
+              "interpretation": "Some records may be kept too long, or not long enough."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:capability:records-management",
+              "interpretation": "Records management is part of the picture."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:requirement:follow-records-schedules",
+              "interpretation": "Records aren’t on approved schedules yet."
+            },
+            {
+              "answerValue": "unsure",
+              "elementId": "eb:capability:records-management",
+              "interpretation": "Worth finding out who manages the office’s records."
+            }
+          ]
+        },
+        {
+          "id": "question:activity-logs",
+          "prompt": "Do the office’s systems keep a record of who viewed or changed sensitive information?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "all",
+              "label": "Yes, all of them"
+            },
+            {
+              "value": "some",
+              "label": "Some of them"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "some",
+              "elementId": "eb:capability:security-logging-monitoring",
+              "interpretation": "Logging is part of the picture."
+            },
+            {
+              "answerValue": "some",
+              "elementId": "eb:requirement:log-system-activity",
+              "interpretation": "Some systems don’t record who did what."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:capability:security-logging-monitoring",
+              "interpretation": "Logging is part of the picture."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:requirement:log-system-activity",
+              "interpretation": "Systems don’t record who did what yet."
+            },
+            {
+              "answerValue": "unsure",
+              "elementId": "eb:capability:security-logging-monitoring",
+              "interpretation": "Worth finding out what the systems record."
+            }
+          ]
+        },
+        {
+          "id": "question:matter-tracking",
+          "prompt": "Where does the office keep track of the requests, complaints, or cases it handles?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "case-system",
+              "label": "A case management system"
+            },
+            {
+              "value": "shared-system",
+              "label": "A system shared with the wider agency"
+            },
+            {
+              "value": "documents",
+              "label": "Spreadsheets, documents, or email"
+            },
+            {
+              "value": "several",
+              "label": "Several of these, depending on the team"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "case-system",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "The office tracks its work in a system already."
+            },
+            {
+              "answerValue": "shared-system",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "The office tracks its work in a shared system, which may raise access questions."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Work tracked in documents may be a gap in case management."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in documents is hard to see in one place."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Work tracked in several places may make status hard to see."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in several places is hard to see in one place."
+            }
+          ]
+        },
+        {
+          "id": "question:legal-deadlines",
+          "prompt": "Do any of the matters the office handles have deadlines set by law or regulation?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:track-deadlines",
+              "interpretation": "Deadlines set by law need tracking, with warnings before they pass."
+            }
+          ]
+        },
+        {
+          "id": "question:shared-platform",
+          "prompt": "Does the agency run a low-code or CRM platform that offices can build on?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "supported",
+              "label": "Yes, with a team that supports offices on it"
+            },
+            {
+              "value": "limited",
+              "label": "Yes, but support for new offices is limited"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "supported",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Building case management on the shared platform is worth weighing."
+            },
+            {
+              "answerValue": "limited",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "A shared platform is possible, but support for it may be the constraint."
+            }
+          ]
+        }
+      ],
+      "description": "A few questions about the foundations every mission relies on: sign-in and access, personal information, records, logging, and keeping track of the office’s work."
+    }
+  ]
+}

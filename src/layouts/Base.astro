@@ -1,0 +1,51 @@
+---
+import '../styles/kit.css';
+import { kit, libraryUrl, typesInUse } from '../kit';
+import { href } from '../lib/paths';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = kit.site.description } = Astro.props;
+const pageTitle = title ? `${title} · ${kit.site.title}` : kit.site.title;
+const path = Astro.url.pathname;
+const nav = typesInUse().map(([, t]) => ({ label: t.navLabel, url: href(`${t.section}/`) }));
+// The accent from kit.yaml, for links and buttons.
+const accent = kit.site.accent ? `--accent: ${kit.site.accent};` : undefined;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+  </head>
+  <body style={accent}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="brand" href={href('')}>{kit.site.title}</a>
+        <nav aria-label="Main">
+          <ul class="site-nav">
+            {nav.map((item) => <li><a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a></li>)}
+            <li><a href={libraryUrl}>The library</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>{kit.site.description}</p>
+        <p class="muted">Builds on <a href={libraryUrl}>Enterprise Blueprints</a>. The packages and their data are at <a href={href('catalog.json')}>catalog.json</a>.</p>
+      </div>
+    </footer>
+  </body>
+</html>

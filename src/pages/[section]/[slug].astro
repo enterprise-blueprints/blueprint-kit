@@ -1,0 +1,70 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { downloadUrl, elements, groupLabel, linksOf, measuresOf, resourceDetails, resourcesFor } from '../../kit';
+import { attributeLabel, formatDate } from '../../lib/format';
+import { statuses } from '../../lib/vocabulary';
+
+export const getStaticPaths = (() =>
+  elements.map((element) => ({ params: { section: element.typeInfo.section, slug: element.slug }, props: { element } }))) satisfies GetStaticPaths;
+
+const { element } = Astro.props;
+const resource = element.type === 'resource' ? resourceDetails(element) : null;
+const group = groupLabel(element);
+const measures = measuresOf(element);
+const groups = linksOf(element);
+const helping = resourcesFor(element);
+---
+<Base title={element.title} description={element.description}>
+  <div class={`container type-${element.type}`}>
+    <p class="kicker">
+      {element.typeInfo.label}{group && <> · {group}</>}{element.status && element.status !== 'reference' && <> · {statuses[element.status]}</>}
+    </p>
+    <h1>{element.title}</h1>
+    <p class="lede">{element.description}</p>
+    {resource && (
+      <p>
+        <a class="button" href={resource.url}>Go to the {resource.kindLabel.toLowerCase()}</a>
+        <span class="muted"> By {resource.by ?? element.package.publisher.name}{resource.lastReviewedAt && <> · Checked {formatDate(resource.lastReviewedAt)}</>}</span>
+      </p>
+    )}
+
+    {measures.length > 0 && (
+      <section>
+        <h2>Measures</h2>
+        <dl class="facts">{measures.map((m) => <><dt>{m.title}</dt><dd>{m.description}</dd></>)}</dl>
+      </section>
+    )}
+
+    {groups.map((g) => (
+      <section>
+        <h2>{g.heading}</h2>
+        <ul class="links">
+          {g.links.map((l) => (
+            <li class={`type-${l.target.type}`}>
+              <a class="chip" href={l.target.url}>
+                {l.target.title}
+                <span class="chip__note"> · {l.target.typeLabel}{l.target.fromLibrary && ', in the library'}{l.way && <>, way: {l.way}</>}{l.partial && ', covers part of it'}</span>
+              </a>
+              {l.note && <span class="muted">{l.note}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    {helping.length > 0 && (
+      <section>
+        <h2>Resources</h2>
+        <ul class="cards">{helping.map((r) => <ResourceCard resource={r} />)}</ul>
+      </section>
+    )}
+
+    <dl class="facts">
+      <dt>ID</dt><dd><code>{element.id}</code></dd>
+      <dt>Package</dt><dd>{element.package.title} {element.package.version} · <a href={downloadUrl(element.package)}>JSON</a></dd>
+      {resource?.extra.map(([key, value]) => <><dt>{attributeLabel(key)}</dt><dd>{value}</dd></>)}
+    </dl>
+  </div>
+</Base>

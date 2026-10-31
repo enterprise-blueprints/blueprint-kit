@@ -1,0 +1,15 @@
+# Your site and what it builds on. This is the one file to change to make the
+# kit yours; your packages' own details are in source/<package>/package.yaml.
+
+site:
+  # The name at the top of every page, and a sentence about what's here.
+  title: Example Partner Blueprints
+  description: Example Partner’s services, demos, and products for public-sector missions, linked to the Enterprise Blueprints library.
+  # The site's main color, for links and buttons, as a hex color.
+  accent: "#0b6e69"
+
+library:
+  # Where the library publishes its catalog, and the release your packages build on.
+  # Run `pnpm sync` after changing the release, then `pnpm content:build`.
+  url: https://enterprise-blueprints.github.io/
+  release: 0.12.0

@@ -1,0 +1,18 @@
+# The package itself. Its version and date are set when it is built (pnpm content:build).
+
+schemaVersion: 0.6.0
+packageId: com.example.local-audit
+idPrefix: example
+title: Local Government Audit — A Sample Mission
+description: "A sample mission of a firm’s own, for a city or county audit office: two outcomes, a capability of its own, and capabilities and patterns from the library’s Inspector General and Common packages. It shows how a package adds a mission while reusing the library’s items."
+publisher:
+  name: Example Partner
+  url: https://example.com
+license: CC-BY-4.0
+domain: public-sector
+jurisdictions:
+  - United States — local government audit offices
+tags:
+  - local-government
+  - audits
+dependencies: [ common, federal-oig ]

@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { downloadUrl, elements, kit, libraryRelease, libraryUrl, packages, release, resourcesByKind } from '../kit';
+import { href } from '../lib/paths';
+
+// Every resource in one grid, kind by kind.
+const offered = resourcesByKind().flatMap((g) => g.items);
+// Missions, outcomes, capabilities, and the rest that aren't resources: what your packages add to the model.
+const own = elements.filter((e) => e.type !== 'resource' && e.type !== 'requirement');
+const catalog = new URL(href('catalog.json'), Astro.site).href;
+---
+<Base>
+  <div class="container">
+    <h1>{kit.site.title}</h1>
+    <p class="lede">{kit.site.description}</p>
+    <p class="muted">Release {release}, built on <a href={libraryUrl}>Enterprise Blueprints</a> {libraryRelease}.</p>
+
+    {offered.length > 0 && (
+      <section>
+        <h2>What we offer</h2>
+        <ul class="cards">{offered.map((r) => <ResourceCard resource={r} />)}</ul>
+      </section>
+    )}
+
+    {own.length > 0 && (
+      <section>
+        <h2>Added to the model</h2>
+        <p class="muted">Missions, outcomes, and capabilities of our own, built on the library’s.</p>
+        <ul class="chips">
+          {own.map((e) => <li class={`type-${e.type}`}><a class="chip" href={e.url}>{e.title}<span class="chip__note"> · {e.typeInfo.label}</span></a></li>)}
+        </ul>
+      </section>
+    )}
+
+    <section>
+      <h2>Packages</h2>
+      <p class="muted">
+        Tools such as Solution Studio read these from the catalog at <code>{catalog}</code>, beside the library’s.
+      </p>
+      <div class="table-scroll">
+        <table class="packages">
+          <thead><tr><th>Package</th><th>Version</th><th>Download</th></tr></thead>
+          <tbody>
+            {packages.map((p) => (
+              <tr>
+                <td><strong>{p.title}</strong><br /><span class="muted">{p.description}</span></td>
+                <td>{p.version}</td>
+                <td><a href={downloadUrl(p)}>JSON</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>

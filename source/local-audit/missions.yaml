@@ -1,0 +1,7 @@
+# Missions, in the order the pages show them, each with the links it holds.
+
+- id: local-government-audit
+  title: Local Government Audit
+  status: draft
+  description: A city or county auditor’s office plans and performs audits of the government’s programs and spending, reports what it finds to the council and the public, and follows up until problems are fixed.
+  seeks: [ audits-on-plan, findings-resolved ]

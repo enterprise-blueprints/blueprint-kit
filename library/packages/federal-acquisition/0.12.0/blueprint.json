@@ -1,0 +1,2526 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "org.enterprise-blueprints.federal-acquisition",
+  "idPrefix": "eb",
+  "version": "0.12.0",
+  "title": "Acquisition — Buying Goods and Services for the Government",
+  "description": "U.S. federal acquisition blueprint: one mission with the outcomes it seeks and ways to measure them, ten capabilities from acquisition planning through closeout with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for acquisition results and for acquisition operations. It follows the statutes behind the Federal Acquisition Regulation, which is being rewritten in the Revolutionary FAR Overhaul, and builds on Common Capabilities for case management, records, identity and access, data protection, security logging, and checks of SAM.gov.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-10-30",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies that award contracts under the Federal Acquisition Regulation"
+  ],
+  "tags": [
+    "acquisition",
+    "contracting",
+    "procurement",
+    "competition",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.12.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:far",
+      "title": "Federal Acquisition Regulation (FAR), 48 CFR Chapter 1",
+      "url": "https://www.acquisition.gov/far",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The rules executive agencies follow when they buy. Among much else: acquisition planning (Part 7), market research (Part 10), publicizing (Part 5), responsibility (Subpart 9.1), past performance evaluations at least annually and at completion (Subpart 42.15), contract reporting within three business days after award (§ 4.604), contract files (Subpart 4.8), and closeout within 6, 20, or 36 months of physical completion, by contract type (§ 4.804-1). Being rewritten in the Revolutionary FAR Overhaul, so the part numbers and details may change."
+    },
+    {
+      "id": "src:far-overhaul",
+      "title": "Acquisition.gov — Revolutionary FAR Overhaul",
+      "url": "https://www.acquisition.gov/far-overhaul",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The rewrite of the FAR under Executive Order 14275 of April 15, 2025, Restoring Common Sense to Federal Procurement, which aims to return it to what the statutes require, in plain language. Agencies adopted model deviation text part by part during 2025, and the formal proposed rules began in June 2026. Until the final rules, what applies in an agency is the FAR as modified by the deviations that agency has adopted."
+    },
+    {
+      "id": "src:competition-41-usc-3301",
+      "title": "41 U.S.C. § 3301 — Full and open competition",
+      "url": "https://www.law.cornell.edu/uscode/text/41/3301",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Part of the Competition in Contracting Act. Executive agencies obtain full and open competition through competitive procedures, except as the statute allows."
+    },
+    {
+      "id": "src:competition-exceptions-41-usc-3304",
+      "title": "41 U.S.C. § 3304 — Use of noncompetitive procedures",
+      "url": "https://www.law.cornell.edu/uscode/text/41/3304",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The circumstances in which an agency may use other than competitive procedures, such as only one responsible source or unusual and compelling urgency, and the written justification and approvals each needs."
+    },
+    {
+      "id": "src:procurement-integrity-41-usc-2102",
+      "title": "41 U.S.C. § 2102 — Prohibitions on disclosing and obtaining procurement information",
+      "url": "https://www.law.cornell.edu/uscode/text/41/2102",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Part of the Procurement Integrity Act. Bars disclosing contractor bid or proposal information or source selection information before the award it relates to, except as the law allows."
+    },
+    {
+      "id": "src:integrity-records-41-usc-2313",
+      "title": "41 U.S.C. § 2313 — Database for federal agency contract and grant officers and suspension and debarment officials",
+      "url": "https://www.law.cornell.edu/uscode/text/41/2313",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The database of contractor and recipient integrity and performance information, now kept in SAM.gov as responsibility and qualification records. Before a contract or grant over the simplified acquisition threshold, the official reviews it and documents how its information was considered."
+    },
+    {
+      "id": "src:small-business-goals-15-usc-644",
+      "title": "15 U.S.C. § 644 — Awards or contracts (small business goals)",
+      "url": "https://www.law.cornell.edu/uscode/text/15/644",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Subsection (g) sets the government-wide goal for small businesses at not less than 23 percent of the total value of prime contract awards each fiscal year, with goals for service-disabled veteran-owned, HUBZone, disadvantaged, and women-owned small businesses. Each agency agrees its own goals with the Small Business Administration."
+    },
+    {
+      "id": "src:prompt-payment-31-usc-3903",
+      "title": "31 U.S.C. § 3903 — Regulations (Prompt Payment)",
+      "url": "https://www.law.cornell.edu/uscode/text/31/3903",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Part of the Prompt Payment Act. Payment is due on the date the contract sets, or otherwise 30 days after the agency receives a proper invoice, and an invoice that isn’t proper is returned within 7 days with the reasons. Late payments carry interest penalties."
+    },
+    {
+      "id": "src:protest-stay-31-usc-3553",
+      "title": "31 U.S.C. § 3553 — Review of protests; effect on contracts pending decision",
+      "url": "https://www.law.cornell.edu/uscode/text/31/3553",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "When GAO tells an agency about a protest filed in time, the agency holds off on the award, or suspends performance, until GAO decides, unless the head of the procuring activity finds in writing that urgent and compelling circumstances, or the government’s best interests, won’t allow waiting."
+    },
+    {
+      "id": "src:protest-decisions-31-usc-3554",
+      "title": "31 U.S.C. § 3554 — Decisions on protests",
+      "url": "https://www.law.cornell.edu/uscode/text/31/3554",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "GAO issues a final decision on a protest within 100 days after it is filed, or within 65 days under its express option, and may recommend corrective action."
+    },
+    {
+      "id": "src:gao-bid-protest-rules",
+      "title": "4 CFR Part 21 — Bid Protest Regulations (Government Accountability Office)",
+      "url": "https://www.law.cornell.edu/cfr/text/4/part-21",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "How protests are filed with GAO and when, and what the agency must do, including filing its report on the protest within 30 days after GAO tells it about the protest."
+    },
+    {
+      "id": "src:sam-gov",
+      "title": "SAM.gov — System for Award Management",
+      "url": "https://sam.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Where agencies publicize contract opportunities, and where contractors register and agencies check exclusions and responsibility and qualification records. It also holds contract award data, which used to be FPDS.gov until FPDS’s public site closed in February 2026, and subcontract reports, which moved from eSRS the same month."
+    },
+    {
+      "id": "src:usaspending",
+      "title": "USAspending.gov",
+      "url": "https://www.usaspending.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "The official public source of federal spending data, including the contract awards agencies report."
+    },
+    {
+      "id": "src:cpars",
+      "title": "Contractor Performance Assessment Reporting System (CPARS)",
+      "url": "https://www.cpars.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Where agencies record their evaluations of contractors’ performance, and where source selection officials find past evaluations. Its guidance asks for evaluations within 120 days after the end of each period of performance. GSA plans to move it into SAM.gov."
+    },
+    {
+      "id": "src:invoice-processing-platform",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — Invoice Processing Platform (IPP)",
+      "url": "https://www.ipp.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A free, web-based service where vendors send invoices to the agencies that use it, and track their invoices and payments. OMB Memorandum M-15-19 had agencies move to electronic invoicing by the end of fiscal year 2018, through a shared service provider or a solution such as IPP."
+    },
+    {
+      "id": "src:palt-memo",
+      "title": "Office of Management and Budget, Office of Federal Procurement Policy — Reducing Procurement Administrative Lead Time Using Modern Business Practices (January 14, 2021)",
+      "url": "https://bidenwhitehouse.archives.gov/wp-content/uploads/2021/01/OFPPPALTMemorandum-01-14-2021.pdf",
+      "kind": "background",
+      "publicationDate": "2021-01-14",
+      "lastReviewedAt": "2026-10-29",
+      "note": "Defines procurement administrative lead time (PALT) government-wide as the time from the date an initial solicitation is issued to the date of award, as section 878 of the National Defense Authorization Act for Fiscal Year 2019 suggested, and describes practices that can shorten it."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:acquiring-goods-and-services",
+      "type": "mission",
+      "title": "Acquisition",
+      "description": "Buy what the agency needs, when it needs it, through open and fair competition, from responsible contractors, with a fair share for small businesses; see that contractors deliver what they agreed to and are paid on time; make award decisions that stand up to challenge; report the spending publicly; and close each contract when the work is done.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:competition-41-usc-3301"
+      ],
+      "attributes": {
+        "tagline": "Acquiring goods and services for the government",
+        "sector": "public-sector",
+        "scope": "US-federal-acquisition",
+        "principles": [
+          "Each acquisition is one record from the program office’s request to closeout",
+          "Clauses come from rules the contracting office keeps current as the FAR changes",
+          "Contract data reaches SAM.gov, CPARS, and the financial system without retyping",
+          "Vendors submit offers through one secure portal, and offers open only after the deadline",
+          "Every offeror gets the same SAM.gov checks the agency uses for grants applicants",
+          "AI drafts and analytics inform, and contracting officers decide"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:needs-met-on-time",
+      "type": "outcome",
+      "title": "The agency gets what it needs when it needs it",
+      "description": "Acquisitions start early enough, and move from request to award quickly enough, that the goods and services arrive when the program needs them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:palt-memo"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "procurement-lead-time",
+            "title": "Procurement administrative lead time (PALT)",
+            "description": "The median number of days from the date an initial solicitation is issued to the date of award, for contracts and orders above the simplified acquisition threshold, as OFPP defines it. Many offices also track the time from a complete request package to award.",
+            "sourceIds": [
+              "src:palt-memo",
+              "src:sam-gov"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:full-open-competition",
+      "type": "outcome",
+      "title": "Contracts are competed openly and fairly",
+      "description": "Opportunities are publicized so businesses can compete, offers are judged only on the criteria the solicitation stated, and any exception to full and open competition is one the law allows, justified in writing.",
+      "status": "reference",
+      "sourceIds": [
+        "src:competition-41-usc-3301",
+        "src:competition-exceptions-41-usc-3304",
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "competed-obligations-share",
+            "title": "Share of obligations competed",
+            "description": "The share of the year’s contract obligations that were made on competed contracts and orders, from the agency’s contract data in SAM.gov.",
+            "sourceIds": [
+              "src:competition-41-usc-3301",
+              "src:sam-gov"
+            ]
+          },
+          {
+            "id": "single-offer-awards",
+            "title": "Competitions with only one offer",
+            "description": "The share of obligations on competed contracts and orders that received only one offer, which can mean the requirement or the notice kept other businesses out.",
+            "sourceIds": [
+              "src:sam-gov"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:responsible-contractors",
+      "type": "outcome",
+      "title": "Contracts go to responsible contractors",
+      "description": "Before each award, the agency checks the contractor isn’t excluded, reviews its integrity and performance records, and determines it able to do the work.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:integrity-records-41-usc-2313",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "awards-with-responsibility-review",
+            "title": "Awards with a documented responsibility determination",
+            "description": "The share of awards above the simplified acquisition threshold whose file shows the exclusion check, the review of integrity and performance records, and the responsibility determination.",
+            "sourceIds": [
+              "src:far",
+              "src:integrity-records-41-usc-2313"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:small-business-participation",
+      "type": "outcome",
+      "title": "Small businesses get a fair share of the work",
+      "description": "The agency finds small businesses able to do its work, sets work aside for them where the rules call for it, and meets the goals it agreed with the Small Business Administration.",
+      "status": "reference",
+      "sourceIds": [
+        "src:small-business-goals-15-usc-644"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "small-business-share",
+            "title": "Small business share of prime contract dollars",
+            "description": "The share of the agency’s eligible prime contract dollars awarded to small businesses, compared with the goal it agreed with the Small Business Administration. The government-wide goal is at least 23 percent.",
+            "sourceIds": [
+              "src:small-business-goals-15-usc-644"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:contracts-perform-as-agreed",
+      "type": "outcome",
+      "title": "Contractors deliver what the contract calls for",
+      "description": "Each contract is monitored against its terms, problems are raised while there’s time to fix them, and each contractor’s performance is evaluated and recorded for future source selections.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:cpars"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "performance-evaluations-on-time",
+            "title": "Performance evaluations completed on time",
+            "description": "The share of required past performance evaluations completed in CPARS within 120 days after the end of the period of performance they cover.",
+            "sourceIds": [
+              "src:far",
+              "src:cpars"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:invoices-paid-on-time",
+      "type": "outcome",
+      "title": "Contractors are paid correctly and on time",
+      "description": "Invoices are checked against the contract and what was accepted, improper ones go back within 7 days with the reasons, and proper ones are paid by the due date.",
+      "status": "reference",
+      "sourceIds": [
+        "src:prompt-payment-31-usc-3903",
+        "src:invoice-processing-platform"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "proper-invoices-paid-on-time",
+            "title": "Invoices paid on time",
+            "description": "The share of proper invoices paid by their due date, which is 30 days after receipt unless the contract says otherwise.",
+            "sourceIds": [
+              "src:prompt-payment-31-usc-3903"
+            ]
+          },
+          {
+            "id": "interest-penalties-paid",
+            "title": "Prompt Payment interest paid",
+            "description": "The number of late payments that carried Prompt Payment interest, and the amount paid, by office.",
+            "sourceIds": [
+              "src:prompt-payment-31-usc-3903"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:award-decisions-hold-up",
+      "type": "outcome",
+      "title": "Award decisions stand up to challenge",
+      "description": "Each award decision is made and documented by the solicitation’s rules, so it holds up when an offeror protests, and protests are answered on time.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:protest-decisions-31-usc-3554",
+        "src:gao-bid-protest-rules"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "protests-sustained-or-corrected",
+            "title": "Protests sustained or resolved by corrective action",
+            "description": "The number of protests of the agency’s awards, and the share that GAO sustained or that the agency resolved by corrective action, such as reevaluating offers.",
+            "sourceIds": [
+              "src:protest-decisions-31-usc-3554",
+              "src:gao-bid-protest-rules"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:contract-data-public",
+      "type": "outcome",
+      "title": "The contract spending is open to view",
+      "description": "Each contract action is reported accurately within three business days, so the public can see on USAspending.gov who the government buys from and for what.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov",
+        "src:usaspending"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "contract-actions-reported-on-time",
+            "title": "Contract actions reported within three business days",
+            "description": "The share of contract action reports completed in SAM.gov within three business days after award, and how many had to be corrected later.",
+            "sourceIds": [
+              "src:far",
+              "src:sam-gov"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:outcome:contracts-closed-on-time",
+      "type": "outcome",
+      "title": "Contracts are closed out on time",
+      "description": "Once the work is done, each contract is closed within the time standard for its type, and money no longer needed is released while it can still be used.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "contracts-overdue-for-closeout",
+            "title": "Contracts overdue for closeout",
+            "description": "The number of physically completed contracts still open past their closeout standard, such as 6 months for firm-fixed-price contracts, and the funds still obligated on them.",
+            "sourceIds": [
+              "src:far"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:capability:acquisition-planning-market-research",
+      "type": "capability",
+      "title": "Acquisition Planning & Market Research",
+      "description": "Ability to define each need with the program office, research the market for commercial products and services and for small businesses able to do the work, and plan the acquisition’s strategy, contract type, competition, and schedule early enough to meet the need.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:small-business-goals-15-usc-644"
+      ],
+      "applicabilityNotes": "How much planning is written down depends on the acquisition’s size and the agency’s rules. Small purchases need little; major acquisitions need a written plan.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:solicitation-publicizing",
+      "type": "capability",
+      "title": "Solicitation & Publicizing",
+      "description": "Ability to publicize each opportunity on SAM.gov, issue solicitations with clear requirements and evaluation criteria, answer offerors’ questions the same way for everyone, and receive offers securely by the deadline.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov",
+        "src:competition-41-usc-3301"
+      ],
+      "applicabilityNotes": "Orders under existing contracts, such as the GSA schedules, follow their own, simpler steps for notice and competition.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:evaluation-source-selection",
+      "type": "capability",
+      "title": "Evaluation & Source Selection",
+      "description": "Ability to evaluate offers only against the factors the solicitation stated, keep proposal and source selection information from anyone not authorized, document the award decision and its reasons, and notify and debrief offerors.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "applicabilityNotes": "Evaluations range from comparing prices on a simple purchase to a source selection board weighing many factors on a major one.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:responsibility-determination",
+      "type": "capability",
+      "title": "Responsibility & Award",
+      "description": "Ability to check that the apparent awardee is registered in SAM.gov and not excluded, review its integrity and performance records, determine it responsible, and issue the contract with the clauses its type and value call for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:integrity-records-41-usc-2313",
+        "src:sam-gov"
+      ],
+      "applicabilityNotes": "Review of responsibility and qualification records is required above the simplified acquisition threshold. A small business found not responsible is referred to the Small Business Administration, which can issue a Certificate of Competency.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:protest-handling",
+      "type": "capability",
+      "title": "Bid Protests",
+      "description": "Ability to receive and answer protests, at the agency, at GAO, or at the Court of Federal Claims, by their deadlines, hold off on award or performance when the law requires it, prepare the agency’s report from the contract file, and take corrective action where it’s warranted.",
+      "status": "reference",
+      "sourceIds": [
+        "src:protest-stay-31-usc-3553",
+        "src:protest-decisions-31-usc-3554",
+        "src:gao-bid-protest-rules"
+      ],
+      "applicabilityNotes": "Agency counsel usually leads the response with the contracting officer. Which forum hears a protest, and how quickly, depends on where and when it’s filed.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:contract-administration",
+      "type": "capability",
+      "title": "Contract Administration & Surveillance",
+      "description": "Ability to monitor each contractor’s performance against the contract, inspect and accept what’s delivered, make changes only through written modifications by an authorized contracting officer, exercise options, and act on problems.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "applicabilityNotes": "A contracting officer’s representative often monitors the work day to day, within the authority the contracting officer delegates in writing.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:invoicing-payment",
+      "type": "capability",
+      "title": "Invoicing & Payment",
+      "description": "Ability to receive invoices electronically, check each against the contract and what was delivered and accepted, return improper ones within 7 days with the reasons, and pay proper ones by the due date, with any interest owed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:prompt-payment-31-usc-3903",
+        "src:invoice-processing-platform"
+      ],
+      "applicabilityNotes": "Payment usually happens in the agency’s financial system, with acceptance from the program office and the contract’s terms from the contracting office.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:past-performance-evaluation",
+      "type": "capability",
+      "title": "Past Performance Evaluation",
+      "description": "Ability to evaluate each contractor’s performance at least once a year and when the work is complete, give the contractor its chance to comment, have someone above the contracting officer settle disagreements, and record the evaluations in CPARS for future source selections.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:cpars"
+      ],
+      "applicabilityNotes": "Evaluations are required above set dollar thresholds, which differ by kind of contract. Source selections use evaluations within three years of the work’s completion, or six for construction and architect-engineer contracts.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:contract-reporting",
+      "type": "capability",
+      "title": "Contract Data Reporting",
+      "description": "Ability to report each contract action to SAM.gov within three business days after award, keep the data accurate, certify it each year, and see that contractors report their first-tier subcontracts.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov",
+        "src:usaspending"
+      ],
+      "applicabilityNotes": "Contract data reported to SAM.gov flows on to USAspending.gov. Some information, such as classified actions, isn’t reported publicly.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:capability:contract-closeout",
+      "type": "capability",
+      "title": "Contract Closeout",
+      "description": "Ability to close each contract within the time standard for its type after the work is done, settling the final invoice and any indirect cost rates, releasing funds no longer needed, and completing the contract file.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "applicabilityNotes": "A contract can’t be closed while it’s in litigation or under appeal, or before a termination is settled.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:plan-each-acquisition",
+      "type": "requirement",
+      "title": "Plan each acquisition early enough to meet the need",
+      "description": "Write down the need, the strategy, the contract type, how it will be competed, and the milestones, at the level of detail the acquisition’s size and the agency’s rules call for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:research-the-market",
+      "type": "requirement",
+      "title": "Research the market before each acquisition",
+      "description": "Find out whether commercial products and services, and small businesses, can meet the need, and record what was found and how it shaped the acquisition.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:small-business-goals-15-usc-644"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:publicize-on-sam",
+      "type": "requirement",
+      "title": "Publicize each opportunity on SAM.gov",
+      "description": "Post notices of proposed contract actions and solicitations on SAM.gov when the FAR, as the agency applies it, requires them, with enough time for businesses to respond.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:justify-other-than-full-open",
+      "type": "requirement",
+      "title": "Justify and approve any exception to full and open competition",
+      "description": "Name the statutory authority and the reasons, get the approvals the law requires for the contract’s value, and make the justification public when required.",
+      "status": "reference",
+      "sourceIds": [
+        "src:competition-exceptions-41-usc-3304"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:receive-offers-securely",
+      "type": "requirement",
+      "title": "Receive offers securely, and know when each arrived",
+      "description": "Take offers through a channel that keeps them from anyone outside the evaluation, and records when each one arrived, so late offers are handled by the solicitation’s rules.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:evaluate-against-stated-criteria",
+      "type": "requirement",
+      "title": "Evaluate offers only against the stated factors",
+      "description": "Rate each offer against the factors and their relative importance as the solicitation stated them, and record the strengths, weaknesses, and risks behind each rating.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:protect-source-selection-information",
+      "type": "requirement",
+      "title": "Keep proposal and source selection information from anyone not authorized",
+      "description": "Limit access to proposals, evaluations, and rankings to the people working on the source selection, until the award and afterward as the law requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:document-award-decision",
+      "type": "requirement",
+      "title": "Document the award decision, and notify and debrief offerors",
+      "description": "Record the source selection decision and the reasons for it, notify the offerors not selected, and offer the debriefings the rules call for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:check-exclusions-integrity",
+      "type": "requirement",
+      "title": "Check exclusions and integrity records before award",
+      "description": "Confirm the apparent awardee is registered in SAM.gov and not excluded, and above the simplified acquisition threshold, review its responsibility and qualification records and document how they were considered.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:integrity-records-41-usc-2313",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:determine-responsibility",
+      "type": "requirement",
+      "title": "Determine the contractor responsible before award",
+      "description": "Record that the contractor has the resources, performance record, integrity, and capacity to do the work, and refer a small business found not responsible to the Small Business Administration.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:respond-to-protests-on-time",
+      "type": "requirement",
+      "title": "Answer each protest by its deadline",
+      "description": "Track each protest’s deadlines from the day it’s filed, such as GAO’s 30 days for the agency’s report, and produce the documents the forum requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gao-bid-protest-rules",
+        "src:protest-decisions-31-usc-3554"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:stay-when-required",
+      "type": "requirement",
+      "title": "Hold the award or the work when a protest requires it",
+      "description": "When GAO gives notice of a protest filed in time, hold off on the award or suspend performance until GAO decides, unless the head of the procuring activity makes the written finding the law allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:protest-stay-31-usc-3553"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:monitor-performance",
+      "type": "requirement",
+      "title": "Monitor performance against the contract",
+      "description": "Name who monitors each contract and within what authority, inspect and accept deliveries against the contract’s terms, and record problems and what was done about them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:manage-modifications",
+      "type": "requirement",
+      "title": "Change contracts only through written modifications",
+      "description": "Make each change through a modification signed by a contracting officer with the authority for it, with its funding and any effect on price and schedule recorded.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:receive-invoices-electronically",
+      "type": "requirement",
+      "title": "Receive invoices electronically",
+      "description": "Take invoices through an electronic invoicing system, so each one is recorded on arrival, routed for acceptance, and visible to the contractor until it’s paid.",
+      "status": "reference",
+      "sourceIds": [
+        "src:invoice-processing-platform"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:pay-by-due-date",
+      "type": "requirement",
+      "title": "Return improper invoices within 7 days, and pay proper ones on time",
+      "description": "Check each invoice promptly, return one that isn’t proper within 7 days with the reasons, and pay proper ones by the due date, adding interest when a payment is late.",
+      "status": "reference",
+      "sourceIds": [
+        "src:prompt-payment-31-usc-3903"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:evaluate-performance-on-schedule",
+      "type": "requirement",
+      "title": "Evaluate contractor performance at least annually and at completion",
+      "description": "Complete each required evaluation in CPARS, give the contractor up to 14 days to comment, and have a reviewing official above the contracting officer settle disagreements.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:cpars"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:report-contract-actions",
+      "type": "requirement",
+      "title": "Report each contract action within three business days",
+      "description": "Have the contracting officer confirm each contract action report before the award is released, and complete it in SAM.gov within three business days after award.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:certify-contract-data",
+      "type": "requirement",
+      "title": "Certify the year’s contract data",
+      "description": "Check the agency’s contract data for completeness and accuracy, and send GSA the annual certification within 120 days after the fiscal year ends.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:check-subcontract-reporting",
+      "type": "requirement",
+      "title": "See that contractors report first-tier subcontracts",
+      "description": "Find contracts whose contractors haven’t reported the first-tier subcontracts the FAR’s reporting clause requires in SAM.gov, and follow up.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:close-within-standards",
+      "type": "requirement",
+      "title": "Close each contract within the time standard for its type",
+      "description": "Close each contract within 6 months of physical completion for firm-fixed-price contracts, 36 months for those needing indirect cost rates settled, and 20 months for others, unless the agency’s rules say otherwise.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:release-unneeded-funds",
+      "type": "requirement",
+      "title": "Release funds no longer needed",
+      "description": "Deobligate money no longer needed on a contract, during the work and at closeout, while it can still be used.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:acquisition-management",
+      "type": "implementationPattern",
+      "title": "Acquisition Management",
+      "description": "An example architecture: one system of record for each acquisition, from the program office’s request through solicitation, evaluation, award, modifications, and closeout, with clauses chosen by the contract’s type and value and connections to SAM.gov and the agency’s financial system.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Requests from program offices, with funding checked in the financial system",
+          "Solicitations, awards, and modifications assembled from templates, with clauses chosen by rules",
+          "Reviews and approvals set by the acquisition’s value and type",
+          "Evaluation team assignments and ratings, open only to the team",
+          "Notices posted to SAM.gov, and contract action reports sent there after award",
+          "Obligations sent to the financial system as each award and modification is signed",
+          "The contract file, with each document and approval in one place, and closeout steps for each completed contract"
+        ],
+        "strengths": [
+          "One record for each contract, from request to closeout",
+          "Program offices can see where their requests stand",
+          "Contract data reaches SAM.gov and the financial system without retyping"
+        ],
+        "fitsWhen": [
+          "Its current tools are document templates, email, or an aging custom system"
+        ],
+        "watchFor": [
+          "The FAR overhaul and each agency’s deviations change clauses and steps, so clause rules need an owner who keeps them current",
+          "Moving open contracts from an old system needs careful planning",
+          "Connections to the financial system often take the most work"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A contract writing product",
+            "description": "A contract writing product, configured for the agency’s rules and deviations and run by its contracting office.",
+            "strengths": [
+              "Clause logic keeps awards consistent with the rules, and can be updated as the FAR changes"
+            ],
+            "fitsWhen": [
+              "The agency awards many contracts, or contracts of many kinds"
+            ],
+            "watchFor": [
+              "Another product to buy, secure, and keep up"
+            ]
+          },
+          {
+            "id": "agency-platform",
+            "approach": "platform",
+            "title": "The agency’s shared case platform",
+            "description": "Request and contract records, their steps, and documents from templates, built on the agency’s shared case platform.",
+            "strengths": [
+              "Uses licenses, skills, and security approvals the agency already has",
+              "Acquisition work can share a platform with the agency’s other case work"
+            ],
+            "fitsWhen": [
+              "The agency already runs a platform like this, with people who configure it",
+              "Its acquisitions are mostly simple, such as orders under existing contracts"
+            ],
+            "watchFor": [
+              "Clause selection, posting to SAM.gov, and contract action reporting take real building, and keeping them current with the FAR is ongoing work",
+              "Contract data the agency reports must still meet SAM.gov’s data standards"
+            ]
+          },
+          {
+            "id": "assisted-acquisition",
+            "approach": "product",
+            "title": "Another agency’s contracting office",
+            "description": "Another federal agency’s contracting office awards and administers contracts for the agency, under an interagency agreement, in its own contract writing system, while the agency defines its needs, funds them, and monitors the work.",
+            "strengths": [
+              "The agency doesn’t need its own contracting staff and systems for every kind of buy",
+              "Providers bring experience with acquisitions the agency rarely makes",
+              "Reporting to SAM.gov and closeout are handled by the provider’s office"
+            ],
+            "fitsWhen": [
+              "The agency is small, or makes few acquisitions of some kinds",
+              "A provider already buys what the agency needs for other agencies"
+            ],
+            "watchFor": [
+              "Fees add to the cost of each acquisition",
+              "The agency still owns its requirements, its funds, and the results, and needs people who can do that well",
+              "Getting the agency’s contract data and files back, for reporting or a later move, needs agreeing up front"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contract-writing-system",
+      "type": "implementationPattern",
+      "title": "Contract Writing System",
+      "description": "An example architecture: a contract writing product, configured for the agency’s rules and deviations, that carries each acquisition from the program office’s request through solicitation, award, modifications, and closeout, choosing clauses by the contract’s type and value and connecting to SAM.gov and the agency’s financial system.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:acquisition-management",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Requests from program offices, with funding checked in the financial system",
+          "Solicitations, awards, and modifications assembled from templates, with clauses chosen by rules",
+          "Reviews and approvals set by the acquisition’s value and type",
+          "Notices posted to SAM.gov, and contract action reports sent there after award",
+          "Obligations sent to the financial system as each award and modification is signed",
+          "The contract file, with each document and approval in one place",
+          "Closeout steps and reminders for each completed contract"
+        ],
+        "strengths": [
+          "One record for each contract, from request to closeout",
+          "Clause logic keeps awards consistent with the rules, and can be updated as the FAR changes",
+          "Contract data reaches SAM.gov and the financial system without retyping"
+        ],
+        "fitsWhen": [
+          "The agency awards many contracts, or contracts of many kinds",
+          "Its current tools are document templates, email, or an aging custom system"
+        ],
+        "watchFor": [
+          "The FAR overhaul and each agency’s deviations change clauses and steps, so clause rules need an owner who keeps them current",
+          "Moving open contracts from an old system needs careful planning",
+          "Connections to the financial system often take the most work"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A contract writing product"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:acquisition-on-shared-platform",
+      "type": "implementationPattern",
+      "title": "Acquisition Requests and Contracts on the Agency’s Shared Platform",
+      "description": "An example architecture: acquisition work built on the agency’s shared case platform, with each request and contract as a record that moves through planning, solicitation, evaluation, award, administration, and closeout, and documents assembled from templates.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:acquisition-management",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Request records from program offices, with the need, funding, and timing",
+          "Acquisition plans, milestones, and approvals for each request",
+          "Solicitation and award documents assembled from templates",
+          "Evaluation team assignments and ratings, open only to the team",
+          "Contract records with modifications, surveillance notes, and closeout checklists",
+          "Reports on workload, lead times, and contracts coming due for closeout"
+        ],
+        "strengths": [
+          "Uses licenses, skills, and security approvals the agency already has",
+          "Program offices can see where their requests stand",
+          "Acquisition work can share a platform with the agency’s other case work"
+        ],
+        "fitsWhen": [
+          "The agency already runs a platform like this, with people who configure it",
+          "Its acquisitions are mostly simple, such as orders under existing contracts"
+        ],
+        "watchFor": [
+          "Clause selection, posting to SAM.gov, and contract action reporting take real building, and keeping them current with the FAR is ongoing work",
+          "Each change from the FAR overhaul or an agency deviation has to be built into the platform",
+          "Contract data the agency reports must still meet SAM.gov’s data standards"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s shared case platform"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:assisted-acquisition-service",
+      "type": "implementationPattern",
+      "title": "Assisted Acquisition from Another Federal Agency",
+      "description": "An example architecture: the agency has another federal agency’s contracting office award and administer contracts for it, under an interagency agreement, using the provider’s contract writing system, while the agency defines its needs, funds them, and monitors the work.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:acquisition-management",
+      "sourceIds": [
+        "src:far"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "An interagency agreement that sets the services, fees, and who does what",
+          "The provider’s contracting officers, and its contract writing and reporting systems",
+          "The agency’s requests, funding, and technical experts for evaluations",
+          "The agency’s representatives who monitor the work and accept deliveries",
+          "Regular reports from the provider on each request and contract"
+        ],
+        "strengths": [
+          "The agency doesn’t need its own contracting staff and systems for every kind of buy",
+          "Providers bring experience with acquisitions the agency rarely makes",
+          "Reporting to SAM.gov and closeout are handled by the provider’s office"
+        ],
+        "fitsWhen": [
+          "The agency is small, or makes few acquisitions of some kinds",
+          "A provider already buys what the agency needs for other agencies"
+        ],
+        "watchFor": [
+          "Fees add to the cost of each acquisition",
+          "The agency still owns its requirements, its funds, and the results, and needs people who can do that well",
+          "Getting the agency’s contract data and files back, for reporting or a later move, needs agreeing up front"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "Another agency’s contracting office"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:vendor-proposal-portal",
+      "type": "implementationPattern",
+      "title": "A Secure Proposal Portal for Vendors",
+      "description": "An example architecture: vendors submit questions and offers through a portal with their SAM.gov-registered accounts, each upload is time-stamped, and offers open only for the evaluation team after the deadline.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "Vendor accounts tied to their SAM.gov registration",
+          "Question and answer exchange for each solicitation, with answers shared with everyone",
+          "Offer uploads with a time stamp and a receipt for the vendor",
+          "Offers locked until the deadline, then opened only for the evaluation team",
+          "A record of who opened what, and when"
+        ],
+        "strengths": [
+          "Proves when each offer arrived, which matters when one is late",
+          "Keeps proposals out of email, where they’re hard to protect",
+          "Vendors get the same answers at the same time"
+        ],
+        "fitsWhen": [
+          "The agency receives offers by email today",
+          "Its solicitations draw many offers, or large ones"
+        ],
+        "watchFor": [
+          "An outage near a deadline raises questions of fairness, so there needs to be a plan for one",
+          "Access for evaluators has to be granted and removed for each source selection"
+        ],
+        "ways": [
+          {
+            "id": "combine",
+            "approach": "combine",
+            "title": "A portal combined from secure upload and sign-in tools"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contract-data-to-sam",
+      "type": "implementationPattern",
+      "title": "Contract Action Reports to SAM.gov from the Contract Writing System",
+      "description": "An example architecture: the contract writing system sends each contract action report to SAM.gov through its system-to-system connection when the award is signed, flags reports still in draft or error, and lists contracts whose subcontract reports are missing.",
+      "status": "reference",
+      "sourceIds": [
+        "src:far",
+        "src:sam-gov",
+        "src:usaspending"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A connection from the contract writing system to SAM.gov’s contract data reporting service",
+          "A report for each action, confirmed by the contracting officer before the award is released",
+          "A daily list of reports still in draft or error, or past three business days",
+          "A list of contracts whose subcontract reports are missing",
+          "Checks of the year’s data that support the annual certification"
+        ],
+        "strengths": [
+          "Reports are completed on time without retyping",
+          "Errors are found and fixed at the source"
+        ],
+        "fitsWhen": [
+          "The agency’s contract writing system holds the contract data, but reporting is manual or late"
+        ],
+        "watchFor": [
+          "SAM.gov’s services and data standards change, as they did when FPDS moved into SAM.gov, so the connection needs keeping up",
+          "Fixes made in SAM.gov instead of the contract writing system come back next time"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "The contract system’s connection to SAM.gov"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:invoices-through-ipp",
+      "type": "implementationPattern",
+      "title": "Invoices through Treasury’s Invoice Processing Platform",
+      "description": "An example architecture: vendors send invoices through Treasury’s Invoice Processing Platform, each invoice is matched to its order and routed for acceptance, and the agency’s financial system pays it by the due date, with status visible to the vendor throughout.",
+      "status": "reference",
+      "sourceIds": [
+        "src:invoice-processing-platform",
+        "src:prompt-payment-31-usc-3903"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Vendor enrollment in IPP, with orders sent from the agency’s financial or contract writing system",
+          "Invoices matched to the order and its line items",
+          "Routing for acceptance by the program office, with due dates shown",
+          "Rejection of improper invoices with the reasons, within 7 days",
+          "Payment from the financial system, and payment details sent back to the vendor"
+        ],
+        "strengths": [
+          "Treasury provides it at no cost to agencies or vendors",
+          "Each invoice’s arrival date is recorded, which starts the Prompt Payment clock",
+          "Vendors see their invoices’ status without calling the office"
+        ],
+        "fitsWhen": [
+          "The agency still receives paper or emailed invoices",
+          "Its financial system can exchange orders and payments with IPP"
+        ],
+        "watchFor": [
+          "Acceptance by the program office is often what makes payments late, so routing and reminders need care",
+          "Some kinds of payments, such as utilities, may stay outside IPP"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "Treasury’s Invoice Processing Platform"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:cpars-from-contract-data",
+      "type": "implementationPattern",
+      "title": "Performance Evaluations in CPARS, Scheduled from Contract Data",
+      "description": "An example architecture: each contract that needs evaluations is registered in CPARS from the contract data, with its assessing officials and due dates, and reminders go to them and their managers until each evaluation is done.",
+      "status": "reference",
+      "sourceIds": [
+        "src:cpars",
+        "src:far"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Registration of each contract that needs evaluations, from the contract writing system or SAM.gov data",
+          "Assessing officials and reviewing officials named for each contract",
+          "Due dates for each interim and final evaluation",
+          "Reminders before and after each due date, to the officials and their managers",
+          "Reports of evaluations due and overdue, by office"
+        ],
+        "strengths": [
+          "Uses the government-wide system that source selections already read",
+          "Evaluations are less often missed when they’re scheduled from the start"
+        ],
+        "fitsWhen": [
+          "Evaluations are often late or missing",
+          "Contracts are registered in CPARS by hand today"
+        ],
+        "watchFor": [
+          "CPARS is moving into SAM.gov, so the connection and the steps may change",
+          "A scheduled evaluation still needs someone who knows the work to write it"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "CPARS, fed from contract data"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:acquisition-ai-drafting",
+      "type": "implementationPattern",
+      "title": "AI Help Drafting Acquisition Documents",
+      "description": "An example architecture: contracting and program staff use an AI model, in an environment the agency approves, to draft market research summaries, statements of work, evaluation criteria, and acquisition plans from the agency’s templates and guidance, and then check and finish each draft themselves.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-ai-rmf",
+        "src:procurement-integrity-41-usc-2102"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "An AI model in an environment the agency has approved for acquisition information",
+          "The agency’s templates, guidance, and current deviations as reference material",
+          "Drafts with the sources they drew on shown beside them",
+          "Staff who check, correct, and approve each draft",
+          "Rules for what may be shared with the model, such as no proposals during a source selection"
+        ],
+        "strengths": [
+          "Staff start from a draft instead of a blank page or an old document",
+          "Drafts can follow the agency’s current templates and deviations",
+          "Program offices can get help writing clear requirements before they reach the contracting office"
+        ],
+        "fitsWhen": [
+          "Writing requirements and plans takes much of the lead time",
+          "The agency has templates and guidance the model can draw on"
+        ],
+        "watchFor": [
+          "Drafts can be wrong or out of date, such as citing rules the overhaul changed, so staff check each one",
+          "Proposal and source selection information must stay where the Procurement Integrity Act allows",
+          "The agency’s AI governance may require an impact assessment and a listing in its AI use case inventory first"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "An AI model the agency approves"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contract-spend-analytics",
+      "type": "implementationPattern",
+      "title": "Contract and Spend Analytics",
+      "description": "An example architecture: an analytics workspace that brings together the agency’s contract data, obligations, invoices, and evaluation and closeout dates, and shows what the agency buys and from whom, where lead times run long, which competitions draw one offer, and which evaluations and closeouts are overdue.",
+      "status": "reference",
+      "sourceIds": [
+        "src:sam-gov",
+        "src:far"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Regular feeds from SAM.gov contract data, the contract writing system, the financial system, and invoicing",
+          "Views of spending by category, vendor, office, and contract",
+          "Lead times, competition, and single-offer rates by office and kind of buy",
+          "Lists of evaluations and closeouts coming due or overdue",
+          "Small business share against the agency’s goals, through the year"
+        ],
+        "strengths": [
+          "Planning starts from what the agency already buys and the contracts it can use",
+          "Managers see where work is falling behind before it’s overdue",
+          "The same numbers support the agency’s reports and its own decisions"
+        ],
+        "fitsWhen": [
+          "The agency’s contract data is spread across systems",
+          "Managers ask for the same reports by hand each month"
+        ],
+        "watchFor": [
+          "SAM.gov’s data and the agency’s own records can disagree, so which one wins needs deciding",
+          "Numbers like single-offer rates need context before they become targets"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "An analytics workspace"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:federal-acquisition-institute",
+      "type": "resource",
+      "title": "Federal Acquisition Institute",
+      "description": "Training, certification, and career development for the civilian acquisition workforce, with courses, videos, and podcasts on the work from planning through closeout.",
+      "status": "reference",
+      "attributes": {
+        "kind": "course",
+        "url": "https://www.fai.gov/",
+        "by": "Federal Acquisition Institute, General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:market-research-techniques",
+      "type": "resource",
+      "title": "Market research techniques",
+      "description": "Ways to do market research beyond the basics, such as facilitated requirements workshops, reverse industry days, and one-on-ones with vendors, each with when to use it, from the Periodic Table of Acquisition Innovations.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.fai.gov/periodic-table-categories/market-research",
+        "by": "Federal Acquisition Institute, General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:acquisition-gateway",
+      "type": "resource",
+      "title": "Acquisition Gateway",
+      "description": "The government-wide site for acquisition professionals, with sample and template documents from every stage of an acquisition, prices other agencies paid, solutions to compare, and experts to contact.",
+      "status": "reference",
+      "attributes": {
+        "kind": "site",
+        "url": "https://acquisitiongateway.gov/",
+        "by": "General Services Administration",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:techfar-hub",
+      "type": "resource",
+      "title": "TechFAR Hub",
+      "description": "How to buy digital services and agile software development under the FAR, stage by stage from before the solicitation through evaluation and administration, with case studies, templates, and the Digital IT Acquisition Professional training.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://techfarhub.usds.gov/",
+        "by": "U.S. Digital Service",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-needs-met-on-time",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:needs-met-on-time"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-full-open-competition",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-responsible-contractors",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:responsible-contractors"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-small-business-participation",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:small-business-participation"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-contracts-perform-as-agreed",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:contracts-perform-as-agreed"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-invoices-paid-on-time",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:invoices-paid-on-time"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-award-decisions-hold-up",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-contract-data-public",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:contract-data-public"
+    },
+    {
+      "id": "rel:acquiring-goods-and-services-seeks-contracts-closed-on-time",
+      "from": "eb:mission:acquiring-goods-and-services",
+      "predicate": "seeks",
+      "to": "eb:outcome:contracts-closed-on-time"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-contributes-to-needs-met-on-time",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:needs-met-on-time"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-contributes-to-full-open-competition",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-contributes-to-small-business-participation",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:small-business-participation"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-satisfies-plan-each-acquisition",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "satisfies",
+      "to": "eb:requirement:plan-each-acquisition"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-satisfies-research-the-market",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "satisfies",
+      "to": "eb:requirement:research-the-market"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-candidate-pattern-acquisition-management",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-candidate-pattern-acquisition-ai-drafting",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-ai-drafting",
+      "coverage": "partial",
+      "description": "Drafts market research summaries and plans for staff to check and finish."
+    },
+    {
+      "id": "rel:acquisition-planning-market-research-candidate-pattern-contract-spend-analytics",
+      "from": "eb:capability:acquisition-planning-market-research",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contract-spend-analytics",
+      "coverage": "partial",
+      "description": "Shows what the agency already buys, from whom, and on which contracts, before a new acquisition starts."
+    },
+    {
+      "id": "rel:solicitation-publicizing-contributes-to-full-open-competition",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:solicitation-publicizing-contributes-to-small-business-participation",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:small-business-participation"
+    },
+    {
+      "id": "rel:solicitation-publicizing-satisfies-publicize-on-sam",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:publicize-on-sam"
+    },
+    {
+      "id": "rel:solicitation-publicizing-satisfies-justify-other-than-full-open",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:justify-other-than-full-open"
+    },
+    {
+      "id": "rel:solicitation-publicizing-satisfies-receive-offers-securely",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:receive-offers-securely"
+    },
+    {
+      "id": "rel:solicitation-publicizing-candidate-pattern-acquisition-management",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:solicitation-publicizing-candidate-pattern-vendor-proposal-portal",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:vendor-proposal-portal",
+      "coverage": "partial",
+      "description": "Receives offers and answers questions. The solicitation itself is written and posted elsewhere."
+    },
+    {
+      "id": "rel:solicitation-publicizing-candidate-pattern-acquisition-ai-drafting",
+      "from": "eb:capability:solicitation-publicizing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-ai-drafting",
+      "coverage": "partial",
+      "description": "Drafts statements of work and evaluation criteria for staff to check and finish."
+    },
+    {
+      "id": "rel:evaluation-source-selection-contributes-to-full-open-competition",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:evaluation-source-selection-contributes-to-award-decisions-hold-up",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:evaluation-source-selection-satisfies-evaluate-against-stated-criteria",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:evaluate-against-stated-criteria"
+    },
+    {
+      "id": "rel:evaluation-source-selection-satisfies-protect-source-selection-information",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-source-selection-information"
+    },
+    {
+      "id": "rel:evaluation-source-selection-satisfies-document-award-decision",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:document-award-decision"
+    },
+    {
+      "id": "rel:evaluation-source-selection-candidate-pattern-acquisition-management",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management",
+      "coverage": "partial",
+      "description": "Holds the award decision and notices. Evaluators’ worksheets and consensus often live in a separate evaluation tool or workspace."
+    },
+    {
+      "id": "rel:evaluation-source-selection-candidate-pattern-vendor-proposal-portal",
+      "from": "eb:capability:evaluation-source-selection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:vendor-proposal-portal",
+      "coverage": "partial",
+      "description": "Keeps proposals where only the evaluation team can open them."
+    },
+    {
+      "id": "rel:responsibility-determination-contributes-to-responsible-contractors",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:responsible-contractors"
+    },
+    {
+      "id": "rel:responsibility-determination-contributes-to-award-decisions-hold-up",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:responsibility-determination-satisfies-check-exclusions-integrity",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-exclusions-integrity"
+    },
+    {
+      "id": "rel:responsibility-determination-satisfies-determine-responsibility",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "satisfies",
+      "to": "eb:requirement:determine-responsibility"
+    },
+    {
+      "id": "rel:responsibility-determination-candidate-pattern-acquisition-management",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:responsibility-determination-candidate-pattern-sam-gov-entity-checks",
+      "from": "eb:capability:responsibility-determination",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:sam-gov-entity-checks",
+      "coverage": "partial",
+      "description": "Checks registration, exclusions, and integrity records automatically. The contracting officer still makes the determination."
+    },
+    {
+      "id": "rel:protest-handling-contributes-to-award-decisions-hold-up",
+      "from": "eb:capability:protest-handling",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:protest-handling-satisfies-respond-to-protests-on-time",
+      "from": "eb:capability:protest-handling",
+      "predicate": "satisfies",
+      "to": "eb:requirement:respond-to-protests-on-time"
+    },
+    {
+      "id": "rel:protest-handling-satisfies-stay-when-required",
+      "from": "eb:capability:protest-handling",
+      "predicate": "satisfies",
+      "to": "eb:requirement:stay-when-required"
+    },
+    {
+      "id": "rel:protest-handling-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:protest-handling",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Each protest tracked as its own case, with its forum, deadlines, documents, and outcome."
+    },
+    {
+      "id": "rel:protest-handling-candidate-pattern-acquisition-management",
+      "from": "eb:capability:protest-handling",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management",
+      "coverage": "partial",
+      "description": "Where protests are tracked with the acquisitions they challenge. Counsel’s own work is often tracked in a separate legal matter system."
+    },
+    {
+      "id": "rel:contract-administration-contributes-to-contracts-perform-as-agreed",
+      "from": "eb:capability:contract-administration",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contracts-perform-as-agreed"
+    },
+    {
+      "id": "rel:contract-administration-contributes-to-needs-met-on-time",
+      "from": "eb:capability:contract-administration",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:needs-met-on-time"
+    },
+    {
+      "id": "rel:contract-administration-satisfies-monitor-performance",
+      "from": "eb:capability:contract-administration",
+      "predicate": "satisfies",
+      "to": "eb:requirement:monitor-performance"
+    },
+    {
+      "id": "rel:contract-administration-satisfies-manage-modifications",
+      "from": "eb:capability:contract-administration",
+      "predicate": "satisfies",
+      "to": "eb:requirement:manage-modifications"
+    },
+    {
+      "id": "rel:contract-administration-candidate-pattern-acquisition-management",
+      "from": "eb:capability:contract-administration",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:invoicing-payment-contributes-to-invoices-paid-on-time",
+      "from": "eb:capability:invoicing-payment",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:invoices-paid-on-time"
+    },
+    {
+      "id": "rel:invoicing-payment-satisfies-receive-invoices-electronically",
+      "from": "eb:capability:invoicing-payment",
+      "predicate": "satisfies",
+      "to": "eb:requirement:receive-invoices-electronically"
+    },
+    {
+      "id": "rel:invoicing-payment-satisfies-pay-by-due-date",
+      "from": "eb:capability:invoicing-payment",
+      "predicate": "satisfies",
+      "to": "eb:requirement:pay-by-due-date"
+    },
+    {
+      "id": "rel:invoicing-payment-candidate-pattern-invoices-through-ipp",
+      "from": "eb:capability:invoicing-payment",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:invoices-through-ipp"
+    },
+    {
+      "id": "rel:invoicing-payment-candidate-pattern-acquisition-management",
+      "from": "eb:capability:invoicing-payment",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management",
+      "coverage": "partial",
+      "description": "When another agency awards the contracts, some providers process invoices and payments too. Others leave payment to the agency."
+    },
+    {
+      "id": "rel:past-performance-evaluation-contributes-to-contracts-perform-as-agreed",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contracts-perform-as-agreed"
+    },
+    {
+      "id": "rel:past-performance-evaluation-contributes-to-responsible-contractors",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:responsible-contractors"
+    },
+    {
+      "id": "rel:past-performance-evaluation-satisfies-evaluate-performance-on-schedule",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "satisfies",
+      "to": "eb:requirement:evaluate-performance-on-schedule"
+    },
+    {
+      "id": "rel:past-performance-evaluation-candidate-pattern-cpars-from-contract-data",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:cpars-from-contract-data"
+    },
+    {
+      "id": "rel:past-performance-evaluation-candidate-pattern-acquisition-management",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management",
+      "coverage": "partial",
+      "description": "When another agency awards the contracts, its contracting officer completes the evaluation, with the agency’s representative’s input."
+    },
+    {
+      "id": "rel:past-performance-evaluation-candidate-pattern-contract-spend-analytics",
+      "from": "eb:capability:past-performance-evaluation",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contract-spend-analytics",
+      "coverage": "partial",
+      "description": "Finds evaluations coming due or overdue. The evaluations themselves are written in CPARS."
+    },
+    {
+      "id": "rel:contract-reporting-contributes-to-contract-data-public",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contract-data-public"
+    },
+    {
+      "id": "rel:contract-reporting-contributes-to-small-business-participation",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:small-business-participation"
+    },
+    {
+      "id": "rel:contract-reporting-satisfies-report-contract-actions",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-contract-actions"
+    },
+    {
+      "id": "rel:contract-reporting-satisfies-certify-contract-data",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:certify-contract-data"
+    },
+    {
+      "id": "rel:contract-reporting-satisfies-check-subcontract-reporting",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-subcontract-reporting"
+    },
+    {
+      "id": "rel:contract-reporting-candidate-pattern-contract-data-to-sam",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contract-data-to-sam"
+    },
+    {
+      "id": "rel:contract-reporting-candidate-pattern-acquisition-management",
+      "from": "eb:capability:contract-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:contract-closeout-contributes-to-contracts-closed-on-time",
+      "from": "eb:capability:contract-closeout",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contracts-closed-on-time"
+    },
+    {
+      "id": "rel:contract-closeout-satisfies-close-within-standards",
+      "from": "eb:capability:contract-closeout",
+      "predicate": "satisfies",
+      "to": "eb:requirement:close-within-standards"
+    },
+    {
+      "id": "rel:contract-closeout-satisfies-release-unneeded-funds",
+      "from": "eb:capability:contract-closeout",
+      "predicate": "satisfies",
+      "to": "eb:requirement:release-unneeded-funds"
+    },
+    {
+      "id": "rel:contract-closeout-candidate-pattern-acquisition-management",
+      "from": "eb:capability:contract-closeout",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:contract-closeout-candidate-pattern-contract-spend-analytics",
+      "from": "eb:capability:contract-closeout",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contract-spend-analytics",
+      "coverage": "partial",
+      "description": "Finds contracts past their closeout standard and the funds still on them."
+    },
+    {
+      "id": "rel:acquisition-management-depends-on-shared-case-platform",
+      "from": "eb:implementationPattern:acquisition-management",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "way": "agency-platform",
+      "description": "The request and contract records and their steps are the shared platform, set up for acquisition."
+    },
+    {
+      "id": "rel:acquisition-management-works-with-contract-data-to-sam",
+      "from": "eb:implementationPattern:acquisition-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contract-data-to-sam",
+      "description": "The system’s connection sends each contract action report to SAM.gov."
+    },
+    {
+      "id": "rel:acquisition-management-works-with-invoices-through-ipp",
+      "from": "eb:implementationPattern:acquisition-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:invoices-through-ipp",
+      "description": "Awards and their line items set up what vendors invoice against."
+    },
+    {
+      "id": "rel:acquisition-management-works-with-cpars-from-contract-data",
+      "from": "eb:implementationPattern:acquisition-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:cpars-from-contract-data",
+      "description": "Contract data registers each contract in CPARS and sets its evaluation dates."
+    },
+    {
+      "id": "rel:acquisition-management-works-with-sam-gov-entity-checks",
+      "from": "eb:implementationPattern:acquisition-management",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:sam-gov-entity-checks",
+      "description": "Registration and exclusion results show on the award screens."
+    },
+    {
+      "id": "rel:vendor-proposal-portal-works-with-acquisition-management",
+      "from": "eb:implementationPattern:vendor-proposal-portal",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:acquisition-management",
+      "description": "Offers and questions are linked to the solicitation in the acquisition system."
+    },
+    {
+      "id": "rel:contract-data-to-sam-works-with-acquisition-management",
+      "from": "eb:implementationPattern:contract-data-to-sam",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:invoices-through-ipp-works-with-contract-spend-analytics",
+      "from": "eb:implementationPattern:invoices-through-ipp",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contract-spend-analytics",
+      "description": "Invoice and payment dates feed the reports on late payments."
+    },
+    {
+      "id": "rel:contract-spend-analytics-works-with-acquisition-management",
+      "from": "eb:implementationPattern:contract-spend-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:federal-acquisition-institute-helps-with-acquiring-goods-and-services",
+      "from": "eb:resource:federal-acquisition-institute",
+      "predicate": "helps_with",
+      "to": "eb:mission:acquiring-goods-and-services"
+    },
+    {
+      "id": "rel:market-research-techniques-helps-with-acquisition-planning-market-research",
+      "from": "eb:resource:market-research-techniques",
+      "predicate": "helps_with",
+      "to": "eb:capability:acquisition-planning-market-research"
+    },
+    {
+      "id": "rel:acquisition-gateway-helps-with-acquisition-planning-market-research",
+      "from": "eb:resource:acquisition-gateway",
+      "predicate": "helps_with",
+      "to": "eb:capability:acquisition-planning-market-research"
+    },
+    {
+      "id": "rel:acquisition-gateway-helps-with-solicitation-publicizing",
+      "from": "eb:resource:acquisition-gateway",
+      "predicate": "helps_with",
+      "to": "eb:capability:solicitation-publicizing"
+    },
+    {
+      "id": "rel:techfar-hub-helps-with-acquisition-planning-market-research",
+      "from": "eb:resource:techfar-hub",
+      "predicate": "helps_with",
+      "to": "eb:capability:acquisition-planning-market-research"
+    },
+    {
+      "id": "rel:techfar-hub-helps-with-evaluation-source-selection",
+      "from": "eb:resource:techfar-hub",
+      "predicate": "helps_with",
+      "to": "eb:capability:evaluation-source-selection"
+    },
+    {
+      "id": "rel:techfar-hub-helps-with-contract-administration",
+      "from": "eb:resource:techfar-hub",
+      "predicate": "helps_with",
+      "to": "eb:capability:contract-administration"
+    },
+    {
+      "id": "rel:case-management-contributes-to-needs-met-on-time",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:needs-met-on-time"
+    },
+    {
+      "id": "rel:case-management-contributes-to-contracts-closed-on-time",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contracts-closed-on-time"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-acquisition-management",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:acquisition-management"
+    },
+    {
+      "id": "rel:records-management-contributes-to-award-decisions-hold-up",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:records-management-contributes-to-contracts-closed-on-time",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:contracts-closed-on-time"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-full-open-competition",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-award-decisions-hold-up",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:award-decisions-hold-up"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-full-open-competition",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    },
+    {
+      "id": "rel:security-logging-monitoring-contributes-to-full-open-competition",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:full-open-competition"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:acquisition-results",
+      "title": "Acquisition results discovery",
+      "questions": [
+        {
+          "id": "question:acquisition-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "needs-met-on-time",
+              "label": "The agency gets what it needs when it needs it"
+            },
+            {
+              "value": "full-open-competition",
+              "label": "Contracts are competed openly and fairly"
+            },
+            {
+              "value": "responsible-contractors",
+              "label": "Contracts go to responsible contractors"
+            },
+            {
+              "value": "small-business-participation",
+              "label": "Small businesses get a fair share of the work"
+            },
+            {
+              "value": "contracts-perform-as-agreed",
+              "label": "Contractors deliver what the contract calls for"
+            },
+            {
+              "value": "invoices-paid-on-time",
+              "label": "Contractors are paid correctly and on time"
+            },
+            {
+              "value": "award-decisions-hold-up",
+              "label": "Award decisions stand up to challenge"
+            },
+            {
+              "value": "contract-data-public",
+              "label": "The contract spending is open to view"
+            },
+            {
+              "value": "contracts-closed-on-time",
+              "label": "Contracts are closed out on time"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "needs-met-on-time",
+              "elementId": "eb:outcome:needs-met-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "full-open-competition",
+              "elementId": "eb:outcome:full-open-competition",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "responsible-contractors",
+              "elementId": "eb:outcome:responsible-contractors",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "small-business-participation",
+              "elementId": "eb:outcome:small-business-participation",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "contracts-perform-as-agreed",
+              "elementId": "eb:outcome:contracts-perform-as-agreed",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "invoices-paid-on-time",
+              "elementId": "eb:outcome:invoices-paid-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "award-decisions-hold-up",
+              "elementId": "eb:outcome:award-decisions-hold-up",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "contract-data-public",
+              "elementId": "eb:outcome:contract-data-public",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "contracts-closed-on-time",
+              "elementId": "eb:outcome:contracts-closed-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-tracked-measures",
+          "prompt": "Which of these does the office track during the year?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "lead-time",
+              "label": "How long acquisitions take from solicitation to award"
+            },
+            {
+              "value": "competition",
+              "label": "How much is competed, and how often only one offer comes in"
+            },
+            {
+              "value": "evaluations",
+              "label": "How many performance evaluations are done on time"
+            },
+            {
+              "value": "prompt-payment",
+              "label": "Late payments and the interest paid on them"
+            },
+            {
+              "value": "closeout",
+              "label": "How many completed contracts are past their closeout standard"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "lead-time",
+              "elementId": "eb:measure:procurement-lead-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "competition",
+              "elementId": "eb:measure:competed-obligations-share",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "competition",
+              "elementId": "eb:measure:single-offer-awards",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "evaluations",
+              "elementId": "eb:measure:performance-evaluations-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "prompt-payment",
+              "elementId": "eb:measure:proper-invoices-paid-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "prompt-payment",
+              "elementId": "eb:measure:interest-penalties-paid",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "closeout",
+              "elementId": "eb:measure:contracts-overdue-for-closeout",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-lead-time-start",
+          "prompt": "Does the office know how long requests wait before a solicitation is issued?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:acquisition-planning-market-research",
+              "interpretation": "The official lead time starts at the solicitation, so time spent before it, often the longest part, can go unseen."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:measure:procurement-lead-time",
+              "interpretation": "The official lead time starts at the solicitation, so time spent before it, often the longest part, can go unseen."
+            }
+          ]
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the agency’s acquisitions and how the office tells how it’s doing. They ask about the office’s operations, never about individual acquisitions, offerors, or contractors. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:acquisition-operations",
+      "title": "Acquisition operations discovery",
+      "questions": [
+        {
+          "id": "question:acquisition-contract-writing",
+          "prompt": "How does the office write and track its contracts today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "cws-product",
+              "label": "A contract writing product the agency runs"
+            },
+            {
+              "value": "agency-platform",
+              "label": "The agency’s shared case or low-code platform"
+            },
+            {
+              "value": "other-agency",
+              "label": "Another federal agency awards contracts for us"
+            },
+            {
+              "value": "documents",
+              "label": "Document templates, email, and shared drives"
+            },
+            {
+              "value": "custom-system",
+              "label": "A custom system built for the agency"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:acquisition-management",
+              "interpretation": "These are example ways to bring each contract onto one record, from request to closeout."
+            },
+            {
+              "answerValue": "custom-system",
+              "elementId": "eb:implementationPattern:acquisition-management",
+              "interpretation": "These are example ways to bring each contract onto one record, from request to closeout."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-offers-received",
+          "prompt": "How do offers reach the office?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "portal",
+              "label": "Through a portal that time-stamps and locks them"
+            },
+            {
+              "value": "email",
+              "label": "By email"
+            },
+            {
+              "value": "mixed",
+              "label": "It varies by solicitation"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:solicitation-publicizing",
+              "interpretation": "Offers in email are hard to protect, and hard to prove on time when one is late."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:solicitation-publicizing",
+              "interpretation": "Offers in email are hard to protect, and hard to prove on time when one is late."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:implementationPattern:vendor-proposal-portal",
+              "interpretation": "Offers in email are hard to protect, and hard to prove on time when one is late."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:implementationPattern:vendor-proposal-portal",
+              "interpretation": "Offers in email are hard to protect, and hard to prove on time when one is late."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-sam-checks",
+          "prompt": "How does the office check SAM.gov before an award?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "automatic",
+              "label": "The contract system checks it and saves the result"
+            },
+            {
+              "value": "by-hand",
+              "label": "Staff look it up and save a screenshot or printout"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by person"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:capability:responsibility-determination",
+              "interpretation": "Checks by hand are easy to miss, and leave nothing to notice a new exclusion after award."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:responsibility-determination",
+              "interpretation": "Checks by hand are easy to miss, and leave nothing to notice a new exclusion after award."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:implementationPattern:sam-gov-entity-checks",
+              "interpretation": "Checks by hand are easy to miss, and leave nothing to notice a new exclusion after award."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:sam-gov-entity-checks",
+              "interpretation": "Checks by hand are easy to miss, and leave nothing to notice a new exclusion after award."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-invoices",
+          "prompt": "How do invoices arrive?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "electronic",
+              "label": "Through an electronic invoicing system, such as IPP"
+            },
+            {
+              "value": "email-paper",
+              "label": "By email or paper"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "email-paper",
+              "elementId": "eb:capability:invoicing-payment",
+              "interpretation": "Without a record of when each invoice arrived, it’s hard to pay on time or know which payments owe interest."
+            },
+            {
+              "answerValue": "email-paper",
+              "elementId": "eb:implementationPattern:invoices-through-ipp",
+              "interpretation": "Without a record of when each invoice arrived, it’s hard to pay on time or know which payments owe interest."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-cpars-registration",
+          "prompt": "Are contracts registered in CPARS automatically from contract data?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:past-performance-evaluation",
+              "interpretation": "Contracts registered by hand are the ones whose evaluations are most often missed."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:cpars-from-contract-data",
+              "interpretation": "Contracts registered by hand are the ones whose evaluations are most often missed."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-protests-tracked",
+          "prompt": "Are protests tracked with their deadlines in a system the office and counsel both use?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:protest-handling",
+              "interpretation": "Protest deadlines are short, and missing one can lose the protest."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Protest deadlines are short, and missing one can lose the protest."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-evaluation-records",
+          "prompt": "Where do evaluators record their ratings and the consensus?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "In the contract system or an evaluation tool"
+            },
+            {
+              "value": "documents",
+              "label": "In documents and spreadsheets on a shared drive"
+            },
+            {
+              "value": "email",
+              "label": "Mostly in email"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:evaluation-source-selection",
+              "interpretation": "Ratings in documents and email are hard to keep from people outside the evaluation, and hard to put together if the award is protested."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:evaluation-source-selection",
+              "interpretation": "Ratings in documents and email are hard to keep from people outside the evaluation, and hard to put together if the award is protested."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:requirement:protect-source-selection-information",
+              "interpretation": "Ratings in documents and email are hard to keep from people outside the evaluation, and hard to put together if the award is protested."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:protect-source-selection-information",
+              "interpretation": "Ratings in documents and email are hard to keep from people outside the evaluation, and hard to put together if the award is protested."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-administration-records",
+          "prompt": "How are contract changes and the contractor’s performance tracked after award?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "On the contract’s record in the contract system"
+            },
+            {
+              "value": "file-email",
+              "label": "In the contract file and email"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by contracting officer"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "file-email",
+              "elementId": "eb:capability:contract-administration",
+              "interpretation": "Changes and problems tracked outside the contract’s record are hard to see when the next one comes up."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:contract-administration",
+              "interpretation": "Changes and problems tracked outside the contract’s record are hard to see when the next one comes up."
+            },
+            {
+              "answerValue": "file-email",
+              "elementId": "eb:implementationPattern:acquisition-management",
+              "interpretation": "Changes and problems tracked outside the contract’s record are hard to see when the next one comes up."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:acquisition-management",
+              "interpretation": "Changes and problems tracked outside the contract’s record are hard to see when the next one comes up."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-contract-reporting",
+          "prompt": "How does each contract action reach SAM.gov after award?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "automatic",
+              "label": "The contract system reports it"
+            },
+            {
+              "value": "by-hand",
+              "label": "Staff enter it in SAM.gov by hand"
+            },
+            {
+              "value": "not-sure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:capability:contract-reporting",
+              "interpretation": "Actions entered by hand are where the three-day deadline and the year-end certification slip."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:capability:contract-reporting",
+              "interpretation": "Actions entered by hand are where the three-day deadline and the year-end certification slip."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:implementationPattern:contract-data-to-sam",
+              "interpretation": "Actions entered by hand are where the three-day deadline and the year-end certification slip."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:implementationPattern:contract-data-to-sam",
+              "interpretation": "Actions entered by hand are where the three-day deadline and the year-end certification slip."
+            }
+          ]
+        },
+        {
+          "id": "question:acquisition-closeout-backlog",
+          "prompt": "Does the office know which contracts are past their closeout standard?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:contract-closeout",
+              "interpretation": "Contracts left open hold funds that could be released while they can still be used."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:contract-spend-analytics",
+              "interpretation": "Contracts left open hold funds that could be released while they can still be used."
+            }
+          ]
+        }
+      ],
+      "description": "Questions about how the office runs its acquisitions today, from request to closeout. They ask about the office’s tools and steps, never about individual acquisitions, offerors, or contractors. Answers point to capabilities and example patterns worth exploring."
+    }
+  ]
+}

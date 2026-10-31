@@ -1,0 +1,13 @@
+# Capabilities, in the order the pages show them, each with the links it holds.
+
+- id: risk-based-audit-planning
+  title: Risk-Based Audit Planning
+  stage: plan-prepare
+  status: draft
+  description: Ability to rank the government’s programs and departments by risk each year, propose an audit plan from the ranking, and have the council approve it.
+  contributes_to: [ audits-on-plan ]
+  satisfies: [ publish-the-audit-plan ]
+  candidate_pattern:
+    - to: audit-management-system
+      coverage: partial
+      note: Holds the plan once it’s approved. Ranking risk takes data from the finance and budget systems too.

@@ -1,0 +1,13 @@
+# Links from the library's elements, saying what they do for this mission.
+
+- from: capability:audit-inspection-evaluation
+  contributes_to: [ audits-on-plan, findings-resolved ]
+
+- from: capability:recommendations-corrective-action-monitoring
+  contributes_to: [ findings-resolved ]
+
+- from: capability:records-management
+  contributes_to: [ findings-resolved ]
+
+- from: capability:identity-access-management
+  contributes_to: [ audits-on-plan, findings-resolved ]

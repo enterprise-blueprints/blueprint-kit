@@ -1,0 +1,580 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Enterprise Blueprints Package 0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packageId",
+    "version",
+    "title",
+    "description",
+    "publisher",
+    "license",
+    "publishedAt",
+    "domain",
+    "elements",
+    "relations"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.3.0"
+    },
+    "packageId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9-]+)+$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date"
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jurisdictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "description": "Packages this one builds on. Its relations and discovery answers can point at their elements by ID.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/element"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assessment"
+      }
+    },
+    "playbooks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/playbook"
+      }
+    }
+  },
+  "$defs": {
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packageId",
+        "version"
+      ],
+      "properties": {
+        "packageId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:[.-][a-z0-9-]+)+$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "title",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^eb:[a-z][a-zA-Z]*:[a-z0-9][a-z0-9-]*$"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "reference",
+            "draft",
+            "deprecated"
+          ]
+        },
+        "replacedBy": {
+          "type": "string"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "jurisdictions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "applicabilityNotes": {
+          "type": "string"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "implementationPattern"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "attributes"
+            ],
+            "properties": {
+              "attributes": {
+                "$ref": "#/$defs/patternAttributes"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "solution"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "attributes": {
+                "$ref": "#/$defs/solutionAttributes"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "url",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^src:[a-z0-9][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "kind": {
+          "enum": [
+            "official-reference",
+            "research",
+            "background",
+            "other"
+          ]
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "lastReviewedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "from",
+        "predicate",
+        "to"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^rel:[a-z0-9][a-z0-9-]*$"
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predicate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage": {
+          "description": "For candidate_pattern: how much of the capability the pattern covers. Without it, the pattern covers it fully.",
+          "enum": [
+            "full",
+            "partial"
+          ]
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "prompt",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "single-choice",
+            "multiple-choice",
+            "text",
+            "number",
+            "boolean"
+          ]
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "label"
+            ],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "candidateMappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "answerValue",
+              "elementId",
+              "interpretation"
+            ],
+            "properties": {
+              "answerValue": {
+                "type": "string"
+              },
+              "elementId": {
+                "type": "string"
+              },
+              "interpretation": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "questions"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        }
+      }
+    },
+    "activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "kind",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "review",
+            "capture",
+            "assess",
+            "compare",
+            "model",
+            "deliver"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "suggestedWhen": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "readinessCriterionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputHints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "playbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "title",
+        "objectiveTags",
+        "activities"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objectiveTags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/activity"
+          }
+        }
+      }
+    },
+    "statements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "patternAttributes": {
+      "description": "What an implementation pattern says about itself, so patterns can be compared and grouped by the role they play.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approach",
+        "role"
+      ],
+      "properties": {
+        "approach": {
+          "enum": [
+            "product",
+            "platform",
+            "combine",
+            "build"
+          ]
+        },
+        "role": {
+          "enum": [
+            "public-facing",
+            "business-applications",
+            "worker-productivity",
+            "processing",
+            "ai-insights",
+            "infrastructure"
+          ]
+        },
+        "parts": {
+          "$ref": "#/$defs/statements"
+        },
+        "strengths": {
+          "$ref": "#/$defs/statements"
+        },
+        "fitsWhen": {
+          "$ref": "#/$defs/statements"
+        },
+        "watchFor": {
+          "$ref": "#/$defs/statements"
+        }
+      }
+    },
+    "solutionAttributes": {
+      "description": "When a solution fits, and what to watch for.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fitsWhen": {
+          "$ref": "#/$defs/statements"
+        },
+        "watchFor": {
+          "$ref": "#/$defs/statements"
+        }
+      }
+    }
+  }
+}

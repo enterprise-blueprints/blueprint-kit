@@ -1,0 +1,7 @@
+# Requirements, in the order the pages show them.
+
+- id: publish-the-audit-plan
+  title: Publish the approved audit plan
+  kind: transparency-reporting
+  status: draft
+  description: Publish the audit plan once the council approves it, and report against it during the year.

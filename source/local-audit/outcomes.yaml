@@ -1,0 +1,21 @@
+# Outcomes, in the order the pages show them, each with its measures.
+
+- id: audits-on-plan
+  title: The audit plan is carried out on time
+  theme: timely
+  status: draft
+  description: The audits the council approved for the year are done and reported when planned.
+  measures:
+    - id: audit-plan-completed
+      title: Share of the audit plan completed
+      description: Audits reported this year, out of those in the approved plan.
+
+- id: findings-resolved
+  title: Audit findings are resolved
+  theme: accountable
+  status: draft
+  description: Departments act on the audit office’s recommendations, and the office confirms it.
+  measures:
+    - id: recommendations-closed
+      title: Recommendations closed within a year
+      description: Recommendations confirmed as carried out within a year of the report.

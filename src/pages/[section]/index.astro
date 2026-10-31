@@ -1,0 +1,35 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { elements, groupLabel, resourcesByKind, typesInUse } from '../../kit';
+
+export const getStaticPaths = (() => typesInUse().map(([type, info]) => ({ params: { section: info.section }, props: { type, info } }))) satisfies GetStaticPaths;
+
+const { type, info } = Astro.props;
+const items = elements.filter((e) => e.type === type);
+---
+<Base title={info.plural} description={info.definition}>
+  <div class="container">
+    <h1>{info.plural}</h1>
+    <p class="lede">{info.definition}</p>
+    {type === 'resource'
+      ? resourcesByKind().map((g) => (
+          <section>
+            <h2>{g.label}</h2>
+            <ul class="cards">{g.items.map((r) => <ResourceCard resource={r} />)}</ul>
+          </section>
+        ))
+      : (
+          <ul class="cards">
+            {items.map((e) => (
+              <li class={`card type-${e.type}`}>
+                <p class="kicker">{groupLabel(e) ?? e.typeInfo.label}</p>
+                <a class="card__title" href={e.url}>{e.title}</a>
+                <p class="card__about">{e.description}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+  </div>
+</Base>

@@ -1,0 +1,63 @@
+# Resources, in the order the pages show them, each with what it helps with.
+#
+# A reference without a prefix, such as capability:records-management, means
+# your own element when you have one, and otherwise the library's. A link to a
+# pattern can name one of its ways, for something about sourcing it that way.
+# Anything else you want to say goes in attributes, and shows on its page.
+
+- id: oversight-intake-assessment
+  title: Oversight intake assessment
+  kind: service
+  url: https://example.com/services/oversight-intake-assessment
+  lastReviewedAt: 2026-10-30
+  description: Two weeks with an Inspector General’s office mapping how complaints, allegations, and disclosures come in, where they wait, and how they’re tracked, ending in a short plan for intake and case tracking that fits the office.
+  attributes:
+    typicalLength: 2 weeks
+    deliverables: Current-state map, findings, and a phased plan
+  helps_with:
+    - capability:complaint-allegation-disclosure-intake
+    - implementationPattern:oversight-intake-case-tracking
+
+- id: intake-to-referral-demo
+  title: From intake to referral, on a shared case platform
+  kind: demo
+  url: https://example.com/demos/intake-to-referral
+  lastReviewedAt: 2026-10-30
+  description: A 15-minute recorded walkthrough of a hotline complaint taken in, screened, protected, and referred for investigation, built on an agency’s existing case management platform.
+  helps_with:
+    - to: implementationPattern:shared-case-platform
+      way: platform
+    - capability:complaint-allegation-disclosure-intake
+
+- id: example-case-manager
+  title: Example Case Manager
+  kind: product
+  url: https://example.com/products/case-manager
+  lastReviewedAt: 2026-10-30
+  description: A case management product for oversight offices, with intake forms, confidential reporter handling, case assignment, and referral tracking that come configured for an Inspector General’s work.
+  attributes:
+    editions: Standard, Government Cloud
+  helps_with:
+    - to: implementationPattern:oversight-intake-case-tracking
+      way: product
+
+- id: grant-risk-review-scorecard
+  title: Grant risk review scorecard
+  kind: template
+  url: https://example.com/templates/grant-risk-scorecard
+  lastReviewedAt: 2026-10-30
+  description: A spreadsheet that scores an applicant’s risk before an award from its financial stability, audit history, and past performance, with notes on where to find each in SAM.gov and the Federal Audit Clearinghouse.
+  helps_with: [ capability:risk-review-award ]
+
+- id: records-schedules-workshop
+  title: Records schedules in practice
+  kind: course
+  url: https://example.com/training/records-schedules
+  lastReviewedAt: 2026-10-30
+  description: A half-day workshop for records officers and system owners on applying records schedules inside business systems, with exercises on legal holds and disposal.
+  attributes:
+    format: Virtual or on site
+  helps_with:
+    - capability:records-management
+    - to: implementationPattern:records-in-business-systems
+      way: built-in

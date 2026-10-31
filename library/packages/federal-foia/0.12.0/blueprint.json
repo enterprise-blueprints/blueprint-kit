@@ -1,0 +1,2390 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "org.enterprise-blueprints.federal-foia",
+  "idPrefix": "eb",
+  "version": "0.12.0",
+  "title": "FOIA Program — Public Access to Agency Records",
+  "description": "U.S. federal Freedom of Information Act program blueprint: one mission with the outcomes it seeks and ways to measure them, eight capabilities, from leading the program to reporting on it, with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for FOIA results and for request processing. It builds on Common Capabilities for case management, records, identity and access, and data protection.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-10-30",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies subject to the Freedom of Information Act"
+  ],
+  "tags": [
+    "freedom-of-information",
+    "foia",
+    "transparency",
+    "public-records",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.12.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:foia-statute",
+      "title": "5 U.S.C. § 552 — Public information; agency rules, opinions, orders, records, and proceedings (Freedom of Information Act)",
+      "url": "https://www.govinfo.gov/link/uscode/5/552?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "What agencies must publish and post, the 20-working-day time limit and its extensions, expedited processing, appeals, the foreseeable harm standard, segregable release, tracking numbers, FOIA Public Liaisons, OGIS, the national request portal, and the contents of the annual FOIA report."
+    },
+    {
+      "id": "src:doj-foia-guide",
+      "title": "U.S. Department of Justice — Guide to the Freedom of Information Act",
+      "url": "https://www.justice.gov/oip/doj-guide-freedom-information-act-0",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The Office of Information Policy’s treatise on the FOIA, with chapters on proactive disclosures, procedural requirements such as searches and response letters, fees and fee waivers, and each exemption."
+    },
+    {
+      "id": "src:oip-backlog-guidance",
+      "title": "U.S. Department of Justice, Office of Information Policy — Guidance on Backlog Reduction Plans",
+      "url": "https://www.justice.gov/oip/oip-guidance/guidance-backlog-reduction-plans",
+      "kind": "official-reference",
+      "publicationDate": "2025-08-21",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Agencies should aim to keep their backlog below 10% of the requests they receive each year, and plan how to reduce it."
+    },
+    {
+      "id": "src:oip-annual-report-handbook",
+      "title": "U.S. Department of Justice — Handbook for Agency Annual FOIA Reports (2024 update)",
+      "url": "https://www.justice.gov/d9/2024-10/DOJ%20Handbook%20for%20Agency%20Annual%20FOIA%20Reports%20(2024%20update).pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "How agencies count what the annual FOIA report includes. A backlogged request is one still pending at the end of the fiscal year beyond the time the law allows for a response."
+    },
+    {
+      "id": "src:oip-chief-foia-officer-guidelines",
+      "title": "U.S. Department of Justice, Office of Information Policy — Guidelines for 2026 Chief FOIA Officer Reports",
+      "url": "https://www.justice.gov/oip/guidelines-2026-chief-foia-officer-reports",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "What each agency’s Chief FOIA Officer reports each year, including proactive disclosures, use of technology, and managing backlogs and the oldest pending requests."
+    },
+    {
+      "id": "src:ogis",
+      "title": "National Archives — Office of Government Information Services (OGIS)",
+      "url": "https://www.archives.gov/ogis",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The FOIA ombudsman: resolves disputes between requesters and agencies through mediation, and reviews agencies’ FOIA policies, procedures, and compliance."
+    },
+    {
+      "id": "src:foia-gov",
+      "title": "FOIA.gov — the government’s central website for FOIA",
+      "url": "https://www.foia.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Where the public can start a request with any agency, and where agencies’ annual and quarterly FOIA data is published."
+    },
+    {
+      "id": "src:ogis-search-technology",
+      "title": "National Archives, Office of Government Information Services — Leveraging Technology to Improve FOIA Searches",
+      "url": "https://www.archives.gov/ogis/foia-compliance-program/targeted-assessments/leveraging-tech-2019-jul-31",
+      "kind": "official-reference",
+      "publicationDate": "2019-07-31",
+      "lastReviewedAt": "2026-10-28",
+      "note": "How agencies use technology, including e-discovery tools, to search for records, and the backlogs that can build when searches depend on IT offices."
+    },
+    {
+      "id": "src:foia-gov-developer",
+      "title": "FOIA.gov — Developer resources",
+      "url": "https://www.foia.gov/developer/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "The agency API for receiving requests submitted through the national FOIA portal."
+    },
+    {
+      "id": "src:section-508",
+      "title": "Section508.gov — IT accessibility for federal agencies",
+      "url": "https://www.section508.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-10-28",
+      "note": "Federal agencies’ information and communication technology, including web content and documents, must be accessible to people with disabilities."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-10-29",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:public-access-to-agency-records",
+      "type": "mission",
+      "title": "FOIA Program",
+      "description": "Give the public access to agency records: post what the law requires without waiting to be asked, answer requests promptly, and release everything the law allows, withholding only what an exemption protects and release would foreseeably harm.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "tagline": "Public access to agency records",
+        "sector": "public-sector",
+        "scope": "US-federal-FOIA",
+        "principles": [
+          "Each request is one record from receipt to final response, with every letter and decision in it",
+          "The system keeps FOIA’s clock, with its tracks, working days, pauses, and extensions",
+          "Requests from FOIA.gov arrive as records, without retyping",
+          "Records are reviewed and redacted in one place, with each redaction marked with its exemption",
+          "Records people ask for again and again are posted without waiting for the next request",
+          "The annual report comes from the system of record, not from spreadsheets",
+          "AI suggests redactions, and staff decide"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:requests-answered-on-time",
+      "type": "outcome",
+      "title": "Requests are answered within the time the law allows",
+      "description": "Requesters get a determination within 20 working days, or within the extension the law allows in unusual circumstances, and requests that qualify for expedited processing move faster.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "request-processing-time",
+            "title": "Time to process requests",
+            "description": "The median and average number of days to process simple, complex, and expedited requests, with the lowest and highest. Annual FOIA reports include these figures.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-annual-report-handbook"
+            ]
+          },
+          {
+            "id": "requests-within-20-days",
+            "title": "Requests answered within 20 working days",
+            "description": "The share of processed requests answered within 20 working days. Annual FOIA reports group response times in 20-day bands.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-annual-report-handbook"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:backlog-kept-small",
+      "type": "outcome",
+      "title": "Overdue requests don’t pile up",
+      "description": "Few requests and appeals are still open past their legal deadline, and the oldest ones get closed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:oip-annual-report-handbook",
+        "src:oip-backlog-guidance"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "backlogged-requests",
+            "title": "Backlogged requests",
+            "description": "Requests still pending at the end of the fiscal year beyond the time the law allows, compared with the number received that year. The Department of Justice suggests keeping it below 10% of requests received.",
+            "sourceIds": [
+              "src:oip-annual-report-handbook",
+              "src:oip-backlog-guidance"
+            ]
+          },
+          {
+            "id": "oldest-pending-requests",
+            "title": "Age of the oldest pending requests",
+            "description": "How long the agency’s ten oldest pending requests and ten oldest pending appeals have been open. Annual FOIA reports list them.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-annual-report-handbook"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:records-released-as-allowed",
+      "type": "outcome",
+      "title": "Records are released unless the law calls for withholding",
+      "description": "Requesters get every record, and every reasonably segregable part of one, that the law allows. Information is withheld only under an exemption where release would foreseeably harm a protected interest, or where law prohibits release, and each withholding is marked.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "request-dispositions",
+            "title": "How requests are resolved",
+            "description": "The number of requests granted in full, granted in part, and denied, with how often each exemption was used. Annual FOIA reports include these figures.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-annual-report-handbook"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:frequently-requested-posted",
+      "type": "outcome",
+      "title": "Records people often ask for are posted without a request",
+      "description": "The agency posts the records the law requires it to make available, including records released 3 or more times, so people can find them without filing a request.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide",
+        "src:oip-chief-foia-officer-guidelines"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "records-posted-proactively",
+            "title": "Records posted proactively",
+            "description": "The records made available online without a request, including frequently requested records. Annual FOIA reports count them, and Chief FOIA Officer reports describe them.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-chief-foia-officer-guidelines"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:outcome:requesters-helped",
+      "type": "outcome",
+      "title": "Requesters can get help and resolve disputes",
+      "description": "Requesters can reach a FOIA Public Liaison with concerns, appeal an adverse determination, and turn to OGIS mediation instead of going to court.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:ogis"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "appeal-processing-time",
+            "title": "Time to decide appeals",
+            "description": "The median and average number of days to decide administrative appeals, against the 20 working days the law allows, and how the appeals came out. Annual FOIA reports include these figures.",
+            "sourceIds": [
+              "src:foia-statute",
+              "src:oip-annual-report-handbook"
+            ]
+          }
+        ],
+        "theme": "easy-to-use"
+      }
+    },
+    {
+      "id": "eb:outcome:foia-performance-public",
+      "type": "outcome",
+      "title": "The program’s performance is open to view",
+      "description": "The Attorney General, OGIS, Congress, and the public can see how the agency’s FOIA program is doing through its annual, quarterly, and Chief FOIA Officer reports and their data.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:oip-chief-foia-officer-guidelines",
+        "src:foia-gov"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "annual-report-on-time",
+            "title": "Annual FOIA report on time",
+            "description": "Whether the annual FOIA report reaches the Attorney General and OGIS by February 1, and is posted online with its raw data.",
+            "sourceIds": [
+              "src:foia-statute"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:capability:foia-program-leadership",
+      "type": "capability",
+      "title": "FOIA Program Leadership",
+      "description": "Ability to lead the agency’s FOIA program through its Chief FOIA Officer, who is responsible agency-wide for compliance, monitors how the program is doing, recommends changes to its practices, policies, staffing, and funding, and reports to the Attorney General, and to keep the agency’s FOIA regulations and fee schedule current.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:oip-chief-foia-officer-guidelines"
+      ],
+      "applicabilityNotes": "The Chief FOIA Officer is a senior official, at the Assistant Secretary level or equivalent. The Department of Justice sets when Chief FOIA Officer Reports are due and what they cover each year.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:foia-request-intake",
+      "type": "capability",
+      "title": "Request Intake",
+      "description": "Ability to receive FOIA requests through the national portal and the agency’s own channels, log and acknowledge each one, work with requesters to make requests clear, and decide each request’s processing track, fee category, and whether it qualifies for expedited processing.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide",
+        "src:foia-gov"
+      ],
+      "applicabilityNotes": "Each agency’s FOIA regulations set what makes a request proper, how its tracks and fee categories work, and who decides on expedited processing. Requests for records about the requester may also fall under the Privacy Act.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:records-search-collection",
+      "type": "capability",
+      "title": "Records Search & Collection",
+      "description": "Ability to find the records a request covers wherever the agency keeps them, including email and other electronic systems, collect them for review, and document how the search was done.",
+      "status": "reference",
+      "sourceIds": [
+        "src:doj-foia-guide"
+      ],
+      "applicabilityNotes": "A search needs to be reasonably calculated to find the records asked for. What that takes depends on how and where the agency keeps its records.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:records-review-redaction",
+      "type": "capability",
+      "title": "Review, Redaction & Consultation",
+      "description": "Ability to review the records found line by line, decide what can be released under the foreseeable harm standard, redact only what an exemption protects, and consult or refer other agencies with an interest in the records.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "applicabilityNotes": "Exemptions, exclusions, and consultation practices are technical. This describes the ability, not how to apply any exemption.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:response-release",
+      "type": "capability",
+      "title": "Response & Release",
+      "description": "Ability to send each requester a determination that explains what was released and withheld and why, with their appeal rights and where to get help, and to deliver released records in the form asked for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:appeals-requester-assistance",
+      "type": "capability",
+      "title": "Appeals & Requester Assistance",
+      "description": "Ability to help requesters through a FOIA Public Liaison, decide administrative appeals of adverse determinations, and work with OGIS when a requester seeks mediation.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:ogis"
+      ],
+      "applicabilityNotes": "Who decides appeals, and how the FOIA Public Liaison works with requesters, is set by each agency.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:proactive-disclosure",
+      "type": "capability",
+      "title": "Proactive Disclosure",
+      "description": "Ability to publish the records the law requires agencies to make available without a request, such as final opinions, policy statements, staff manuals, and records released 3 or more times, in an online FOIA library people can search.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide",
+        "src:oip-chief-foia-officer-guidelines"
+      ],
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:capability:foia-reporting",
+      "type": "capability",
+      "title": "FOIA Reporting",
+      "description": "Ability to compile the annual FOIA report, quarterly reports, and the Chief FOIA Officer report from the agency’s request data, and post them and their raw data online.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:oip-annual-report-handbook",
+        "src:oip-chief-foia-officer-guidelines"
+      ],
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:monitor-and-improve-the-program",
+      "type": "requirement",
+      "title": "Monitor the program and recommend improvements",
+      "description": "Monitor how the FOIA program is doing across the agency, keep the agency head, the chief legal officer, and the Attorney General informed, and recommend changes to practices, policies, staffing, and funding that would improve it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:report-to-attorney-general",
+      "type": "requirement",
+      "title": "Report on the program to the Attorney General",
+      "description": "Review the agency’s FOIA performance and report on it to the Attorney General, through the agency head, at the times and in the format the Attorney General sets, in the Chief FOIA Officer Report.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:oip-chief-foia-officer-guidelines"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-foia-regulations-current",
+      "type": "requirement",
+      "title": "Keep the agency’s FOIA regulations and fee schedule current",
+      "description": "Issue the agency’s FOIA regulations, including its fee schedule and when fees are waived or reduced, after public notice and comment, and update them as the law and the Office of Management and Budget’s fee guidelines change.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:accept-portal-requests",
+      "type": "requirement",
+      "title": "Accept requests from the national portal",
+      "description": "Take in requests submitted through FOIA.gov alongside the agency’s own channels, without retyping them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:foia-gov"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:place-on-track",
+      "type": "requirement",
+      "title": "Place each request on a processing track",
+      "description": "Decide whether a request is simple, complex, or expedited, and decide on expedited processing within 10 calendar days of the request.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:clarify-requests",
+      "type": "requirement",
+      "title": "Work with requesters to clarify requests",
+      "description": "Contact requesters to clarify or narrow what they’re asking for, record what was agreed, and offer a faster track when narrowing would allow one.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:set-fee-category",
+      "type": "requirement",
+      "title": "Set fees and decide fee waivers",
+      "description": "Place each requester in a fee category, estimate fees, decide fee waiver requests, and charge no search fees when the agency misses a deadline without an allowed exception.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:search-all-record-locations",
+      "type": "requirement",
+      "title": "Search every place records are kept",
+      "description": "Search the systems, email, shared drives, and paper files likely to hold the records asked for, by terms, dates, and the people who hold them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:document-search",
+      "type": "requirement",
+      "title": "Document each search",
+      "description": "Record where the agency searched, the terms and dates used, and who searched, so the search can be shown to be adequate.",
+      "status": "reference",
+      "sourceIds": [
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:deduplicate-records",
+      "type": "requirement",
+      "title": "Set duplicates aside before review",
+      "description": "Find exact and near duplicates, such as copies of the same email thread, so each record is reviewed once.",
+      "status": "reference",
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:mark-redactions",
+      "type": "requirement",
+      "title": "Mark each redaction with its exemption",
+      "description": "Show on the released record where information was withheld, how much, and under which exemption, unless showing it would reveal what the exemption protects.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:release-segregable-parts",
+      "type": "requirement",
+      "title": "Release every segregable part",
+      "description": "Release the parts of a record that can reasonably be separated from what’s exempt, instead of withholding whole pages.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:record-withholding-reasons",
+      "type": "requirement",
+      "title": "Record why each withholding is needed",
+      "description": "Record the exemption and the foreseeable harm behind each withholding, so the decision can be explained on appeal or in court.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:consult-other-agencies",
+      "type": "requirement",
+      "title": "Consult and refer other agencies",
+      "description": "Send records another agency has an interest in for consultation or referral, follow them until they come back, and tell the requester when part of a request was referred.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:protect-unredacted-records",
+      "type": "requirement",
+      "title": "Protect records before redaction",
+      "description": "Limit who can see records before they’re redacted to the people processing the request, and keep a record of access.",
+      "status": "reference",
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:complete-determination-letters",
+      "type": "requirement",
+      "title": "Send complete determination letters",
+      "description": "Tell the requester what was found, released, and withheld and why. For an adverse determination, include the right to appeal within at least 90 days and to seek help from the FOIA Public Liaison and OGIS.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:deliver-in-requested-format",
+      "type": "requirement",
+      "title": "Deliver records in the format asked for",
+      "description": "Provide records in the form or format the requester asks for when they can readily be reproduced that way, such as electronic files.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:release-in-parts",
+      "type": "requirement",
+      "title": "Release large requests in parts",
+      "description": "Release records as they’re ready, in interim releases, when a request is large enough that waiting for all of it would delay everything.",
+      "status": "reference",
+      "sourceIds": [
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:decide-appeals-on-time",
+      "type": "requirement",
+      "title": "Decide appeals within 20 working days",
+      "description": "Log each administrative appeal, review the original determination independently, and decide it within 20 working days.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:answer-status-questions",
+      "type": "requirement",
+      "title": "Answer questions about where a request stands",
+      "description": "Let requesters find out the status of a request, including an estimated date of completion, by phone or online, and reach a FOIA Public Liaison with concerns.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:work-with-ogis",
+      "type": "requirement",
+      "title": "Work with OGIS on mediation",
+      "description": "Respond when OGIS contacts the agency about a dispute, and keep track of mediation cases and their results.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:ogis"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:spot-frequently-requested-records",
+      "type": "requirement",
+      "title": "Spot records requested 3 or more times",
+      "description": "Notice when the same records have been requested 3 or more times, and post them once they’re released.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-online-foia-library",
+      "type": "requirement",
+      "title": "Keep an online FOIA library",
+      "description": "Post the records the law requires in an online library people can search, in accessible formats.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:compile-annual-foia-report",
+      "type": "requirement",
+      "title": "Compile the annual FOIA report on time",
+      "description": "Gather the statistics the law requires for the fiscal year, such as requests received and processed, how they were resolved, exemptions used, processing times, backlog, and fees, and submit them by February 1.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:oip-annual-report-handbook"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:post-reports-and-data",
+      "type": "requirement",
+      "title": "Post the reports and their raw data",
+      "description": "Make each report and the raw statistics behind it available online.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:foia-request-processing",
+      "type": "implementationPattern",
+      "title": "FOIA Request Processing",
+      "description": "An example architecture: one place to handle a FOIA request from start to finish. It takes requests from the national portal and the agency’s own form, tracks them on FOIA’s tracks and deadlines, collects records and sets duplicates aside, applies marked redactions, publishes releases to the FOIA library, and produces the annual report from the same data.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-gov",
+        "src:doj-foia-guide",
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Request intake from the national portal and the agency’s own form",
+          "Request tracking with FOIA’s tracks, working-day deadlines, fee categories, and correspondence",
+          "A review workspace that collects records, sets duplicates aside, and applies redactions marked with their exemptions",
+          "Release packages and determination letters from templates",
+          "Publishing to the online FOIA library",
+          "Annual and quarterly report figures from the request data"
+        ],
+        "strengths": [
+          "The annual report’s figures come from the same records staff work in",
+          "The requester’s whole history is in one place"
+        ],
+        "fitsWhen": [
+          "Tracking and review happen in separate tools today, with retyping between them"
+        ],
+        "watchFor": [
+          "Moving open requests from an old system mid-year can disturb the annual report’s counts",
+          "A hosted system needs a security authorization before it can hold unredacted records"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "A FOIA product",
+            "description": "A product made for FOIA that handles tracking, review, release, and reporting in one place.",
+            "strengths": [
+              "Knows FOIA’s rules, such as tracks, working-day deadlines, fee categories, and exemption codes"
+            ],
+            "fitsWhen": [
+              "The office handles hundreds of requests a year or more"
+            ],
+            "watchFor": [
+              "Built-in review may struggle with very large email collections"
+            ]
+          },
+          {
+            "id": "platform-and-review-tool",
+            "approach": "combine",
+            "title": "The shared case platform, with a separate review tool",
+            "description": "Requests tracked on the agency’s shared case platform, set up for FOIA’s tracks and deadlines, with a separate document review tool for collecting, deduplicating, and redacting records, and a handoff between the two.",
+            "strengths": [
+              "Uses a platform the agency already has for the tracking",
+              "Either tool can be replaced without replacing the other",
+              "Suits offices that already own a review tool"
+            ],
+            "fitsWhen": [
+              "The agency’s shared case platform is well supported",
+              "Request volume is moderate, and records are mostly documents rather than large email collections"
+            ],
+            "watchFor": [
+              "The handoff between the tools is where requests stall or records go missing",
+              "Deadline rules, such as pausing the clock, must be built and kept up to date",
+              "Two tools to authorize, secure, and train people on"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:foia-tracking-with-review-tool",
+      "type": "implementationPattern",
+      "title": "Request Tracking with a Separate Review Tool",
+      "description": "An example architecture: requests tracked on the agency’s shared case platform, set up for FOIA’s tracks and deadlines, with a separate document review tool for collecting, deduplicating, and redacting records, and a handoff between the two.",
+      "status": "deprecated",
+      "replacedBy": "eb:implementationPattern:foia-request-processing",
+      "sourceIds": [
+        "src:doj-foia-guide",
+        "src:foia-statute"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "FOIA request tracking set up on the agency’s shared case platform",
+          "A deadline calculator for working days, extensions, and pauses for clarification or fees",
+          "A document review and redaction tool that marks exemptions",
+          "A link from each request to its set of records in review, and the release package back",
+          "Annual report figures from the tracking data"
+        ],
+        "strengths": [
+          "Uses a platform the agency already has for the tracking",
+          "Either tool can be replaced without replacing the other",
+          "Suits offices that already own a review tool"
+        ],
+        "fitsWhen": [
+          "The agency’s shared case platform is well supported",
+          "Request volume is moderate, and records are mostly documents rather than large email collections"
+        ],
+        "watchFor": [
+          "The handoff between the tools is where requests stall or records go missing",
+          "Deadline rules, such as pausing the clock, must be built and kept up to date",
+          "Two tools to authorize, secure, and train people on"
+        ],
+        "ways": [
+          {
+            "id": "combine",
+            "approach": "combine",
+            "title": "The shared case platform, with a separate review tool"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:ediscovery-search-review",
+      "type": "implementationPattern",
+      "title": "Email Search with eDiscovery Tools",
+      "description": "An example architecture: the agency’s eDiscovery tools search mailboxes and other collections by people, terms, and dates, set aside duplicates and thread email conversations, and send what’s found to review, with each search recorded.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ogis-search-technology",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "Searches across mailboxes, chats, and shared files by person, terms, and date range",
+          "Deduplication and email threading before review",
+          "A record of each search’s terms, sources, and results",
+          "Export of the results to the review tool, or review in place",
+          "Coordination with the IT staff who run the searches"
+        ],
+        "strengths": [
+          "Handles large email collections far better than typical FOIA software",
+          "The search record helps show that the search was adequate",
+          "Reviewers see each conversation once"
+        ],
+        "fitsWhen": [
+          "Many requests ask for email",
+          "The agency already licenses eDiscovery tools for litigation or investigations"
+        ],
+        "watchFor": [
+          "Searches can wait in IT’s queue for a long time",
+          "For a single known record, asking the person who keeps it is faster",
+          "Threading and deduplication need checking, since copies still slip through"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s eDiscovery tools"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:national-portal-api",
+      "type": "implementationPattern",
+      "title": "Requests from the National Portal by API",
+      "description": "An example architecture: the agency’s FOIA system receives requests submitted on FOIA.gov through the portal’s agency API, so each one arrives as a request record with its fields filled in, instead of as an email to retype.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-gov-developer",
+        "src:foia-statute",
+        "src:foia-gov"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A connection in the agency’s FOIA system that implements the portal’s agency API",
+          "A mapping from the portal’s fields to the agency’s request record",
+          "An acknowledgment with the tracking number sent back to the requester",
+          "Monitoring for requests that fail to arrive",
+          "The agency’s FOIA.gov contact and component details kept current"
+        ],
+        "strengths": [
+          "No retyping, so fewer errors and faster logging",
+          "Requests reach the right component directly",
+          "One intake path for portal requests and the agency’s own form"
+        ],
+        "fitsWhen": [
+          "The agency has an automated FOIA case system",
+          "Portal requests arrive by email today"
+        ],
+        "watchFor": [
+          "Changes to the portal’s API need following",
+          "Each component’s routing must match how FOIA.gov lists it"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "A connection to FOIA.gov’s agency API"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:foia-library-publishing",
+      "type": "implementationPattern",
+      "title": "FOIA Library Publishing",
+      "description": "An example architecture: released records go from the review tool to the agency’s online FOIA library with a title, date, and request number, in accessible formats, and records requested 3 or more times are flagged for posting.",
+      "status": "reference",
+      "sourceIds": [
+        "src:foia-statute",
+        "src:doj-foia-guide",
+        "src:section-508"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "A FOIA library section of the agency’s website, with search",
+          "A publishing step from the review tool that carries each release’s details",
+          "A check that released files are accessible, such as text-searchable PDFs",
+          "A list of records requested 3 or more times, from the tracking data",
+          "A hold on records released to people about themselves, which aren’t for public posting"
+        ],
+        "strengths": [
+          "Posting becomes part of closing a request",
+          "Repeat requests can be answered with a link"
+        ],
+        "fitsWhen": [
+          "Releases are posted by hand, if at all",
+          "Several requesters ask for the same records"
+        ],
+        "watchFor": [
+          "Records released to people about themselves must never be posted",
+          "Making older scanned records accessible takes effort",
+          "Posted records still follow a records schedule"
+        ],
+        "ways": [
+          {
+            "id": "platform",
+            "approach": "platform",
+            "title": "The agency’s online FOIA library"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:ai-review-suggestions",
+      "type": "implementationPattern",
+      "title": "AI Suggestions in Records Review",
+      "description": "An example architecture: the review tool suggests passages that may fall under an exemption, groups near-duplicate records, and flags personal information, and the reviewer decides every redaction and records the exemption that applies.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-ai-rmf",
+        "src:doj-foia-guide"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Suggested redactions for patterns such as Social Security numbers, phone numbers, and names",
+          "Passages that may fall under an exemption, each with the reason it was suggested",
+          "Groups of near-duplicate records and email threads, so one decision applies consistently",
+          "The reviewer’s decision on every suggestion, with the exemption recorded",
+          "Checks of how often suggestions are accepted, by kind"
+        ],
+        "strengths": [
+          "Reviewers spend less time finding routine personal information",
+          "Similar records get the same treatment",
+          "Large releases move faster without lowering the bar for what’s withheld"
+        ],
+        "fitsWhen": [
+          "The office reviews large volumes of email and documents",
+          "Its review tool offers these features, or can add them"
+        ],
+        "watchFor": [
+          "Exemptions turn on judgment, including the foreseeable harm standard, so a person decides every withholding",
+          "Relying on suggestions can lead to withholding more than the law allows",
+          "Records under review hold sensitive information, so the model must run where the records are allowed to be"
+        ],
+        "ways": [
+          {
+            "id": "product",
+            "approach": "product",
+            "title": "The review tool’s AI features"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:foia-workload-dashboard",
+      "type": "implementationPattern",
+      "title": "FOIA Workload Dashboard from Tracking Data",
+      "description": "An example architecture: a dashboard built on the request tracking data that shows the backlog, the oldest open requests, time to respond on each track, and work by team, refreshed daily, so leaders can act long before the annual report.",
+      "status": "reference",
+      "sourceIds": [
+        "src:oip-annual-report-handbook",
+        "src:oip-backlog-guidance"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "A daily copy of the tracking data in a reporting store",
+          "Measures defined the way the annual report counts them, such as backlogged requests",
+          "Views of the backlog, the oldest requests, and response times by track and team",
+          "Forecasts of incoming requests from past volumes, for planning staff",
+          "Access for the Chief FOIA Officer, managers, and staff"
+        ],
+        "strengths": [
+          "Leaders see the backlog as it grows, not once a year",
+          "Counts match the annual report, so there are no surprises when it’s due",
+          "Changes to staffing and process can be checked against results"
+        ],
+        "fitsWhen": [
+          "The tracking system’s data can be copied out every day",
+          "Leaders want to act on the goal of keeping the backlog under 10% during the year"
+        ],
+        "watchFor": [
+          "Definitions must match the handbook, or the dashboard and the report will disagree",
+          "Request details can be sensitive, so dashboards should show counts rather than requesters"
+        ],
+        "ways": [
+          {
+            "id": "build",
+            "approach": "build",
+            "title": "A dashboard on the tracking data"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:oip-foia-training",
+      "type": "resource",
+      "title": "FOIA training from the Office of Information Policy",
+      "description": "Live virtual courses for agency FOIA staff and contractors, from an introduction to the FOIA through processing a request start to finish, privacy considerations, litigation, and annual report refreshers.",
+      "status": "reference",
+      "attributes": {
+        "kind": "course",
+        "url": "https://www.justice.gov/oip/training",
+        "by": "Office of Information Policy, U.S. Department of Justice",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:foia-executive-briefing",
+      "type": "resource",
+      "title": "Executive Briefing on the Freedom of Information Act",
+      "description": "A short overview of the FOIA for an agency’s senior executives, from the Director of the Office of Information Policy, on why their support matters to the agency’s FOIA program. Recorded in 2015.",
+      "status": "reference",
+      "attributes": {
+        "kind": "video",
+        "url": "https://www.youtube.com/watch?v=lL2rsznuH_Y",
+        "by": "Office of Information Policy, U.S. Department of Justice",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:chief-foia-officers-council",
+      "type": "resource",
+      "title": "Chief FOIA Officers Council",
+      "description": "The council of agencies’ Chief FOIA Officers, led by the Department of Justice and the National Archives, which shares practices for improving FOIA programs. Its meetings and committees, on technology and on working across agencies, are open to follow.",
+      "status": "reference",
+      "attributes": {
+        "kind": "community",
+        "url": "https://www.foia.gov/chief-foia-officers-council.html",
+        "by": "Office of Information Policy and Office of Government Information Services",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "eb:resource:foia-gov-data",
+      "type": "resource",
+      "title": "FOIA data on FOIA.gov",
+      "description": "Every agency’s annual and quarterly FOIA figures, such as requests received and processed, response times, and backlogs, to compare one program with others or follow it over time.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://www.foia.gov/data.html",
+        "by": "Office of Information Policy, U.S. Department of Justice",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-requests-answered-on-time",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-backlog-kept-small",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:backlog-kept-small"
+    },
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-records-released-as-allowed",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:records-released-as-allowed"
+    },
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-frequently-requested-posted",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:frequently-requested-posted"
+    },
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-requesters-helped",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:requesters-helped"
+    },
+    {
+      "id": "rel:foia-public-access-to-agency-records-seeks-foia-performance-public",
+      "from": "eb:mission:public-access-to-agency-records",
+      "predicate": "seeks",
+      "to": "eb:outcome:foia-performance-public"
+    },
+    {
+      "id": "rel:foia-program-leadership-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:foia-program-leadership-contributes-to-backlog-kept-small",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:backlog-kept-small"
+    },
+    {
+      "id": "rel:foia-program-leadership-contributes-to-foia-performance-public",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:foia-performance-public"
+    },
+    {
+      "id": "rel:foia-program-leadership-satisfies-monitor-and-improve-the-program",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "satisfies",
+      "to": "eb:requirement:monitor-and-improve-the-program"
+    },
+    {
+      "id": "rel:foia-program-leadership-satisfies-report-to-attorney-general",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-to-attorney-general"
+    },
+    {
+      "id": "rel:foia-program-leadership-satisfies-keep-foia-regulations-current",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-foia-regulations-current"
+    },
+    {
+      "id": "rel:foia-program-leadership-candidate-pattern-foia-workload-dashboard",
+      "from": "eb:capability:foia-program-leadership",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-workload-dashboard",
+      "coverage": "partial",
+      "description": "Shows the backlog, response times, and workload as they stand, for the Chief FOIA Officer to act on. Recommending and reporting are the officer’s work."
+    },
+    {
+      "id": "rel:foia-request-intake-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:foia-request-intake-contributes-to-requesters-helped",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requesters-helped"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-accept-portal-requests",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:accept-portal-requests"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-place-on-track",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:place-on-track"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-clarify-requests",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:clarify-requests"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-set-fee-category",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:set-fee-category"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-multi-channel-intake",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:multi-channel-intake"
+    },
+    {
+      "id": "rel:foia-request-intake-satisfies-acknowledge-receipt",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:acknowledge-receipt"
+    },
+    {
+      "id": "rel:foia-request-intake-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:foia-request-intake-candidate-pattern-national-portal-api",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:national-portal-api",
+      "coverage": "partial",
+      "description": "Requests from FOIA.gov only. The agency’s own form, email, and mail come in another way."
+    },
+    {
+      "id": "rel:foia-request-intake-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "coverage": "partial",
+      "description": "Set up for FOIA’s tracks, working-day deadlines, and fee categories. Requests from FOIA.gov need a connection to the portal too."
+    },
+    {
+      "id": "rel:foia-request-intake-candidate-pattern-ai-assisted-intake-sorting",
+      "from": "eb:capability:foia-request-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "coverage": "partial",
+      "description": "Suggests where a request should go and which processing track it may need. Staff decide, and log and acknowledge each request in the tracking system."
+    },
+    {
+      "id": "rel:records-search-collection-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:records-search-collection-contributes-to-records-released-as-allowed",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:records-released-as-allowed"
+    },
+    {
+      "id": "rel:records-search-collection-satisfies-search-all-record-locations",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:search-all-record-locations"
+    },
+    {
+      "id": "rel:records-search-collection-satisfies-document-search",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:document-search"
+    },
+    {
+      "id": "rel:records-search-collection-satisfies-deduplicate-records",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "satisfies",
+      "to": "eb:requirement:deduplicate-records"
+    },
+    {
+      "id": "rel:records-search-collection-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing",
+      "coverage": "partial",
+      "description": "Collects what program offices send and sets duplicates aside. Searching mailboxes and other large collections usually takes other tools."
+    },
+    {
+      "id": "rel:records-search-collection-candidate-pattern-ediscovery-search-review",
+      "from": "eb:capability:records-search-collection",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ediscovery-search-review"
+    },
+    {
+      "id": "rel:records-review-redaction-contributes-to-records-released-as-allowed",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:records-released-as-allowed"
+    },
+    {
+      "id": "rel:records-review-redaction-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:records-review-redaction-satisfies-mark-redactions",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "satisfies",
+      "to": "eb:requirement:mark-redactions"
+    },
+    {
+      "id": "rel:records-review-redaction-satisfies-release-segregable-parts",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "satisfies",
+      "to": "eb:requirement:release-segregable-parts"
+    },
+    {
+      "id": "rel:records-review-redaction-satisfies-record-withholding-reasons",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "satisfies",
+      "to": "eb:requirement:record-withholding-reasons"
+    },
+    {
+      "id": "rel:records-review-redaction-satisfies-consult-other-agencies",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "satisfies",
+      "to": "eb:requirement:consult-other-agencies"
+    },
+    {
+      "id": "rel:records-review-redaction-satisfies-protect-unredacted-records",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-unredacted-records"
+    },
+    {
+      "id": "rel:records-review-redaction-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:records-review-redaction-candidate-pattern-ediscovery-search-review",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ediscovery-search-review",
+      "coverage": "partial",
+      "description": "Sets duplicates aside and threads email before review. Redaction and consultation happen in the review tool."
+    },
+    {
+      "id": "rel:records-review-redaction-candidate-pattern-ai-review-suggestions",
+      "from": "eb:capability:records-review-redaction",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-review-suggestions",
+      "coverage": "partial",
+      "description": "Speeds up finding what may need redacting. Reviewers make every decision and handle consultations."
+    },
+    {
+      "id": "rel:response-release-contributes-to-records-released-as-allowed",
+      "from": "eb:capability:response-release",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:records-released-as-allowed"
+    },
+    {
+      "id": "rel:response-release-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:response-release",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:response-release-satisfies-complete-determination-letters",
+      "from": "eb:capability:response-release",
+      "predicate": "satisfies",
+      "to": "eb:requirement:complete-determination-letters"
+    },
+    {
+      "id": "rel:response-release-satisfies-deliver-in-requested-format",
+      "from": "eb:capability:response-release",
+      "predicate": "satisfies",
+      "to": "eb:requirement:deliver-in-requested-format"
+    },
+    {
+      "id": "rel:response-release-satisfies-release-in-parts",
+      "from": "eb:capability:response-release",
+      "predicate": "satisfies",
+      "to": "eb:requirement:release-in-parts"
+    },
+    {
+      "id": "rel:response-release-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:response-release",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:response-release-candidate-pattern-letters-from-case-data",
+      "from": "eb:capability:response-release",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "coverage": "partial",
+      "description": "Determination letters with the exemptions used and the requester’s appeal rights filled in. Released records are delivered another way."
+    },
+    {
+      "id": "rel:appeals-requester-assistance-contributes-to-requesters-helped",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requesters-helped"
+    },
+    {
+      "id": "rel:appeals-requester-assistance-satisfies-decide-appeals-on-time",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:decide-appeals-on-time"
+    },
+    {
+      "id": "rel:appeals-requester-assistance-satisfies-answer-status-questions",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:answer-status-questions"
+    },
+    {
+      "id": "rel:appeals-requester-assistance-satisfies-work-with-ogis",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:work-with-ogis"
+    },
+    {
+      "id": "rel:appeals-requester-assistance-satisfies-track-deadlines",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:track-deadlines"
+    },
+    {
+      "id": "rel:appeals-requester-assistance-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Appeals tracked as their own case type, against the 20 working days the law allows."
+    },
+    {
+      "id": "rel:appeals-requester-assistance-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:appeals-requester-assistance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:proactive-disclosure-contributes-to-frequently-requested-posted",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:frequently-requested-posted"
+    },
+    {
+      "id": "rel:proactive-disclosure-contributes-to-backlog-kept-small",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:backlog-kept-small"
+    },
+    {
+      "id": "rel:proactive-disclosure-satisfies-spot-frequently-requested-records",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "satisfies",
+      "to": "eb:requirement:spot-frequently-requested-records"
+    },
+    {
+      "id": "rel:proactive-disclosure-satisfies-keep-online-foia-library",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-online-foia-library"
+    },
+    {
+      "id": "rel:proactive-disclosure-candidate-pattern-foia-library-publishing",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-library-publishing"
+    },
+    {
+      "id": "rel:proactive-disclosure-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:proactive-disclosure",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing",
+      "coverage": "partial",
+      "description": "Publishes releases and flags records requested 3 or more times. Final opinions, policy statements, and staff manuals are posted another way."
+    },
+    {
+      "id": "rel:foia-reporting-contributes-to-foia-performance-public",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:foia-performance-public"
+    },
+    {
+      "id": "rel:foia-reporting-satisfies-compile-annual-foia-report",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:compile-annual-foia-report"
+    },
+    {
+      "id": "rel:foia-reporting-satisfies-post-reports-and-data",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:post-reports-and-data"
+    },
+    {
+      "id": "rel:foia-reporting-satisfies-report-on-caseload",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-on-caseload"
+    },
+    {
+      "id": "rel:foia-reporting-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:foia-reporting-candidate-pattern-foia-workload-dashboard",
+      "from": "eb:capability:foia-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-workload-dashboard",
+      "coverage": "partial",
+      "description": "Tracks the measures the reports use all year. The reports themselves are compiled and posted from the tracking system."
+    },
+    {
+      "id": "rel:foia-request-processing-depends-on-shared-case-platform",
+      "from": "eb:implementationPattern:foia-request-processing",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "way": "platform-and-review-tool",
+      "description": "The tracking half is the shared platform, set up for FOIA."
+    },
+    {
+      "id": "rel:ediscovery-search-review-works-with-foia-request-processing",
+      "from": "eb:implementationPattern:ediscovery-search-review",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:foia-request-processing",
+      "description": "Sends what it finds to the review workspace or tool."
+    },
+    {
+      "id": "rel:national-portal-api-works-with-foia-request-processing",
+      "from": "eb:implementationPattern:national-portal-api",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:foia-library-publishing-works-with-foia-request-processing",
+      "from": "eb:implementationPattern:foia-library-publishing",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:foia-request-processing",
+      "description": "Releases come from the review tool with their request details."
+    },
+    {
+      "id": "rel:ai-review-suggestions-works-with-foia-request-processing",
+      "from": "eb:implementationPattern:ai-review-suggestions",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:foia-request-processing",
+      "description": "Runs in the review workspace or tool, where it’s offered."
+    },
+    {
+      "id": "rel:foia-workload-dashboard-works-with-foia-request-processing",
+      "from": "eb:implementationPattern:foia-workload-dashboard",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:oip-foia-training-helps-with-public-access-to-agency-records",
+      "from": "eb:resource:oip-foia-training",
+      "predicate": "helps_with",
+      "to": "eb:mission:public-access-to-agency-records"
+    },
+    {
+      "id": "rel:oip-foia-training-helps-with-records-review-redaction",
+      "from": "eb:resource:oip-foia-training",
+      "predicate": "helps_with",
+      "to": "eb:capability:records-review-redaction"
+    },
+    {
+      "id": "rel:oip-foia-training-helps-with-foia-reporting",
+      "from": "eb:resource:oip-foia-training",
+      "predicate": "helps_with",
+      "to": "eb:capability:foia-reporting"
+    },
+    {
+      "id": "rel:foia-executive-briefing-helps-with-foia-program-leadership",
+      "from": "eb:resource:foia-executive-briefing",
+      "predicate": "helps_with",
+      "to": "eb:capability:foia-program-leadership"
+    },
+    {
+      "id": "rel:chief-foia-officers-council-helps-with-foia-program-leadership",
+      "from": "eb:resource:chief-foia-officers-council",
+      "predicate": "helps_with",
+      "to": "eb:capability:foia-program-leadership"
+    },
+    {
+      "id": "rel:foia-gov-data-helps-with-foia-reporting",
+      "from": "eb:resource:foia-gov-data",
+      "predicate": "helps_with",
+      "to": "eb:capability:foia-reporting"
+    },
+    {
+      "id": "rel:foia-gov-data-helps-with-foia-performance-public",
+      "from": "eb:resource:foia-gov-data",
+      "predicate": "helps_with",
+      "to": "eb:outcome:foia-performance-public"
+    },
+    {
+      "id": "rel:case-management-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:case-management-contributes-to-backlog-kept-small",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:backlog-kept-small"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-foia-request-processing",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:foia-request-processing"
+    },
+    {
+      "id": "rel:records-management-contributes-to-requests-answered-on-time",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:requests-answered-on-time"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-records-released-as-allowed",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:records-released-as-allowed"
+    },
+    {
+      "id": "rel:identity-access-management-satisfies-protect-unredacted-records",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-unredacted-records"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-records-released-as-allowed",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:records-released-as-allowed"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:foia-results",
+      "title": "FOIA results discovery",
+      "questions": [
+        {
+          "id": "question:foia-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "requests-answered-on-time",
+              "label": "Requests are answered within the time the law allows"
+            },
+            {
+              "value": "backlog-kept-small",
+              "label": "Overdue requests don’t pile up"
+            },
+            {
+              "value": "records-released-as-allowed",
+              "label": "Records are released unless the law calls for withholding"
+            },
+            {
+              "value": "frequently-requested-posted",
+              "label": "Records people often ask for are posted without a request"
+            },
+            {
+              "value": "requesters-helped",
+              "label": "Requesters can get help and resolve disputes"
+            },
+            {
+              "value": "foia-performance-public",
+              "label": "The program’s performance is open to view"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "requests-answered-on-time",
+              "elementId": "eb:outcome:requests-answered-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "backlog-kept-small",
+              "elementId": "eb:outcome:backlog-kept-small",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "records-released-as-allowed",
+              "elementId": "eb:outcome:records-released-as-allowed",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "frequently-requested-posted",
+              "elementId": "eb:outcome:frequently-requested-posted",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "requesters-helped",
+              "elementId": "eb:outcome:requesters-helped",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "foia-performance-public",
+              "elementId": "eb:outcome:foia-performance-public",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:foia-tracked-measures",
+          "prompt": "Which of these does the office track during the year, not just for the annual report?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "processing-times",
+              "label": "How long requests take to process"
+            },
+            {
+              "value": "backlog",
+              "label": "How many requests are past their deadline"
+            },
+            {
+              "value": "dispositions",
+              "label": "How requests are resolved and which exemptions are used"
+            },
+            {
+              "value": "appeals",
+              "label": "How long appeals take"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "processing-times",
+              "elementId": "eb:measure:request-processing-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "processing-times",
+              "elementId": "eb:measure:requests-within-20-days",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "backlog",
+              "elementId": "eb:measure:backlogged-requests",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "backlog",
+              "elementId": "eb:measure:oldest-pending-requests",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "dispositions",
+              "elementId": "eb:measure:request-dispositions",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "appeals",
+              "elementId": "eb:measure:appeal-processing-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:foia-measure-sources",
+          "prompt": "Where do those figures come from today, and who puts them together?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the FOIA program and how the office tells how it’s doing. They ask about the program’s operations, never about individual requests or requesters. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:request-processing",
+      "title": "Request processing discovery",
+      "questions": [
+        {
+          "id": "question:request-channels",
+          "prompt": "Through which channels does the office receive FOIA requests?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "portal",
+              "label": "The national portal on FOIA.gov"
+            },
+            {
+              "value": "own-form",
+              "label": "The agency’s own online form"
+            },
+            {
+              "value": "email",
+              "label": "Email"
+            },
+            {
+              "value": "mail",
+              "label": "Postal mail or fax"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "portal",
+              "elementId": "eb:capability:foia-request-intake",
+              "interpretation": "Requests reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "own-form",
+              "elementId": "eb:capability:foia-request-intake",
+              "interpretation": "Requests reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:foia-request-intake",
+              "interpretation": "Requests reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:capability:foia-request-intake",
+              "interpretation": "Requests reach the office this way, so intake is part of the picture."
+            },
+            {
+              "answerValue": "portal",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel needs to feed the same request record."
+            },
+            {
+              "answerValue": "own-form",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel needs to feed the same request record."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel needs to feed the same request record."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:requirement:multi-channel-intake",
+              "interpretation": "Every channel needs to feed the same request record."
+            },
+            {
+              "answerValue": "portal",
+              "elementId": "eb:requirement:accept-portal-requests",
+              "interpretation": "Portal requests should arrive without being retyped."
+            },
+            {
+              "answerValue": "portal",
+              "elementId": "eb:implementationPattern:national-portal-api",
+              "interpretation": "Receiving portal requests by API ends the retyping."
+            }
+          ]
+        },
+        {
+          "id": "question:request-tracking",
+          "prompt": "Where is the status of each request tracked today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "foia-system",
+              "label": "A system built for FOIA requests"
+            },
+            {
+              "value": "general-system",
+              "label": "A general case or ticket system"
+            },
+            {
+              "value": "documents",
+              "label": "Spreadsheets, documents, or email"
+            },
+            {
+              "value": "several",
+              "label": "Several of these, depending on the team"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "foia-system",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Requests are tracked in a system already."
+            },
+            {
+              "answerValue": "general-system",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Requests are tracked in a general system, which may not know FOIA deadlines and tracks."
+            },
+            {
+              "answerValue": "general-system",
+              "elementId": "eb:requirement:track-deadlines",
+              "interpretation": "A general system may not count working days or extensions."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Requests tracked in documents may be a gap in case management."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in documents is hard to see in one place."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:foia-request-processing",
+              "interpretation": "Tracking in documents suggests the request processing pattern is worth exploring."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:capability:case-management",
+              "interpretation": "Requests tracked in several places may make status hard to see."
+            },
+            {
+              "answerValue": "several",
+              "elementId": "eb:requirement:track-case-status",
+              "interpretation": "Status kept in several places is hard to see in one place."
+            },
+            {
+              "answerValue": "general-system",
+              "elementId": "eb:implementationPattern:foia-request-processing",
+              "interpretation": "A general system can track requests if FOIA’s deadlines are built in and review happens in a separate tool."
+            }
+          ]
+        },
+        {
+          "id": "question:records-search",
+          "prompt": "How does the office find the records a request covers?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "central-search",
+              "label": "FOIA staff search across systems with search tools"
+            },
+            {
+              "value": "ask-offices",
+              "label": "Program offices search their own records and send them in"
+            },
+            {
+              "value": "mixed",
+              "label": "A mix of both"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "central-search",
+              "elementId": "eb:capability:records-search-collection",
+              "interpretation": "Searches run centrally; it’s worth knowing which systems they reach."
+            },
+            {
+              "answerValue": "ask-offices",
+              "elementId": "eb:capability:records-search-collection",
+              "interpretation": "Searches depend on program offices, which can slow them and make them uneven."
+            },
+            {
+              "answerValue": "ask-offices",
+              "elementId": "eb:requirement:document-search",
+              "interpretation": "Searches spread across offices are hard to document consistently."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:records-search-collection",
+              "interpretation": "Searches run several ways, which may make them uneven."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:requirement:document-search",
+              "interpretation": "Searches run several ways are hard to document consistently."
+            },
+            {
+              "answerValue": "unsure",
+              "elementId": "eb:capability:records-search-collection",
+              "interpretation": "Worth finding out how searches are done."
+            },
+            {
+              "answerValue": "ask-offices",
+              "elementId": "eb:implementationPattern:ediscovery-search-review",
+              "interpretation": "Central email searches with eDiscovery tools may be faster and more even."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:implementationPattern:ediscovery-search-review",
+              "interpretation": "eDiscovery tools could make email searches more even."
+            }
+          ]
+        },
+        {
+          "id": "question:redaction-method",
+          "prompt": "How are redactions applied today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "review-tool",
+              "label": "In a review tool that marks each exemption"
+            },
+            {
+              "value": "pdf-editor",
+              "label": "In a general PDF editor"
+            },
+            {
+              "value": "paper",
+              "label": "On paper, then scanned"
+            },
+            {
+              "value": "mixed",
+              "label": "It depends on the request"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "review-tool",
+              "elementId": "eb:capability:records-review-redaction",
+              "interpretation": "Review happens in a dedicated tool."
+            },
+            {
+              "answerValue": "pdf-editor",
+              "elementId": "eb:capability:records-review-redaction",
+              "interpretation": "Redacting in a general editor may slow review and miss markings."
+            },
+            {
+              "answerValue": "pdf-editor",
+              "elementId": "eb:requirement:mark-redactions",
+              "interpretation": "A general editor may not mark the exemption on each redaction."
+            },
+            {
+              "answerValue": "pdf-editor",
+              "elementId": "eb:implementationPattern:foia-request-processing",
+              "interpretation": "A review workspace with marked redactions is part of the request processing pattern."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:capability:records-review-redaction",
+              "interpretation": "Paper review is slow and hard to repeat on appeal."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:requirement:mark-redactions",
+              "interpretation": "Exemption markings on paper are easy to miss."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:implementationPattern:foia-request-processing",
+              "interpretation": "A review workspace with marked redactions is part of the request processing pattern."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:records-review-redaction",
+              "interpretation": "Review varies by request, which may make it uneven."
+            }
+          ]
+        },
+        {
+          "id": "question:consultations",
+          "prompt": "Do requests often involve records another agency has an interest in?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:consult-other-agencies",
+              "interpretation": "Consultations and referrals need following until they come back."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:records-review-redaction",
+              "interpretation": "Consultation is part of review."
+            }
+          ]
+        },
+        {
+          "id": "question:frequently-requested",
+          "prompt": "Does the office post records once they’ve been requested 3 or more times?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes, as a routine step"
+            },
+            {
+              "value": "sometimes",
+              "label": "Sometimes"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "sometimes",
+              "elementId": "eb:capability:proactive-disclosure",
+              "interpretation": "Posting isn’t routine yet."
+            },
+            {
+              "answerValue": "sometimes",
+              "elementId": "eb:requirement:spot-frequently-requested-records",
+              "interpretation": "Spotting repeat requests may depend on someone remembering."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:capability:proactive-disclosure",
+              "interpretation": "Records the law requires to be posted may not be."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:requirement:spot-frequently-requested-records",
+              "interpretation": "Repeat requests aren’t being spotted yet."
+            },
+            {
+              "answerValue": "unsure",
+              "elementId": "eb:capability:proactive-disclosure",
+              "interpretation": "Worth finding out who posts records and when."
+            },
+            {
+              "answerValue": "sometimes",
+              "elementId": "eb:implementationPattern:foia-library-publishing",
+              "interpretation": "Publishing from the review tool makes posting routine."
+            },
+            {
+              "answerValue": "no",
+              "elementId": "eb:implementationPattern:foia-library-publishing",
+              "interpretation": "Publishing from the review tool makes posting routine."
+            }
+          ]
+        },
+        {
+          "id": "question:annual-report-preparation",
+          "prompt": "How is the annual FOIA report put together?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "from-system",
+              "label": "Mostly from the tracking system’s data"
+            },
+            {
+              "value": "by-hand",
+              "label": "Mostly by hand, from several sources"
+            },
+            {
+              "value": "mixed",
+              "label": "Partly each way"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "from-system",
+              "elementId": "eb:capability:foia-reporting",
+              "interpretation": "Reporting draws on the system already."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:capability:foia-reporting",
+              "interpretation": "Compiling the report by hand takes time and invites errors."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:requirement:report-on-caseload",
+              "interpretation": "Counts by status and age need to come straight from the request data."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:implementationPattern:foia-request-processing",
+              "interpretation": "Reports drawn from the request data are part of the request processing pattern."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:foia-reporting",
+              "interpretation": "Part of the report is compiled by hand."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:requirement:report-on-caseload",
+              "interpretation": "Some counts don’t come straight from the request data yet."
+            }
+          ]
+        },
+        {
+          "id": "question:response-delivery",
+          "prompt": "How are released records delivered to requesters?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "portal",
+              "label": "Through an online portal where requesters download them"
+            },
+            {
+              "value": "email",
+              "label": "As email attachments"
+            },
+            {
+              "value": "mail",
+              "label": "By mail or on disc"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:response-release",
+              "interpretation": "Large releases by email or mail are slow to send and hard to deliver in parts."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:capability:response-release",
+              "interpretation": "Large releases by email or mail are slow to send and hard to deliver in parts."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:deliver-in-requested-format",
+              "interpretation": "Large releases by email or mail are slow to send and hard to deliver in parts."
+            },
+            {
+              "answerValue": "mail",
+              "elementId": "eb:requirement:deliver-in-requested-format",
+              "interpretation": "Large releases by email or mail are slow to send and hard to deliver in parts."
+            }
+          ]
+        },
+        {
+          "id": "question:appeals-tracking",
+          "prompt": "How are appeals tracked against the 20 working days the law allows?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "same-system",
+              "label": "In the same system as requests, with their own deadline"
+            },
+            {
+              "value": "separate",
+              "label": "In a separate list or spreadsheet"
+            },
+            {
+              "value": "not-tracked",
+              "label": "They aren’t tracked against the deadline"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "separate",
+              "elementId": "eb:capability:appeals-requester-assistance",
+              "interpretation": "Appeals kept apart from requests are the ones that run past their deadline unnoticed."
+            },
+            {
+              "answerValue": "not-tracked",
+              "elementId": "eb:capability:appeals-requester-assistance",
+              "interpretation": "Appeals kept apart from requests are the ones that run past their deadline unnoticed."
+            },
+            {
+              "answerValue": "separate",
+              "elementId": "eb:requirement:decide-appeals-on-time",
+              "interpretation": "Appeals kept apart from requests are the ones that run past their deadline unnoticed."
+            },
+            {
+              "answerValue": "not-tracked",
+              "elementId": "eb:requirement:decide-appeals-on-time",
+              "interpretation": "Appeals kept apart from requests are the ones that run past their deadline unnoticed."
+            }
+          ]
+        },
+        {
+          "id": "question:program-monitoring",
+          "prompt": "How does the Chief FOIA Officer follow the program’s performance during the year?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "live",
+              "label": "From current figures on the backlog and response times"
+            },
+            {
+              "value": "at-report-time",
+              "label": "Mostly when the annual reports are due"
+            },
+            {
+              "value": "not-regularly",
+              "label": "Not regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "at-report-time",
+              "elementId": "eb:capability:foia-program-leadership",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            },
+            {
+              "answerValue": "not-regularly",
+              "elementId": "eb:capability:foia-program-leadership",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            },
+            {
+              "answerValue": "at-report-time",
+              "elementId": "eb:requirement:monitor-and-improve-the-program",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            },
+            {
+              "answerValue": "not-regularly",
+              "elementId": "eb:requirement:monitor-and-improve-the-program",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            },
+            {
+              "answerValue": "at-report-time",
+              "elementId": "eb:implementationPattern:foia-workload-dashboard",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            },
+            {
+              "answerValue": "not-regularly",
+              "elementId": "eb:implementationPattern:foia-workload-dashboard",
+              "interpretation": "A backlog seen once a year is hard to turn around."
+            }
+          ]
+        },
+        {
+          "id": "question:yearly-requests",
+          "prompt": "About how many FOIA requests does the office receive in a year?",
+          "kind": "number"
+        },
+        {
+          "id": "question:slowest-step",
+          "prompt": "Which step of handling a request takes the longest today, and why?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the first conversations about how an office receives FOIA requests, finds and reviews records, and responds. They ask about the office’s operations, never about individual requests or requesters. Some answers point to capabilities or patterns worth exploring."
+    }
+  ]
+}

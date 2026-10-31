@@ -13,13 +13,13 @@
 
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
-import schema010 from '../../schemas/blueprint-package-0.1.0.schema.json';
-import schema020 from '../../schemas/blueprint-package-0.2.0.schema.json';
-import schema030 from '../../schemas/blueprint-package-0.3.0.schema.json';
-import schema040 from '../../schemas/blueprint-package-0.4.0.schema.json';
-import schema050 from '../../schemas/blueprint-package-0.5.0.schema.json';
-import schema060 from '../../schemas/blueprint-package-0.6.0.schema.json';
-import { earlierLayers, elementTypes, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates } from './vocabulary';
+import schema010 from '../../schemas/blueprint-package-0.1.0.schema.json' with { type: 'json' };
+import schema020 from '../../schemas/blueprint-package-0.2.0.schema.json' with { type: 'json' };
+import schema030 from '../../schemas/blueprint-package-0.3.0.schema.json' with { type: 'json' };
+import schema040 from '../../schemas/blueprint-package-0.4.0.schema.json' with { type: 'json' };
+import schema050 from '../../schemas/blueprint-package-0.5.0.schema.json' with { type: 'json' };
+import schema060 from '../../schemas/blueprint-package-0.6.0.schema.json' with { type: 'json' };
+import { earlierLayers, elementTypes, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates } from './vocabulary.ts';
 
 export interface Source {
   id: string;

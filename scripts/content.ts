@@ -8,13 +8,17 @@
 // that. A release built since then is rebuilt in place until it's pushed.
 // A package.yaml builds on the library's packages by their folder names in
 // library/packages/, such as common or federal-oig.
+//
+// Both check your release as it will be published, the way the site does:
+// each package against its schema and the packages it builds on, yours and
+// the library's. A problem stops the build before anything is written.
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import { plan, readSources, SourceError, type Resolved } from '../src/lib/compile.ts';
-import type { BlueprintPackage } from '../src/lib/package.ts';
+import { validatePackage, type BlueprintPackage } from '../src/lib/package.ts';
 
 const mode = process.argv[2];
 if (mode !== 'build' && mode !== 'check') {
@@ -26,8 +30,11 @@ const release = String((parse(readFileSync('kit.yaml', 'utf8')) as { library: { 
 const read = (path: string): BlueprintPackage => JSON.parse(readFileSync(path, 'utf8'));
 const folders = (dir: string) => (existsSync(dir) ? readdirSync(dir) : []);
 
-// The library's packages at the release, by folder name.
+// The library's packages at the release, by folder name, and every version kept, for checking against.
 const external: Record<string, Resolved> = {};
+const libraryPackages = folders(join('library', 'packages')).flatMap((name) =>
+  folders(join('library', 'packages', name)).map((version) => read(join('library', 'packages', name, version, 'blueprint.json'))),
+);
 for (const name of folders(join('library', 'packages'))) {
   const path = join('library', 'packages', name, release, 'blueprint.json');
   if (!existsSync(path)) continue;
@@ -71,6 +78,18 @@ try {
     process.exit(1);
   }
   throw e;
+}
+
+// The release as it will be: what's written, and what stays.
+const written = steps.flatMap((s) => (s.write ? [s.write] : []));
+const known = [...written, ...Object.values(content).flatMap((versions) => Object.values(versions)), ...libraryPackages];
+const resolve = (packageId: string, version: string) => known.find((p) => p.packageId === packageId && p.version === version);
+const problems = steps
+  .filter((s) => !s.retired)
+  .flatMap((s) => validatePackage(s.write ?? content[s.name][s.version], resolve).map((p) => `${s.name} ${s.version}: ${p}`));
+if (problems.length) {
+  console.error(`The release has problems, so nothing was written:\n  ${problems.join('\n  ')}`);
+  process.exit(1);
 }
 
 const behind = steps.filter((s) => s.write || s.remove.length);

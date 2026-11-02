@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ResourceCard from '../components/ResourceCard.astro';
-import { downloadUrl, elements, kit, libraryRelease, libraryUrl, packages, release, resourcesByKind } from '../kit';
+import { downloadUrl, elements, kit, libraryRelease, libraryUrl, newTab, packages, release, resourcesByKind } from '../kit';
 import { href } from '../lib/paths';
 
 // Every resource in one grid, kind by kind.
@@ -14,7 +14,7 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
   <div class="container">
     <h1>{kit.site.title}</h1>
     <p class="lede">{kit.site.description}</p>
-    <p class="muted">Release {release}, built on <a href={libraryUrl}>Enterprise Blueprints</a> {libraryRelease}.</p>
+    <p class="muted">Release {release}, built on <a href={libraryUrl} {...newTab}>Enterprise Blueprints<span class="sr-only"> (opens in a new tab)</span></a> {libraryRelease}.</p>
 
     {offered.length > 0 && (
       <section>

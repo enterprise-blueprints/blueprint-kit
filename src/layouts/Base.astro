@@ -1,6 +1,6 @@
 ---
 import '../styles/kit.css';
-import { kit, libraryUrl, typesInUse } from '../kit';
+import { kit, libraryUrl, newTab, typesInUse } from '../kit';
 import { href } from '../lib/paths';
 
 interface Props {
@@ -33,7 +33,7 @@ const accent = kit.site.accent ? `--accent: ${kit.site.accent};` : undefined;
         <nav aria-label="Main">
           <ul class="site-nav">
             {nav.map((item) => <li><a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a></li>)}
-            <li><a href={libraryUrl}>The library</a></li>
+            <li><a href={libraryUrl} {...newTab}>The library<span class="sr-only"> (opens in a new tab)</span></a></li>
           </ul>
         </nav>
       </div>
@@ -44,7 +44,7 @@ const accent = kit.site.accent ? `--accent: ${kit.site.accent};` : undefined;
     <footer class="site-footer">
       <div class="container">
         <p>{kit.site.description}</p>
-        <p class="muted">Builds on <a href={libraryUrl}>Enterprise Blueprints</a>. The packages and their data are at <a href={href('catalog.json')}>catalog.json</a>.</p>
+        <p class="muted">Builds on <a href={libraryUrl} {...newTab}>Enterprise Blueprints<span class="sr-only"> (opens in a new tab)</span></a>. The packages and their data are at <a href={href('catalog.json')}>catalog.json</a>.</p>
       </div>
     </footer>
   </body>

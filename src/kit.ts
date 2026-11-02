@@ -16,6 +16,9 @@ export const kit = parse(kitText) as {
   site: { title: string; description: string; accent?: string };
   library: { url: string; release: string };
 };
+/** A link to another site, such as the library's, opens in a new tab. */
+export const newTab = { target: '_blank', rel: 'noopener' } as const;
+
 export const libraryUrl = kit.library.url.endsWith('/') ? kit.library.url : `${kit.library.url}/`;
 export const libraryRelease = String(kit.library.release);
 const vocabulary = JSON.parse(vocabularyText) as { types: Record<string, { label: string; page: string }> };

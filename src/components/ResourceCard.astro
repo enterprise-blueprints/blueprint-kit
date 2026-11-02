@@ -1,7 +1,7 @@
 ---
 // One resource as a card: what kind it is, a link to it, who made it, what
 // it's about, and what it helps with, in the library or in your packages.
-import { linksOf, resourceDetails, type KitElement } from '../kit';
+import { linksOf, newTab, resourceDetails, type KitElement } from '../kit';
 import { formatDate } from '../lib/format';
 import { predicates } from '../lib/vocabulary';
 
@@ -15,15 +15,15 @@ const helps = linksOf(resource).find((g) => g.heading === predicates.helps_with.
 ---
 <li class="card type-resource">
   <p class="kicker">{details.kindLabel}</p>
-  <a class="card__title" href={details.url}>{resource.title}</a>
+  <a class="card__title" href={details.url} {...newTab}>{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
   <p class="card__meta">{details.by ?? resource.package.publisher.name}</p>
   <p class="card__about">{resource.description}</p>
   {helps.length > 0 && (
     <ul class="chips" aria-label="Helps with">
       {helps.map((l) => (
         <li class={`type-${l.target.type}`}>
-          <a class="chip" href={l.target.url} title={`${l.target.typeLabel}${l.target.fromLibrary ? ', in the library' : ''}`}>
-            {l.target.title}{l.way && <span class="chip__note"> · way: {l.way}</span>}
+          <a class="chip" href={l.target.url} title={`${l.target.typeLabel}${l.target.fromLibrary ? ', in the library' : ''}`} {...(l.target.fromLibrary ? newTab : {})}>
+            {l.target.title}{l.way && <span class="chip__note"> · way: {l.way}</span>}{l.target.fromLibrary && <span class="sr-only"> (opens in a new tab)</span>}
           </a>
         </li>
       ))}

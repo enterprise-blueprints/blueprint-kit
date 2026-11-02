@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
-import { downloadUrl, elements, groupLabel, linksOf, measuresOf, resourceDetails, resourcesFor } from '../../kit';
+import { downloadUrl, elements, groupLabel, linksOf, measuresOf, newTab, resourceDetails, resourcesFor } from '../../kit';
 import { attributeLabel, formatDate } from '../../lib/format';
 import { statuses } from '../../lib/vocabulary';
 
@@ -25,7 +25,7 @@ const helping = resourcesFor(element);
     <p class="lede">{element.description}</p>
     {resource && (
       <p>
-        <a class="button" href={resource.url}>Go to the {resource.kindLabel.toLowerCase()}</a>
+        <a class="button" href={resource.url} {...newTab}>Go to the {resource.kindLabel.toLowerCase()}<span class="sr-only"> (opens in a new tab)</span></a>
         <span class="muted"> By {resource.by ?? element.package.publisher.name}{resource.lastReviewedAt && <> · Checked {formatDate(resource.lastReviewedAt)}</>}</span>
       </p>
     )}
@@ -43,9 +43,10 @@ const helping = resourcesFor(element);
         <ul class="links">
           {g.links.map((l) => (
             <li class={`type-${l.target.type}`}>
-              <a class="chip" href={l.target.url}>
+              <a class="chip" href={l.target.url} {...(l.target.fromLibrary ? newTab : {})}>
                 {l.target.title}
                 <span class="chip__note"> · {l.target.typeLabel}{l.target.fromLibrary && ', in the library'}{l.way && <>, way: {l.way}</>}{l.partial && ', covers part of it'}</span>
+                {l.target.fromLibrary && <span class="sr-only"> (opens in a new tab)</span>}
               </a>
               {l.note && <span class="muted">{l.note}</span>}
             </li>

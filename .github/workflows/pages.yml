@@ -64,9 +64,10 @@ jobs:
         with:
           path: dist
 
+  # Deploys a push to main, or a run started by hand on main, but never a pull request.
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     permissions:

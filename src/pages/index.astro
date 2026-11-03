@@ -38,6 +38,15 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
         <a href={upstream!.url} target="_blank" rel="noopener">{upstream!.title}<span class="sr-only"> (opens in a new tab)</span></a> {upstream!.release}.
       </p>
     </header>
+    <aside class="notice built-on" aria-label={`Built on ${upstream!.title}`}>
+      <p>
+        <strong>{upstream!.title} is the shared knowledge underneath.</strong> It's an open library of what
+        public organizations are responsible for and the capabilities that work depends on, with example
+        patterns and its sources. This site adds our work to it, in its terms: what we offer, linked to the
+        missions, capabilities, and patterns it helps with.{library.length > 0 && <> Items from the library carry a small book
+        (<LibraryMark element={library[0].m} legend />).</>} <a href={href('about/')}>More about this site</a>
+      </p>
+    </aside>
   </div>
 
   {offered.length > 0 && (
@@ -113,6 +122,8 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
 </Base>
 
 <style>
+  .built-on { max-width: 60rem; margin: 0 0 2rem; }
+  .built-on p { margin: 0; }
   .offer-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); }
   .stack-table th[scope='row'] { font-weight: 650; }
   .stack-table th[scope='row'] p { margin: .25rem 0 0; font-weight: 400; }

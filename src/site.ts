@@ -11,10 +11,13 @@ const kit = parse(kitText) as {
   library: { url: string; release: string };
 };
 
+// Your About page, while you keep one.
+const hasAbout = Object.keys(import.meta.glob('./pages/about.astro')).length > 0;
+
 export const site: SiteConfig = {
   title: kit.site.title,
   description: kit.site.description,
   accent: kit.site.accent,
-  nav: [{ label: 'The library', url: kit.library.url }],
+  nav: [...(hasAbout ? [{ label: 'About', path: 'about/' }] : []), { label: 'The library', url: kit.library.url }],
   upstream: { title: 'Enterprise Blueprints', url: kit.library.url, release: String(kit.library.release) },
 };

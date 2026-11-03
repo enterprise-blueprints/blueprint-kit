@@ -4,10 +4,10 @@ schemaVersion: 0.6.0
 packageId: com.example.offerings
 # The first part of every element ID in your packages. Pick one that's yours; "eb" is the library's.
 idPrefix: example
-title: Example Partner Offerings
-description: Example Partner’s services, demos, products, templates, and training, each linked to the Enterprise Blueprints missions, capabilities, and patterns it helps with. A sample of what a firm’s package can hold.
+title: My Offerings
+description: My organization’s services, demos, products, templates, and training, each linked to the Enterprise Blueprints missions, capabilities, and patterns it helps with. A sample of what an organization’s package can hold.
 publisher:
-  name: Example Partner
+  name: My Organization
   url: https://example.com
 license: CC-BY-4.0
 domain: public-sector

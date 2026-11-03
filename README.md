@@ -11,7 +11,7 @@ repository, with a site that works like the library's: the same mission explorer
 and pattern pages, and discovery questions. It shows your own missions and items, and the library's
 missions your packages build on, with what you offer shown wherever it helps.
 
-This copy comes with a sample publisher, Example Partner, so you can see each piece working before you
+This copy comes with a sample publisher, My Organization, so you can see each piece working before you
 change it.
 
 ## What's here

@@ -278,7 +278,7 @@ export const resourceKinds: Grouping = {
     tool: { label: 'Tool', hint: 'Free tools, calculators, and open-source software.' },
     template: { label: 'Template', hint: 'Templates, samples, and checklists to start from.' },
     demo: { label: 'Demo', hint: 'A working example to see or try.' },
-    service: { label: 'Service', hint: 'Help a firm offers, such as an assessment or an implementation.' },
+    service: { label: 'Service', hint: 'Help an organization offers, such as an assessment or an implementation.' },
     product: { label: 'Product', hint: 'A product, or a feature of one, that fits.' },
     'case-study': { label: 'Case study', hint: 'How an agency did it, and what it learned.' },
   },

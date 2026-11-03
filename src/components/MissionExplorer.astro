@@ -10,6 +10,7 @@
 import { byLayer, coversPartly, groupOf, patternDetails, resourcesFor, shortTitle, type LibraryElement, type MissionBlueprint } from '../lib/library';
 import { plural } from '../lib/format';
 import { capabilityStages, patternLayers } from '../lib/vocabulary';
+import LibraryMark from './LibraryMark.astro';
 
 interface Props {
   blueprint: MissionBlueprint;
@@ -68,7 +69,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
           {outcomes.map((o) => (
             <li>
               <button type="button" class="ex-card" aria-pressed="false" {...node(o.outcome.id)}>
-                <span class="ex-card__title">{o.outcome.title}</span>
+                <span class="ex-card__title">{o.outcome.title}<LibraryMark element={o.outcome} within={mission} /></span>
                 <span class="ex-card__meta">{[groupOf(o.outcome)?.label, o.measures.length && countOf(o.measures.length, 'measure', 'measures')].filter(Boolean).join(' · ')}</span>
               </button>
             </li>
@@ -85,7 +86,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
               {g.items.map((c) => (
                 <li>
                   <button type="button" class="ex-card" aria-pressed="false" {...node(c.capability.id)}>
-                    <span class="ex-card__title">{c.capability.title}</span>
+                    <span class="ex-card__title">{c.capability.title}<LibraryMark element={c.capability} within={mission} /></span>
                     <span class="ex-card__meta">{[sharedLabel(c.capability), c.requirements.length && countOf(c.requirements.length, 'requirement', 'requirements')].filter(Boolean).join(' · ')}</span>
                   </button>
                 </li>
@@ -104,7 +105,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
               {g.items.map((p) => (
                 <li>
                   <button type="button" class="ex-card" aria-pressed="false" {...node(p.id)}>
-                    <span class="ex-card__title">{p.title}</span>
+                    <span class="ex-card__title">{p.title}<LibraryMark element={p} within={mission} /></span>
                     <span class="ex-card__meta">{[sharedLabel(p), patternDetails(p).sourcing].filter(Boolean).join(' · ')}</span>
                   </button>
                 </li>
@@ -128,7 +129,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
       {outcomes.map((o) => (
         <div class="ex__detail type-outcome" data-detail={o.outcome.id} hidden>
           <p class="ex__kicker">Outcome{groupOf(o.outcome) && <> · {groupOf(o.outcome)!.label}</>}</p>
-          <h3 class="ex__title">{o.outcome.title}</h3>
+          <h3 class="ex__title">{o.outcome.title}<LibraryMark element={o.outcome} within={mission} /></h3>
           <p>{o.outcome.description}</p>
           {o.measures.length > 0 && (
             <>
@@ -137,11 +138,11 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
             </>
           )}
           <h4>Capabilities that contribute</h4>
-          <div class="ex__chips type-capability">{o.capabilities.map((c) => <button type="button" class="ex-chip" data-select={c.id}>{c.title}</button>)}</div>
+          <div class="ex__chips type-capability">{o.capabilities.map((c) => <button type="button" class="ex-chip" data-select={c.id}><span>{c.title}<LibraryMark element={c} within={mission} /></span></button>)}</div>
           {resourcesFor(o.outcome).length > 0 && (
             <>
               <h4>Resources</h4>
-              <div class="ex__chips type-resource">{resourcesFor(o.outcome).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+              <div class="ex__chips type-resource">{resourcesFor(o.outcome).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
             </>
           )}
           <p class="ex__open"><a href={o.outcome.url}>Open the outcome’s page →</a></p>
@@ -151,17 +152,17 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
       {capabilities.map((c) => (
         <div class="ex__detail type-capability" data-detail={c.capability.id} hidden>
           <p class="ex__kicker">Capability{groupOf(c.capability) && <> · {groupOf(c.capability)!.label}</>}{c.sharedFrom && <> · from {shortTitle(c.sharedFrom)}</>}</p>
-          <h3 class="ex__title">{c.capability.title}</h3>
+          <h3 class="ex__title">{c.capability.title}<LibraryMark element={c.capability} within={mission} /></h3>
           <p>{c.capability.description}</p>
           <h4>Outcomes it serves</h4>
-          <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}>{o.title}</button>)}</div>
+          <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}><span>{o.title}<LibraryMark element={o} within={mission} /></span></button>)}</div>
           {c.patterns.length > 0 && (
             <>
               <h4>Patterns that could provide it</h4>
               <div class="ex__chips type-implementationPattern">
                 {c.patterns.map((p) => (
                   <button type="button" class="ex-chip" data-select={p.id}>
-                    {p.title}
+                    <span>{p.title}<LibraryMark element={p} within={mission} /></span>
                     {coversPartly(c.capability, p) && <span class="ex-chip__note">partly</span>}
                   </button>
                 ))}
@@ -171,13 +172,13 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
           {c.requirements.length > 0 && (
             <>
               <h4>Requirements</h4>
-              <div class="ex__chips type-requirement">{c.requirements.map((r) => <a class="ex-chip" href={r.url}>{r.title}</a>)}</div>
+              <div class="ex__chips type-requirement">{c.requirements.map((r) => <a class="ex-chip" href={r.url}><span>{r.title}<LibraryMark element={r} within={mission} /></span></a>)}</div>
             </>
           )}
           {resourcesFor(c.capability).length > 0 && (
             <>
               <h4>Resources</h4>
-              <div class="ex__chips type-resource">{resourcesFor(c.capability).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+              <div class="ex__chips type-resource">{resourcesFor(c.capability).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
             </>
           )}
           <p class="ex__open"><a href={c.capability.url}>Open the capability’s page →</a></p>
@@ -189,7 +190,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
         return (
           <div class="ex__detail type-implementationPattern" data-detail={p.id} hidden>
             <p class="ex__kicker">Pattern{details.layer && <> · {patternLayers[details.layer].label}</>}{sharedLabel(p) && <> · from {shortTitle(p.package)}</>}</p>
-            <h3 class="ex__title">{p.title}</h3>
+            <h3 class="ex__title">{p.title}<LibraryMark element={p} within={mission} /></h3>
             <p>{p.description}</p>
             {details.ways.length > 0 && (
               <>
@@ -201,7 +202,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
             <div class="ex__chips type-capability">
               {capabilitiesFor(p).map((c) => (
                 <button type="button" class="ex-chip" data-select={c.id}>
-                  {c.title}
+                  <span>{c.title}<LibraryMark element={c} within={mission} /></span>
                   {coversPartly(c, p) && <span class="ex-chip__note">partly</span>}
                 </button>
               ))}
@@ -209,7 +210,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
             {resourcesFor(p).length > 0 && (
               <>
                 <h4>Resources</h4>
-                <div class="ex__chips type-resource">{resourcesFor(p).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+                <div class="ex__chips type-resource">{resourcesFor(p).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
               </>
             )}
             <p class="ex__open"><a href={p.url}>Open the pattern’s page →</a></p>
@@ -236,6 +237,13 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
     const panel = root.querySelector<HTMLElement>('[data-panel]')!;
     const search = root.querySelector<HTMLInputElement>('[data-search]')!;
     let selected: string | null = null;
+    // A card's own words, without the note that marks a library item on a publisher's site.
+    const plainText = (el: Element | null | undefined) => {
+      if (!el) return '';
+      const copy = el.cloneNode(true) as Element;
+      copy.querySelectorAll('.library-mark').forEach((m) => m.remove());
+      return copy.textContent ?? '';
+    };
 
     /**
      * Everything on the selected item's trace: each step goes one column further
@@ -288,7 +296,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
       for (const d of details) d.hidden = d.dataset.detail !== (id ?? '');
       root.querySelector<HTMLElement>('[data-idle]')!.hidden = Boolean(id);
       root.querySelector<HTMLElement>('[data-active]')!.hidden = !id;
-      if (id) root.querySelector('[data-selected-name]')!.textContent = byId.get(id)?.querySelector('.ex-card__title')?.textContent ?? '';
+      if (id) root.querySelector('[data-selected-name]')!.textContent = plainText(byId.get(id)?.querySelector('.ex-card__title'));
       panel.classList.toggle('is-open', Boolean(id));
       if (id) panel.scrollTop = 0;
     }
@@ -312,7 +320,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
     search.addEventListener('input', () => {
       const q = search.value.trim().toLowerCase();
       root.classList.toggle('is-searching', Boolean(q));
-      for (const c of cards) c.classList.toggle('is-match', Boolean(q) && (c.textContent ?? '').toLowerCase().includes(q));
+      for (const c of cards) c.classList.toggle('is-match', Boolean(q) && plainText(c).toLowerCase().includes(q));
     });
 
     new ResizeObserver(draw).observe(graph);

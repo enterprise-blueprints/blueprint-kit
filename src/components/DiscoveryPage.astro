@@ -4,6 +4,7 @@ import { discoveryTarget, downloadUrl, upstream, type DiscoveryTarget, type Libr
 import type { Question } from '../lib/package';
 import { href } from '../lib/paths';
 import { elementTypes } from '../lib/vocabulary';
+import LibraryMark from './LibraryMark.astro';
 
 interface Props {
   assessment: LibraryAssessment;
@@ -83,7 +84,7 @@ const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets
         <ul class="explores__list">
           {explores.map(({ element, count }) => (
             <li>
-              <a class={`element-link type-${element.type}`} href={element.url}>{element.title}</a>
+              <a class={`element-link type-${element.type}`} href={element.url}><span>{element.title}<LibraryMark element={element} within={assessment.package} /></span></a>
               <span class="explores__count">{count} {count === 1 ? 'question' : 'questions'}</span>
             </li>
           ))}
@@ -106,7 +107,7 @@ const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets
               <p class="points__line">
                 <span class="points__label">Points to</span>
                 {targets(q).map((e) => (
-                  <a class={`chip type-${e.type}`} href={e.url}>{e.title}</a>
+                  <a class={`chip type-${e.type}`} href={e.url}>{e.title}<LibraryMark element={e} within={assessment.package} /></a>
                 ))}
               </p>
               <details class="reasons">
@@ -117,7 +118,7 @@ const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets
                       <dt>{r.answer}</dt>
                       {r.points.map((p) => (
                         <dd>
-                          <a class={`chip type-${p.element.type}`} href={p.element.url}>{p.element.title}</a>
+                          <a class={`chip type-${p.element.type}`} href={p.element.url}>{p.element.title}<LibraryMark element={p.element} within={assessment.package} /></a>
                           <span class="reason__why">{p.why}</span>
                         </dd>
                       ))}

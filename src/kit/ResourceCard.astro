@@ -3,6 +3,7 @@
 // and the missions, capabilities, and patterns it helps with.
 import { helpsWith, resourceDetails, type LibraryElement } from '../lib/library';
 import { formatDate } from '../lib/format';
+import LibraryMark from '../components/LibraryMark.astro';
 
 interface Props {
   resource: LibraryElement;
@@ -21,7 +22,7 @@ const helps = helpsWith(resource);
     <div class="element-links offer__helps" aria-label="Helps with">
       {helps.map(({ element, way }) => (
         <a class={`element-link type-${element.type}`} href={way ? `${element.url}#way-${way.id}` : element.url}>
-          {element.title}{way && <span class="offer__way">{way.title}</span>}
+          <span>{element.title}<LibraryMark element={element} /></span>{way && <span class="offer__way">{way.title}</span>}
         </a>
       ))}
     </div>

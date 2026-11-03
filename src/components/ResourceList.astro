@@ -1,18 +1,22 @@
 ---
 import type { ElementResource } from '../lib/library';
+import type { BlueprintPackage } from '../lib/package';
+import LibraryMark from './LibraryMark.astro';
 import { formatDate } from '../lib/format';
 
 interface Props {
   resources: ElementResource[];
+  /** The package of the page the list is on, so a library page's own library resources go unmarked. */
+  within?: BlueprintPackage;
 }
 
-const { resources } = Astro.props;
+const { resources, within } = Astro.props;
 ---
 <ul class="resource-list">
   {resources.map(({ resource, details, way, note }) => (
     <li class="resource type-resource">
       <p class="resource__kind">{details.kind}{way && <> · for <a href={`#way-${way.id}`}>{way.title}</a></>}</p>
-      <a class="resource__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
+      <a class="resource__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a><LibraryMark element={resource} within={within} />
       <p class="resource__by">{details.by ?? resource.package.publisher.name}</p>
       <p class="resource__about">{note ?? resource.description}</p>
       <p class="resource__more">

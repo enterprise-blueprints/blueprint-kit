@@ -1,12 +1,14 @@
 ---
 // Which capabilities contribute to which of a mission's outcomes, as a grid.
 import type { MissionBlueprint } from '../lib/library';
+import LibraryMark from './LibraryMark.astro';
 
 interface Props {
   blueprint: MissionBlueprint;
 }
 
 const { outcomes, capabilities } = Astro.props.blueprint;
+const mission = outcomes[0]?.outcome.package ?? capabilities[0]?.capability.package;
 ---
 <div class="table-wrap">
   <table class="outcome-matrix">
@@ -15,7 +17,7 @@ const { outcomes, capabilities } = Astro.props.blueprint;
       <tr>
         <th scope="col">Capability</th>
         {outcomes.map(({ outcome }) => (
-          <th scope="col" class="outcome-matrix__outcome"><a href={outcome.url}>{outcome.title}</a></th>
+          <th scope="col" class="outcome-matrix__outcome"><a href={outcome.url}>{outcome.title}</a><LibraryMark element={outcome} within={mission} /></th>
         ))}
       </tr>
     </thead>
@@ -23,7 +25,7 @@ const { outcomes, capabilities } = Astro.props.blueprint;
       {capabilities.map(({ capability, outcomes: served, sharedFrom }) => (
         <tr>
           <th scope="row">
-            <a href={capability.url}>{capability.title}</a>
+            <a href={capability.url}>{capability.title}</a><LibraryMark element={capability} within={mission} />
             {sharedFrom && <span class="outcome-matrix__shared">Shared</span>}
           </th>
           {outcomes.map(({ outcome }) =>

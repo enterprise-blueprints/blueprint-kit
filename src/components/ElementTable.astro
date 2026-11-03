@@ -1,5 +1,7 @@
 ---
 import { shortTitle, tagline, type LibraryElement } from '../lib/library';
+import type { BlueprintPackage } from '../lib/package';
+import LibraryMark from './LibraryMark.astro';
 
 interface Props {
   elements: LibraryElement[];
@@ -11,9 +13,11 @@ interface Props {
   parents?: Map<string, LibraryElement>;
   /** Say which package each element comes from, for lists that mix packages. */
   showPackage?: boolean;
+  /** The package of the page the list is on, so a library page's own library items go unmarked. */
+  within?: BlueprintPackage;
 }
 
-const { elements, notes, partial, parents, showPackage } = Astro.props;
+const { elements, notes, partial, parents, showPackage, within } = Astro.props;
 ---
 <div class="table-wrap">
   <table class="stack-table element-table">
@@ -23,7 +27,7 @@ const { elements, notes, partial, parents, showPackage } = Astro.props;
     <tbody>
       {elements.map((e) => (
         <tr>
-          <th scope="row"><a class={`element-link type-${e.type}`} href={e.url}>{e.title}</a></th>
+          <th scope="row"><a class={`element-link type-${e.type}`} href={e.url}><span>{e.title}<LibraryMark element={e} within={within} /></span></a></th>
           <td class="muted">
             {tagline(e) && <strong class="element-table__tagline">{tagline(e)}</strong>}
             {e.description}

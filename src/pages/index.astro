@@ -3,6 +3,7 @@
 // packages build on, and your packages. Everything else is the library's pages.
 import Base from '../layouts/Base.astro';
 import TypeBadge from '../components/TypeBadge.astro';
+import LibraryMark from '../components/LibraryMark.astro';
 import ResourceCard from '../kit/ResourceCard.astro';
 import { downloadUrl, elementsOfType, helpsWith, isOwn, missionBlueprint, ownPackages, release, scopeLabel, tagline, upstream, type LibraryElement } from '../lib/library';
 import { plural } from '../lib/format';
@@ -60,6 +61,7 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
             {own.length > 0 ? 'Missions of our own, and the missions' : 'The missions'} from {upstream!.title} that our work builds on,
             with what we offer shown where it helps.
           </p>
+          {library.length > 0 && <p class="muted"><LibraryMark element={library[0].m} legend /> marks the ones from {upstream!.title}.</p>}
         </div>
         <div class="mission-grid">
           {[...own, ...library].map(({ m, outcomes, capabilities, patterns, helping }) => (
@@ -67,9 +69,9 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
               <div class="card__meta">
                 <TypeBadge type={m.type} />
                 {scopeLabel(m.package) && <span class="scope-badge">{scopeLabel(m.package)}</span>}
-                <span class="scope-badge">{isOwn(m.package) ? 'Ours' : `From ${upstream!.title}`}</span>
+                {isOwn(m.package) && <span class="scope-badge">Ours</span>}
               </div>
-              <h3 class="card__title"><a href={m.url}>{m.title}</a></h3>
+              <h3 class="card__title"><a href={m.url}>{m.title}</a><LibraryMark element={m} /></h3>
               {tagline(m) && <p class="card__tagline">{tagline(m)}</p>}
               <p class="card__summary">{m.description}</p>
               <ul class="card__facts">

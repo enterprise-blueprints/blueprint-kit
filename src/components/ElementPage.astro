@@ -8,6 +8,7 @@ import MissionExplorer from './MissionExplorer.astro';
 import OutcomeMatrix from './OutcomeMatrix.astro';
 import PatternCompare from './PatternCompare.astro';
 import ResourceList from './ResourceList.astro';
+import LibraryMark from './LibraryMark.astro';
 import {
   downloadUrl,
   elements,
@@ -95,7 +96,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
       <p class="lede">{element.description}</p>
       {element.canonicalUrl && (
         <p class="record-from">
-          From {upstream!.title} {pkg.version} ·{' '}
+          From {upstream!.title} {pkg.version}<LibraryMark element={element} always /> ·{' '}
           <a href={element.canonicalUrl} target="_blank" rel="noopener">See it in the library<span class="sr-only"> (opens in a new tab)</span></a>
         </p>
       )}
@@ -200,7 +201,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
             <section class="section">
               <h2>{g.heading}</h2>
               {!perRow && g.notes.map((n) => <p class="section-note">{n}</p>)}
-              <ElementTable elements={g.elements} notes={notes} partial={partial} />
+              <ElementTable elements={g.elements} notes={notes} partial={partial} within={pkg} />
             </section>
           );
         })}
@@ -219,7 +220,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           <section class="section">
             <h2>Resources</h2>
             <p class="section-note">To learn more, or to get started.</p>
-            <ResourceList resources={resources} />
+            <ResourceList resources={resources} within={pkg} />
           </section>
         )}
 

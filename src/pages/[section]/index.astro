@@ -2,7 +2,8 @@
 import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import ElementTable from '../../components/ElementTable.astro';
-import { indexGroups, indexParents, typesInUse } from '../../lib/library';
+import LibraryMark from '../../components/LibraryMark.astro';
+import { fromLibrary, indexGroups, indexParents, typesInUse, upstream } from '../../lib/library';
 import { groupings } from '../../lib/vocabulary';
 import { plural } from '../../lib/format';
 
@@ -16,12 +17,15 @@ const grouped = groups.length > 1;
 const count = (n: number) => plural(n, info.label.toLowerCase(), info.plural.toLowerCase());
 // Outcomes, capabilities, and requirements are grouped across missions, so each row says which one it's from.
 const grouping = groupings[type];
+// On a publisher's site, a list with the library's items says what marks them.
+const fromTheLibrary = groups.flatMap((g) => g.items).find((e) => fromLibrary(e));
 ---
 <Base title={info.plural} description={info.definition}>
   <div class="container">
     <header class="page-header">
       <h1>{info.plural}</h1>
       <p class="lede">{info.definition}</p>
+      {fromTheLibrary && <p class="muted"><LibraryMark element={fromTheLibrary} legend /> marks the ones from {upstream!.title}.</p>}
     </header>
     {grouped && (
       <nav class="index-jump" aria-label={`${info.plural} by ${grouping ? grouping.label.toLowerCase() : 'group'}`}>

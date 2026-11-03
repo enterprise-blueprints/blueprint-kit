@@ -2,6 +2,7 @@
 // A capability's candidate patterns side by side: each one's approach, when
 // it fits, what to watch for, and anything its link says about this capability.
 import { coversPartly, patternDetails, relationNote, shortTitle, type LibraryElement } from '../lib/library';
+import LibraryMark from './LibraryMark.astro';
 
 interface Props {
   capability: LibraryElement;
@@ -32,7 +33,7 @@ const rows = patterns.map((p) => {
       {rows.map((r) => (
         <tr>
           <th scope="row">
-            <a class="element-link type-implementationPattern" href={r.pattern.url}>{r.pattern.title}</a>
+            <a class="element-link type-implementationPattern" href={r.pattern.url}><span>{r.pattern.title}<LibraryMark element={r.pattern} within={capability.package} /></span></a>
             {r.approach && <span class="pattern-compare__approach">{r.approach}</span>}
             {r.shared && <span class="pattern-compare__from">From {r.shared}</span>}
             {r.partial && <span class="pattern-compare__from"><span class="partial-badge">Covers part of it</span></span>}

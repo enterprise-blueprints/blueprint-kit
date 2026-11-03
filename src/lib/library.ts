@@ -138,6 +138,14 @@ export const release = ownPackages[0]?.version;
 /** Whether a package is the site's own, rather than one of the library's on a publisher's site. */
 export const isOwn = (pkg: BlueprintPackage) => ownPackages.includes(pkg);
 
+/**
+ * Whether an item is the library's, on a publisher's site, and worth marking
+ * as such: everywhere, or, given the package of the page or mission it's in,
+ * only among the publisher's own items.
+ */
+export const fromLibrary = (item: { package: BlueprintPackage }, within?: BlueprintPackage) =>
+  !isOwn(item.package) && (!within || isOwn(within));
+
 const folders = new Map<BlueprintPackage, string>([...packageFiles.map((f) => [f.data, f.name] as const), ...loaded.upstream.map((f) => [f.data, f.name] as const)]);
 
 /** Where to download a package: from this site, or a library package from the library's. */
@@ -254,13 +262,13 @@ export function measuresOf(outcome: LibraryElement): Measure[] {
 }
 
 /** What a discovery answer can point at: an element, or an outcome's measure. */
-export type DiscoveryTarget = Pick<LibraryElement, 'id' | 'type' | 'title' | 'url'>;
+export type DiscoveryTarget = Pick<LibraryElement, 'id' | 'type' | 'title' | 'url' | 'package'>;
 
 export function discoveryTarget(id: string): DiscoveryTarget | undefined {
   const element = elements.find((e) => e.id === id);
   if (element) return element;
   const measure = elements.flatMap(measuresOf).find((m) => m.elementId === id);
-  return measure && { id, type: 'measure', title: measure.title, url: measure.url };
+  return measure && { id, type: 'measure', title: measure.title, url: measure.url, package: measure.outcome.package };
 }
 
 export interface MissionBlueprint {

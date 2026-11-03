@@ -129,7 +129,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
       {outcomes.map((o) => (
         <div class="ex__detail type-outcome" data-detail={o.outcome.id} hidden>
           <p class="ex__kicker">Outcome{groupOf(o.outcome) && <> · {groupOf(o.outcome)!.label}</>}</p>
-          <h3 class="ex__title">{o.outcome.title}<LibraryMark element={o.outcome} within={mission} /></h3>
+          <h3 class="ex__title">{o.outcome.title}<LibraryMark element={o.outcome} always /></h3>
           <p>{o.outcome.description}</p>
           {o.measures.length > 0 && (
             <>
@@ -152,7 +152,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
       {capabilities.map((c) => (
         <div class="ex__detail type-capability" data-detail={c.capability.id} hidden>
           <p class="ex__kicker">Capability{groupOf(c.capability) && <> · {groupOf(c.capability)!.label}</>}{c.sharedFrom && <> · from {shortTitle(c.sharedFrom)}</>}</p>
-          <h3 class="ex__title">{c.capability.title}<LibraryMark element={c.capability} within={mission} /></h3>
+          <h3 class="ex__title">{c.capability.title}<LibraryMark element={c.capability} always /></h3>
           <p>{c.capability.description}</p>
           <h4>Outcomes it serves</h4>
           <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}><span>{o.title}<LibraryMark element={o} within={mission} /></span></button>)}</div>
@@ -190,7 +190,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
         return (
           <div class="ex__detail type-implementationPattern" data-detail={p.id} hidden>
             <p class="ex__kicker">Pattern{details.layer && <> · {patternLayers[details.layer].label}</>}{sharedLabel(p) && <> · from {shortTitle(p.package)}</>}</p>
-            <h3 class="ex__title">{p.title}<LibraryMark element={p} within={mission} /></h3>
+            <h3 class="ex__title">{p.title}<LibraryMark element={p} always /></h3>
             <p>{p.description}</p>
             {details.ways.length > 0 && (
               <>

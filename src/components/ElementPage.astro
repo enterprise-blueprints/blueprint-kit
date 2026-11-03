@@ -91,12 +91,12 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
         {pattern?.sourcing && <span class="approach-badge">{pattern.sourcing}</span>}
         {group && <a class="approach-badge" href={group.url} title={group.hint}>{group.label}</a>}
       </div>
-      <h1>{element.title}</h1>
+      <h1>{element.title}<LibraryMark element={element} always /></h1>
       {line && <p class="record-tagline">{line}</p>}
       <p class="lede">{element.description}</p>
       {element.canonicalUrl && (
         <p class="record-from">
-          From {upstream!.title} {pkg.version}<LibraryMark element={element} always /> ·{' '}
+          From {upstream!.title} {pkg.version} ·{' '}
           <a href={element.canonicalUrl} target="_blank" rel="noopener">See it in the library<span class="sr-only"> (opens in a new tab)</span></a>
         </p>
       )}

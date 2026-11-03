@@ -2,15 +2,16 @@
 // A small book after an item's name, on a publisher's site, for an item from
 // the library among the publisher's own. With `within`, the package of the
 // page or mission it's shown in, a library page's own library items go
-// unmarked, since the page already says where it's from. The library's own
-// site shows none.
+// unmarked, since the page already says where it's from. With `always`, it
+// marks one item on its own, such as a page's title or the explorer panel's.
+// The library's own site shows none.
 import { fromLibrary, upstream } from '../lib/library';
 import type { BlueprintPackage } from '../lib/package';
 
 interface Props {
   element: { package: BlueprintPackage };
   within?: BlueprintPackage;
-  /** Show it even on a library page, such as beside the line that says where the page is from. */
+  /** Show it even on a library page, for one item on its own, such as the page's title. */
   always?: boolean;
   /** Just the book, for a legend that says what it means. */
   legend?: boolean;

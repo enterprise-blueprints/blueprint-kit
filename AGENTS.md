@@ -13,6 +13,13 @@ pnpm content:build   # source/ → content/, validated against your packages and
 pnpm verify          # content check, type check, tests, and site build
 ```
 
+- Copies of the kit stay current with `pnpm sync --tools`, which takes the library's engine at the
+  version `kit.yaml` on the kit's `main` names (tagged `engine-v<version>` in the library) and the kit's
+  own shared files, which `kit.json` lists, from `main`. Keep `kit.json` to files every copy shares;
+  never list a file an organization makes its own, such as the home page, `kit.yaml`, or `README.md`.
+  `.github/workflows/update.yml` does it weekly in each copy and opens a pull request. In this repo,
+  `pnpm sync --tools` updates the engine alone. To try a change to `scripts/sync.ts` against local
+  copies, `LIBRARY_REPO_RAW` and `KIT_REPO_RAW` stand in for the two repos' raw addresses, by ref.
 - The pages and the code behind them are the library's engine, the files its `engine.json` lists
   (`src/lib/`, `src/components/`, `src/layouts/`, `src/styles/`, most of `src/pages/`, and
   `public/favicon.svg`), copied as they are. Change them in the library, then

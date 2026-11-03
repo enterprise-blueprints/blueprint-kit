@@ -1,0 +1,23 @@
+{
+  "description": "The kit's own files that every copy of it shares, which pnpm sync --tools brings up to date from the kit's main branch, beside the library's engine. Your own files aren't here: kit.yaml, source/, content/, your home page (src/pages/index.astro and src/kit/), README.md, and anything you add. package.json takes the kit's scripts and versions and keeps what you added.",
+  "files": [
+    ".gitattributes",
+    ".github/workflows/pages.yml",
+    ".github/workflows/update.yml",
+    "astro.config.mjs",
+    "kit.json",
+    "scripts/content.ts",
+    "scripts/sync.ts",
+    "src/pages/catalog.json.ts",
+    "src/pages/packages/[name]/[version]/blueprint.json.sha256.ts",
+    "src/pages/packages/[name]/[version]/blueprint.json.ts",
+    "src/pages/schemas/[file].ts",
+    "src/pages/vocabulary.json.ts",
+    "src/publish.ts",
+    "src/site.ts",
+    "tests/kit.test.ts",
+    "tsconfig.json",
+    "vitest.config.ts"
+  ],
+  "merged": ["package.json"]
+}

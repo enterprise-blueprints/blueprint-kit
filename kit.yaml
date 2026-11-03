@@ -13,3 +13,5 @@ library:
   # Run `pnpm sync` after changing the release, then `pnpm content:build`.
   url: https://enterprise-blueprints.github.io/
   release: 0.12.0
+  # The version of the library's engine, its pages and the code behind them. pnpm sync --tools sets it.
+  engine: 1.0.0

@@ -1,24 +1,41 @@
-// Brings the library into the kit.
+// Brings the library, and the kit's updates, into your copy.
 //
-//   pnpm sync                 the release kit.yaml names: its packages, which
-//                             yours build on, its vocabulary, and every schema
-//   pnpm sync --tools [from]  also the library's engine: the compiler, the
-//                             validator, and the pages this site shares with
-//                             the library's, as its engine.json lists them,
-//                             from its repository at a Git ref (main by
-//                             default) or from a local checkout's folder
+//   pnpm sync                 the library release kit.yaml names: its packages,
+//                             which yours build on, its vocabulary, and every schema
+//   pnpm sync --latest        moves kit.yaml to the library's current release first
+//   pnpm sync --tools         also brings the files your copy shares with the kit up
+//                             to date: the library's engine (the pages and the code
+//                             behind them) at the version the kit's main branch
+//                             uses, and the kit's own files its kit.json lists,
+//                             such as these scripts, the data pages, the workflows,
+//                             and the tests. package.json takes the kit's scripts
+//                             and versions and keeps what you added.
+//   pnpm sync --tools <from>  the engine alone, from a library checkout's folder or
+//                             a Git ref, for working on the kit or the engine
 //
-// Each package is checked against the digest in the library's catalog. Earlier
+// Your own files are never touched: kit.yaml (but for the release and engine
+// version it names), source/, content/, your home page, and src/kit/. Each
+// package is checked against the digest in the library's catalog. Earlier
 // releases stay in library/, since your published versions build on them.
 
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { parse } from 'yaml';
 
-const kit = parse(readFileSync('kit.yaml', 'utf8')) as { library: { url: string; release: string } };
-const base = kit.library.url.endsWith('/') ? kit.library.url : `${kit.library.url}/`;
-const release = String(kit.library.release);
+// Where the library's and the kit's files are, by Git ref. The variables are for trying out a change to this script.
+const LIBRARY_REPO = process.env.LIBRARY_REPO_RAW ?? 'https://raw.githubusercontent.com/enterprise-blueprints/enterprise-blueprints.github.io';
+const KIT_REPO = process.env.KIT_REPO_RAW ?? 'https://raw.githubusercontent.com/enterprise-blueprints/blueprint-kit';
+
+const args = process.argv.slice(2);
+const latest = args.includes('--latest');
+const toolsAt = args.indexOf('--tools');
+const tools = toolsAt !== -1;
+const from = tools && args[toolsAt + 1] && !args[toolsAt + 1].startsWith('--') ? args[toolsAt + 1] : undefined;
+
+type Kit = { library: { url: string; release: string; engine?: string } };
+const readKit = () => parse(readFileSync('kit.yaml', 'utf8')) as Kit;
 
 async function get(url: string): Promise<string> {
   const response = await fetch(url);
@@ -30,13 +47,29 @@ function save(path: string, text: string) {
   writeFileSync(path, text);
 }
 
-const catalogUrl = new URL('catalog.json', base);
+/** Sets a field under library: in kit.yaml, keeping its comments and everything else as it is. */
+function setLibraryField(key: 'release' | 'engine', value: string, comment: string) {
+  const text = readFileSync('kit.yaml', 'utf8');
+  const line = new RegExp(`^(\\s+${key}:).*$`, 'm');
+  const next = line.test(text) ? text.replace(line, `$1 ${value}`) : text.replace(/^(\s+release:.*)$/m, `$1\n${comment}\n  ${key}: ${value}`);
+  if (next !== text) writeFileSync('kit.yaml', next);
+}
+
+const base = (url: string) => (url.endsWith('/') ? url : `${url}/`);
+const catalogUrl = new URL('catalog.json', base(readKit().library.url));
 const catalog = JSON.parse(await get(catalogUrl.href)) as {
   release: string;
   vocabulary: string;
   schemas: string[];
   packages: { packageId: string; version: string; href: string; sha256: string }[];
 };
+
+if (latest && String(readKit().library.release) !== catalog.release) {
+  console.log(`release ${readKit().library.release} → ${catalog.release}`);
+  setLibraryField('release', catalog.release, '');
+}
+const release = String(readKit().library.release);
+
 const wanted = catalog.packages.filter((p) => p.version === release);
 if (!wanted.length) {
   const releases = [...new Set(catalog.packages.map((p) => p.version))].join(', ');
@@ -59,15 +92,52 @@ save(join('library', 'vocabulary.json'), await get(new URL(catalog.vocabulary, c
 for (const href of catalog.schemas) save(join('schemas', href.split('/').at(-1)!), await get(new URL(href, catalogUrl).href));
 console.log(`vocabulary and ${catalog.schemas.length} schemas`);
 
-const tools = process.argv.indexOf('--tools');
-if (tools !== -1) {
-  const from = process.argv[tools + 1] ?? 'main';
-  const read = (path: string) =>
-    existsSync(from)
-      ? Promise.resolve(readFileSync(join(from, path), 'utf8'))
-      : get(`https://raw.githubusercontent.com/enterprise-blueprints/enterprise-blueprints.github.io/${from}/${path}`);
-  const { files } = JSON.parse(await read('engine.json')) as { files: string[] };
-  for (const file of files) save(file, await read(file));
-  console.log(`${files.length} engine files from ${from}`);
+let installNeeded = false;
+if (tools) {
+  // The engine: from a folder or ref when one is named, or else at the version the kit's main branch uses.
+  const kitMain = from ? undefined : (parse(await get(`${KIT_REPO}/main/kit.yaml`)) as Kit);
+  const ref = from ?? `engine-v${kitMain!.library.engine}`;
+  const read = (path: string) => (existsSync(ref) ? Promise.resolve(readFileSync(join(ref, path), 'utf8')) : get(`${LIBRARY_REPO}/${ref}/${path}`));
+  const engine = JSON.parse(await read('engine.json')) as { version: string; files: string[] };
+  for (const file of engine.files) save(file, await read(file));
+  console.log(`engine ${engine.version}: ${engine.files.length} files from ${ref}`);
+  setLibraryField('engine', engine.version, '  # The version of the library\'s engine, its pages and the code behind them. pnpm sync --tools sets it.');
+
+  // The kit's own shared files, from its main branch, unless this is the kit itself or the engine came from elsewhere.
+  if (!from && !isTheKit()) {
+    const shared = JSON.parse(await get(`${KIT_REPO}/main/kit.json`)) as { files: string[]; merged: string[] };
+    for (const file of shared.files) save(file, await get(`${KIT_REPO}/main/${file}`));
+    console.log(`${shared.files.length} of the kit's files from its main branch`);
+    if (shared.merged.includes('package.json')) installNeeded = mergePackageJson(JSON.parse(await get(`${KIT_REPO}/main/package.json`)));
+  }
 }
-console.log('\nNow run pnpm content:build, then pnpm verify.');
+console.log(`\nNow run ${installNeeded ? 'pnpm install, then ' : ''}pnpm content:build, then pnpm verify.`);
+
+/** Whether this is the kit's own repository, where its shared files are made rather than brought in. */
+function isTheKit(): boolean {
+  try {
+    return execFileSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' }).includes('enterprise-blueprints/blueprint-kit');
+  } catch {
+    return false;
+  }
+}
+
+/** Takes the kit's scripts, dependencies, and settings into package.json, keeping your name and anything you added. Returns whether it changed. */
+function mergePackageJson(kit: Record<string, any>): boolean {
+  const text = readFileSync('package.json', 'utf8');
+  const mine = JSON.parse(text) as Record<string, any>;
+  const merged = {
+    ...mine,
+    packageManager: kit.packageManager ?? mine.packageManager,
+    engines: kit.engines ?? mine.engines,
+    scripts: { ...mine.scripts, ...kit.scripts },
+    pnpm: kit.pnpm ?? mine.pnpm,
+    dependencies: { ...mine.dependencies, ...kit.dependencies },
+    devDependencies: { ...mine.devDependencies, ...kit.devDependencies },
+  };
+  const next = `${JSON.stringify(merged, null, 2)}\n`;
+  if (next === text) return false;
+  writeFileSync('package.json', next);
+  console.log('package.json takes the kit\'s scripts and versions');
+  return true;
+}

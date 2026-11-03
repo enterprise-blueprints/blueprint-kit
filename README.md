@@ -122,7 +122,8 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
-| `pnpm sync --tools [ref]` | Also refreshes the library's pages and code from its repository, at a Git ref (`main` by default) or a local folder. |
+| `pnpm sync --latest` | Moves `kit.yaml` to the library's current release first. |
+| `pnpm sync --tools` | Also brings the files you share with the kit up to date: the library's pages and the code behind them, and the kit's scripts, data pages, workflows, and tests. |
 
 ## Publish
 
@@ -142,11 +143,32 @@ that, `pnpm content:build` puts any change in the next release. Before then, it 
 
 ## Staying current
 
-When the library publishes a new release, set `library.release` in `kit.yaml`, then:
+Your copy doesn't follow the kit on its own; you bring updates in when you choose. Two things move:
+
+- **The library's release,** the missions, capabilities, and patterns your packages build on, which
+  `library.release` in `kit.yaml` names.
+- **The pages and code you share with the kit.** The library's engine (its pages and the code behind
+  them) has a version of its own, which `library.engine` in `kit.yaml` names, and the kit's own shared
+  files are listed in `kit.json`. A new engine version can change how your site looks, so it's yours to
+  take or leave. A new major version may need a change to your home page, which uses the engine's code.
+
+Your own files are never touched: `kit.yaml` (but for those two versions), `source/`, `content/`, your
+home page (`src/pages/index.astro` and `src/kit/`), and anything you add. `package.json` takes the kit's
+scripts and versions and keeps what you added.
+
+**Every week, a pull request.** `.github/workflows/update.yml` runs every Monday, or whenever you start it
+from the Actions tab. It moves to the library's current release and the kit's latest shared files,
+rebuilds your packages, runs `pnpm verify`, and opens a pull request that says whether it passed, for you
+to review and merge. To let it open the pull request, turn on **Settings → Actions → General → Allow
+GitHub Actions to create and approve pull requests**. It can't change your workflows itself; when the
+kit's have changed, the pull request says so, and `pnpm sync --tools` on your machine brings them in.
+
+**Or by hand:**
 
 ```sh
-pnpm sync --tools   # the new release, and the compiler and validator that go with it
-pnpm content:build  # your next release, built on it
+pnpm sync --latest --tools  # the library's current release, and the kit's latest shared files
+pnpm install                # when package.json changed
+pnpm content:build          # your next release, built on it
 pnpm verify
 ```
 

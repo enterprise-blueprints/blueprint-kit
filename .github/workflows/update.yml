@@ -1,0 +1,118 @@
+name: Update from the kit and the library
+
+# Once a week, or whenever you start it: moves to the library's current release
+# and the kit's latest shared files, rebuilds your packages, checks everything,
+# and opens a pull request with the result for you to review and merge.
+#
+# To let it open the pull request, turn on Settings → Actions → General →
+# "Allow GitHub Actions to create and approve pull requests". Changes to the
+# workflows themselves can't be pushed from here; the pull request says when
+# there are some, and `pnpm sync --tools` on your machine brings them in.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: kit-update
+  cancel-in-progress: false
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+
+jobs:
+  update:
+    name: Update and open a pull request
+    # The kit itself is where the updates come from.
+    if: github.repository != 'enterprise-blueprints/blueprint-kit'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Note the versions before
+        run: |
+          echo "RELEASE_BEFORE=$(sed -n 's/^ *release: *//p' kit.yaml)" >> "$GITHUB_ENV"
+          echo "ENGINE_BEFORE=$(sed -n 's/^ *engine: *//p' kit.yaml)" >> "$GITHUB_ENV"
+
+      - name: Bring in the library's current release and the kit's latest files
+        run: pnpm sync --latest --tools
+
+      - run: pnpm install --no-frozen-lockfile
+
+      - name: Rebuild your packages on the new release
+        run: pnpm content:build
+
+      - name: Check everything
+        id: verify
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm verify 2>&1 | tee "$RUNNER_TEMP/verify.log"
+
+      - name: Open or update the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.verify.outcome }}
+        run: |
+          # Workflow files can't be pushed with this job's token, so they're left for you to bring in.
+          workflows=$(git status --porcelain -- .github/workflows)
+          git checkout -- .github/workflows 2>/dev/null || true
+          git clean -fdq -- .github/workflows
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Already up to date."
+            exit 0
+          fi
+
+          release_after=$(sed -n 's/^ *release: *//p' kit.yaml)
+          engine_after=$(sed -n 's/^ *engine: *//p' kit.yaml)
+          {
+            echo "Brings this site up to date with the Enterprise Blueprints library and the Blueprint Kit."
+            echo
+            echo "- Library release: ${RELEASE_BEFORE} → ${release_after}"
+            echo "- Engine (the pages and the code behind them): ${ENGINE_BEFORE:-none} → ${engine_after}"
+            echo "- Your packages were rebuilt on the new release, so they're new versions."
+            echo
+            if [ "$OUTCOME" = "success" ]; then
+              echo "\`pnpm verify\` passed."
+            else
+              echo "**\`pnpm verify\` failed**, so this needs a look before merging. The end of its output:"
+              echo
+              echo '```'
+              tail -n 40 "$RUNNER_TEMP/verify.log"
+              echo '```'
+            fi
+            if [ -n "$workflows" ]; then
+              echo
+              echo "The kit's workflows changed too, which this job can't push. Run \`pnpm sync --tools\` on your machine and commit \`.github/workflows/\`."
+            fi
+          } > "$RUNNER_TEMP/body.md"
+
+          branch=kit-update
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$branch"
+          git add -A
+          git commit -q -m "Update to library release ${release_after} and engine ${engine_after}"
+          git push -f origin "$branch"
+
+          title="Update to library release ${release_after} and engine ${engine_after}"
+          draft=$([ "$OUTCOME" = "success" ] || echo --draft)
+          if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            gh pr edit "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --head "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md" $draft
+          fi

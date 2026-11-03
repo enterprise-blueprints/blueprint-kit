@@ -368,7 +368,7 @@
       },
       "service": {
         "label": "Service",
-        "hint": "Help a firm offers, such as an assessment or an implementation."
+        "hint": "Help an organization offers, such as an assessment or an implementation."
       },
       "product": {
         "label": "Product",

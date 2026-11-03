@@ -2,9 +2,11 @@
 //
 //   pnpm sync                 the release kit.yaml names: its packages, which
 //                             yours build on, its vocabulary, and every schema
-//   pnpm sync --tools [from]  also the library's compiler and validator, into
-//                             src/lib/, from its repository at a Git ref (main
-//                             by default) or from a local checkout's folder
+//   pnpm sync --tools [from]  also the library's engine: the compiler, the
+//                             validator, and the pages this site shares with
+//                             the library's, as its engine.json lists them,
+//                             from its repository at a Git ref (main by
+//                             default) or from a local checkout's folder
 //
 // Each package is checked against the digest in the library's catalog. Earlier
 // releases stay in library/, since your published versions build on them.
@@ -60,13 +62,12 @@ console.log(`vocabulary and ${catalog.schemas.length} schemas`);
 const tools = process.argv.indexOf('--tools');
 if (tools !== -1) {
   const from = process.argv[tools + 1] ?? 'main';
-  const files = ['compile.ts', 'package.ts', 'vocabulary.ts', 'format.ts', 'paths.ts'];
-  for (const file of files) {
-    const text = existsSync(from)
-      ? readFileSync(join(from, 'src', 'lib', file), 'utf8')
-      : await get(`https://raw.githubusercontent.com/enterprise-blueprints/enterprise-blueprints.github.io/${from}/src/lib/${file}`);
-    save(join('src', 'lib', file), text);
-  }
-  console.log(`${files.join(', ')} from ${from}`);
+  const read = (path: string) =>
+    existsSync(from)
+      ? Promise.resolve(readFileSync(join(from, path), 'utf8'))
+      : get(`https://raw.githubusercontent.com/enterprise-blueprints/enterprise-blueprints.github.io/${from}/${path}`);
+  const { files } = JSON.parse(await read('engine.json')) as { files: string[] };
+  for (const file of files) save(file, await read(file));
+  console.log(`${files.length} engine files from ${from}`);
 }
 console.log('\nNow run pnpm content:build, then pnpm verify.');

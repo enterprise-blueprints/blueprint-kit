@@ -12,12 +12,19 @@ pnpm content:build   # source/ → content/, validated against your packages and
 pnpm verify          # content check, type check, tests, and site build
 ```
 
-- `src/lib/{compile,package,vocabulary,format,paths}.ts` are verbatim copies of the library's. Change
-  them in the library, then `pnpm sync --tools ../enterprise-blueprints.github.io` (or a Git ref).
+- The pages and the code behind them are the library's engine, the files its `engine.json` lists
+  (`src/lib/`, `src/components/`, `src/layouts/`, `src/styles/`, most of `src/pages/`, and
+  `public/favicon.svg`), copied as they are. Change them in the library, then
+  `pnpm sync --tools ../enterprise-blueprints.github.io` (or a Git ref).
 - `schemas/` and `library/` come from `pnpm sync`. Keep their files byte for byte, with LF endings.
 - The sample publisher, Example Partner, is fictional: `example.com` addresses and the `example` prefix.
   Keep it that way; it must never look like a real firm.
-- `src/kit.ts` loads and validates everything for the site; the pages are in `src/pages/`.
+- The kit's own files: `src/site.ts` (the site config, read from `kit.yaml`), the home page
+  `src/pages/index.astro` with `src/kit/`, and the published data in `src/publish.ts`,
+  `src/pages/*.json.ts`, and `src/pages/packages/`.
+- The library's packages yours build on get pages under `library/`, with your resources added. The
+  library's `scripts/check-dist.mjs` works on a kit build too:
+  `node ../enterprise-blueprints.github.io/scripts/check-dist.mjs <build folder>`.
 
 To publish it as the template repo, from the user's own session (creating a public repo needs their
 go-ahead):

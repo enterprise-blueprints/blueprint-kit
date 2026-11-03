@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ElementPage from '../../../components/ElementPage.astro';
+import { elements, isOwn } from '../../../lib/library';
+
+// On a publisher's site, the library's elements its packages build on. The library's own site has none here.
+export const getStaticPaths = (() =>
+  elements
+    .filter((element) => !isOwn(element.package))
+    .map((element) => ({ params: { section: element.typeInfo.section, slug: element.slug }, props: { element } }))) satisfies GetStaticPaths;
+---
+<ElementPage element={Astro.props.element} />

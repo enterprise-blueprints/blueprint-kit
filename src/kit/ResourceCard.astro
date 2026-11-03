@@ -1,0 +1,47 @@
+---
+// One of your resources, as a card for the home page: what it is, who it's by,
+// and the missions, capabilities, and patterns it helps with.
+import { helpsWith, resourceDetails, type LibraryElement } from '../lib/library';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  resource: LibraryElement;
+}
+
+const { resource } = Astro.props;
+const details = resourceDetails(resource);
+const helps = helpsWith(resource);
+---
+<li class="offer type-resource">
+  <p class="offer__kind">{details.kind}</p>
+  <a class="offer__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
+  <p class="offer__by">{details.by ?? resource.package.publisher.name}</p>
+  <p class="offer__about">{resource.description}</p>
+  {helps.length > 0 && (
+    <div class="element-links offer__helps" aria-label="Helps with">
+      {helps.map(({ element, way }) => (
+        <a class={`element-link type-${element.type}`} href={way ? `${element.url}#way-${way.id}` : element.url}>
+          {element.title}{way && <span class="offer__way">{way.title}</span>}
+        </a>
+      ))}
+    </div>
+  )}
+  <p class="offer__more">
+    <a href={resource.url}>Details</a>
+    {details.lastReviewedAt && <span class="muted"> · Checked {formatDate(details.lastReviewedAt)}</span>}
+  </p>
+</li>
+
+<style>
+  .offer { display: grid; align-content: start; gap: .25rem; padding: 1rem 1.1rem; border: 1px solid color-mix(in srgb, var(--tc) 28%, var(--border)); border-left: 3px solid var(--tc); border-radius: var(--radius-sm); background: var(--surface); }
+  .offer p { margin: 0; }
+  .offer__kind { font-size: .8125rem; font-weight: 650; color: var(--tc); }
+  .offer__title { font-size: 1.0625rem; font-weight: 650; line-height: 1.35; }
+  .offer__by { font-size: .875rem; color: var(--text-muted); }
+  .offer__about { margin-top: .3rem !important; font-size: .9375rem; }
+  .offer__helps { margin-top: .5rem; }
+  .offer__helps .element-link { flex-wrap: wrap; }
+  /* The way a resource is about, on a line of its own under the pattern's name. */
+  .offer__way { flex-basis: 100%; font-size: .8125rem; font-weight: 500; opacity: .85; }
+  .offer__more { margin-top: .4rem !important; font-size: .875rem; }
+</style>

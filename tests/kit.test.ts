@@ -1,11 +1,12 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { elements, libraryRelease, linksOf, packages, release, resources } from '../src/kit';
+import { elements, elementsOfType, helpsWith, isOwn, ownPackages, packages, release, upstream } from '../src/lib/library';
 import { plan, readSources, type Resolved } from '../src/lib/compile';
 import type { BlueprintPackage } from '../src/lib/package';
 
 const read = (path: string): BlueprintPackage => JSON.parse(readFileSync(path, 'utf8'));
+const libraryRelease = upstream!.release;
 
 describe('your packages', () => {
   it('are built from the current source, on the library release kit.yaml names', () => {
@@ -23,21 +24,42 @@ describe('your packages', () => {
 
   // Loading the site checks every package against its schema and the library's packages it builds on.
   it('are valid, and build on the library at its release', () => {
-    expect(packages.length).toBeGreaterThan(0);
-    for (const p of packages) {
+    expect(ownPackages.length).toBeGreaterThan(0);
+    for (const p of ownPackages) {
       expect(p.idPrefix, p.packageId).not.toBe('eb');
       for (const d of p.dependencies ?? []) if (d.packageId.startsWith('org.enterprise-blueprints.')) expect(d.version, p.packageId).toBe(libraryRelease);
     }
   });
 
   it('give every resource a link, a review date, and something it helps with', () => {
-    for (const r of resources) {
+    for (const r of elementsOfType('resource').filter((e) => isOwn(e.package))) {
       expect(r.attributes, r.id).toEqual(expect.objectContaining({ url: expect.stringMatching(/^https?:\/\//), lastReviewedAt: expect.any(String) }));
-      expect(linksOf(r)[0]?.links.length, r.id).toBeGreaterThan(0);
+      expect(helpsWith(r).length, r.id).toBeGreaterThan(0);
     }
   });
 
   it('name every element with your prefix', () => {
-    for (const e of elements) expect(e.id.split(':')[0], e.id).toBe(e.package.idPrefix);
+    for (const e of elements.filter((e) => isOwn(e.package))) expect(e.id.split(':')[0], e.id).toBe(e.package.idPrefix);
+  });
+});
+
+describe('the library on your site', () => {
+  const shown = packages.filter((p) => !isOwn(p));
+
+  it('shows the library packages yours build on, and the ones those build on', () => {
+    const wanted = new Set(ownPackages.flatMap((p) => (p.dependencies ?? []).map((d) => d.packageId)));
+    for (const id of wanted) expect(shown.map((p) => p.packageId), id).toContain(id);
+    for (const p of shown) {
+      const needed = wanted.has(p.packageId) || shown.some((q) => q.dependencies?.some((d) => d.packageId === p.packageId));
+      expect(needed, p.packageId).toBe(true);
+      expect(p.version, p.packageId).toBe(libraryRelease);
+    }
+  });
+
+  it('gives library elements pages under library/ that link to the library’s own', () => {
+    for (const e of elements.filter((e) => !isOwn(e.package))) {
+      expect(e.url, e.id).toContain(`/library/${e.typeInfo.section}/${e.slug}/`);
+      expect(e.canonicalUrl, e.id).toBe(new URL(`${e.typeInfo.section}/${e.slug}/`, upstream!.base).href);
+    }
   });
 });

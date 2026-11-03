@@ -1,0 +1,391 @@
+---
+// A mission to explore: the outcomes it seeks, the capabilities that
+// contribute to them, by stage of the work, and the patterns that could
+// provide those capabilities, by layer, in three columns joined by lines.
+// Selecting anything lights up its trace, from outcomes through capabilities
+// to patterns, and shows it in the panel beside them, with its measures,
+// requirements, or ways to source it. Requirements stay in the panel, since
+// they're the detail under a capability, and so do the resources that help
+// with each item. Search dims what doesn't match.
+import { byLayer, coversPartly, groupOf, patternDetails, resourcesFor, shortTitle, type LibraryElement, type MissionBlueprint } from '../lib/library';
+import { plural } from '../lib/format';
+import { capabilityStages, patternLayers } from '../lib/vocabulary';
+
+interface Props {
+  blueprint: MissionBlueprint;
+}
+
+const { blueprint } = Astro.props;
+const { outcomes, capabilities, patterns } = blueprint;
+const mission = outcomes[0]?.outcome.package ?? capabilities[0]?.capability.package;
+
+// Every line, and every connection both ways, for lighting a trace.
+const edges: { from: string; to: string; partial?: boolean }[] = [];
+for (const o of outcomes) for (const c of o.capabilities) edges.push({ from: o.outcome.id, to: c.id });
+for (const c of capabilities) for (const p of c.patterns) edges.push({ from: c.capability.id, to: p.id, ...(coversPartly(c.capability, p) && { partial: true }) });
+const neighbors = (id: string) => edges.flatMap((e) => (e.from === id ? [e.to] : e.to === id ? [e.from] : []));
+
+// Capabilities by stage of the work, in the library's order, and patterns by layer.
+const stageIds = [...Object.keys(capabilityStages.groups), null];
+const capabilityGroups = stageIds
+  .map((id) => ({
+    id,
+    label: id ? capabilityStages.groups[id].label : 'Other capabilities',
+    items: capabilities.filter((c) => (groupOf(c.capability)?.id ?? null) === id),
+  }))
+  .filter((g) => g.items.length);
+const patternGroups = byLayer(patterns, (p) => p);
+
+const countOf = (n: number, one: string, many: string) => plural(n, one, many);
+const outcomesFor = (c: LibraryElement) => outcomes.filter((o) => o.capabilities.includes(c)).map((o) => o.outcome);
+const capabilitiesFor = (p: LibraryElement) => capabilities.filter((c) => c.patterns.includes(p)).map((c) => c.capability);
+const sharedLabel = (e: LibraryElement) => (e.package !== mission ? shortTitle(e.package).replace(/ Capabilities$/, '') : undefined);
+const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).join(' ') });
+---
+<section class="ex" aria-labelledby="ex-heading" data-explorer>
+  <div class="ex__bar">
+    <h2 id="ex-heading">Explore the mission</h2>
+    <label class="ex__search">
+      <span class="sr-only">Search outcomes, capabilities, and patterns</span>
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="m13 13 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      <input type="search" placeholder="Search outcomes, capabilities, and patterns" data-search autocomplete="off" />
+    </label>
+    <p class="ex__status" aria-live="polite">
+      <span data-idle>Select anything to see what it connects to.</span>
+      <span data-active hidden>Showing the trace of <strong data-selected-name></strong>. <button type="button" class="ex__clear" data-clear>Clear</button></span>
+    </p>
+  </div>
+
+  <div class="ex__body">
+    <div class="ex__graph" data-graph>
+      <svg class="ex__lines" aria-hidden="true" data-lines>
+        {edges.map((e) => <path data-from={e.from} data-to={e.to} class:list={[e.partial && 'is-partial']} />)}
+      </svg>
+
+      <div class="ex__col type-outcome">
+        <h3 class="ex__col-head">Outcomes <span>{outcomes.length}</span></h3>
+        <ul class="ex__cards">
+          {outcomes.map((o) => (
+            <li>
+              <button type="button" class="ex-card" aria-pressed="false" {...node(o.outcome.id)}>
+                <span class="ex-card__title">{o.outcome.title}</span>
+                <span class="ex-card__meta">{[groupOf(o.outcome)?.label, o.measures.length && countOf(o.measures.length, 'measure', 'measures')].filter(Boolean).join(' · ')}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="ex__col type-capability">
+        <h3 class="ex__col-head">Capabilities <span>{capabilities.length}</span></h3>
+        {capabilityGroups.map((g) => (
+          <div class="ex__group">
+            <h4 class="ex__group-head">{g.label}</h4>
+            <ul class="ex__cards">
+              {g.items.map((c) => (
+                <li>
+                  <button type="button" class="ex-card" aria-pressed="false" {...node(c.capability.id)}>
+                    <span class="ex-card__title">{c.capability.title}</span>
+                    <span class="ex-card__meta">{[sharedLabel(c.capability), c.requirements.length && countOf(c.requirements.length, 'requirement', 'requirements')].filter(Boolean).join(' · ')}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div class="ex__col type-implementationPattern">
+        <h3 class="ex__col-head">Patterns <span>{patterns.length}</span></h3>
+        {patternGroups.map((g) => (
+          <div class="ex__group">
+            <h4 class="ex__group-head" title={g.hint}>{g.label}</h4>
+            <ul class="ex__cards">
+              {g.items.map((p) => (
+                <li>
+                  <button type="button" class="ex-card" aria-pressed="false" {...node(p.id)}>
+                    <span class="ex-card__title">{p.title}</span>
+                    <span class="ex-card__meta">{[sharedLabel(p), patternDetails(p).sourcing].filter(Boolean).join(' · ')}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* The panel: a short guide until something is selected, then that item. */}
+    <aside class="ex__panel" aria-label="Selected item" data-panel>
+      <button type="button" class="ex__panel-close" data-clear aria-label="Close">✕</button>
+      <div class="ex__detail" data-detail="">
+        <p class="ex__kicker">How to read it</p>
+        <p>Outcomes on the left are what the mission is after. The capabilities in the middle contribute to them, by stage of the work, and the patterns on the right could provide those capabilities, by layer of the architecture.</p>
+        <p>Select any of them to light up its trace. A dashed line is a pattern that covers only part of a capability.</p>
+        <p class="ex__counts">{countOf(outcomes.length, 'outcome', 'outcomes')} · {countOf(capabilities.length, 'capability', 'capabilities')} · {countOf(blueprint.requirements.length, 'requirement', 'requirements')} · {countOf(patterns.length, 'pattern', 'patterns')}</p>
+      </div>
+
+      {outcomes.map((o) => (
+        <div class="ex__detail type-outcome" data-detail={o.outcome.id} hidden>
+          <p class="ex__kicker">Outcome{groupOf(o.outcome) && <> · {groupOf(o.outcome)!.label}</>}</p>
+          <h3 class="ex__title">{o.outcome.title}</h3>
+          <p>{o.outcome.description}</p>
+          {o.measures.length > 0 && (
+            <>
+              <h4>Measures</h4>
+              <ul class="ex__list">{o.measures.map((m) => <li><a href={m.url}>{m.title}</a></li>)}</ul>
+            </>
+          )}
+          <h4>Capabilities that contribute</h4>
+          <div class="ex__chips type-capability">{o.capabilities.map((c) => <button type="button" class="ex-chip" data-select={c.id}>{c.title}</button>)}</div>
+          {resourcesFor(o.outcome).length > 0 && (
+            <>
+              <h4>Resources</h4>
+              <div class="ex__chips type-resource">{resourcesFor(o.outcome).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+            </>
+          )}
+          <p class="ex__open"><a href={o.outcome.url}>Open the outcome’s page →</a></p>
+        </div>
+      ))}
+
+      {capabilities.map((c) => (
+        <div class="ex__detail type-capability" data-detail={c.capability.id} hidden>
+          <p class="ex__kicker">Capability{groupOf(c.capability) && <> · {groupOf(c.capability)!.label}</>}{c.sharedFrom && <> · from {shortTitle(c.sharedFrom)}</>}</p>
+          <h3 class="ex__title">{c.capability.title}</h3>
+          <p>{c.capability.description}</p>
+          <h4>Outcomes it serves</h4>
+          <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}>{o.title}</button>)}</div>
+          {c.patterns.length > 0 && (
+            <>
+              <h4>Patterns that could provide it</h4>
+              <div class="ex__chips type-implementationPattern">
+                {c.patterns.map((p) => (
+                  <button type="button" class="ex-chip" data-select={p.id}>
+                    {p.title}
+                    {coversPartly(c.capability, p) && <span class="ex-chip__note">partly</span>}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {c.requirements.length > 0 && (
+            <>
+              <h4>Requirements</h4>
+              <div class="ex__chips type-requirement">{c.requirements.map((r) => <a class="ex-chip" href={r.url}>{r.title}</a>)}</div>
+            </>
+          )}
+          {resourcesFor(c.capability).length > 0 && (
+            <>
+              <h4>Resources</h4>
+              <div class="ex__chips type-resource">{resourcesFor(c.capability).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+            </>
+          )}
+          <p class="ex__open"><a href={c.capability.url}>Open the capability’s page →</a></p>
+        </div>
+      ))}
+
+      {patterns.map((p) => {
+        const details = patternDetails(p);
+        return (
+          <div class="ex__detail type-implementationPattern" data-detail={p.id} hidden>
+            <p class="ex__kicker">Pattern{details.layer && <> · {patternLayers[details.layer].label}</>}{sharedLabel(p) && <> · from {shortTitle(p.package)}</>}</p>
+            <h3 class="ex__title">{p.title}</h3>
+            <p>{p.description}</p>
+            {details.ways.length > 0 && (
+              <>
+                <h4>{details.ways.length === 1 ? 'How to source it' : 'Ways to source it'}</h4>
+                <ul class="ex__list">{details.ways.map((w) => <li>{w.title} <span class="ex__muted">· {w.approach}</span></li>)}</ul>
+              </>
+            )}
+            <h4>Capabilities it could provide</h4>
+            <div class="ex__chips type-capability">
+              {capabilitiesFor(p).map((c) => (
+                <button type="button" class="ex-chip" data-select={c.id}>
+                  {c.title}
+                  {coversPartly(c, p) && <span class="ex-chip__note">partly</span>}
+                </button>
+              ))}
+            </div>
+            {resourcesFor(p).length > 0 && (
+              <>
+                <h4>Resources</h4>
+                <div class="ex__chips type-resource">{resourcesFor(p).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener">{r.resource.title}<span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
+              </>
+            )}
+            <p class="ex__open"><a href={p.url}>Open the pattern’s page →</a></p>
+          </div>
+        );
+      })}
+    </aside>
+  </div>
+</section>
+
+<script>
+  // Lighting a trace: an outcome lights its capabilities and their patterns; a
+  // pattern lights its capabilities and their outcomes; a capability lights
+  // both sides. Lines are drawn between the cards and redrawn when they move.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-explorer]')) {
+    const graph = root.querySelector<HTMLElement>('[data-graph]')!;
+    const svg = root.querySelector<SVGSVGElement>('[data-lines]')!;
+    const cards = [...root.querySelectorAll<HTMLButtonElement>('.ex-card')];
+    const byId = new Map(cards.map((c) => [c.dataset.node!, c]));
+    const column = (id: string) => byId.get(id)?.closest('.ex__col')?.classList[1];
+    const links = (id: string) => (byId.get(id)?.dataset.links ?? '').split(' ').filter(Boolean);
+    const paths = [...svg.querySelectorAll<SVGPathElement>('path')];
+    const details = [...root.querySelectorAll<HTMLElement>('[data-detail]')];
+    const panel = root.querySelector<HTMLElement>('[data-panel]')!;
+    const search = root.querySelector<HTMLInputElement>('[data-search]')!;
+    let selected: string | null = null;
+
+    /**
+     * Everything on the selected item's trace: each step goes one column further
+     * away from it, so a pattern's other capabilities don't come along with an
+     * outcome, nor a capability's other outcomes with a pattern.
+     */
+    const order = ['type-outcome', 'type-capability', 'type-implementationPattern'];
+    const columnIndex = (id: string) => order.indexOf(column(id) ?? '');
+    function trace(id: string): Set<string> {
+      const lit = new Set([id]);
+      const walk = (from: string, direction: 1 | -1) => {
+        for (const n of links(from)) {
+          if (lit.has(n) || columnIndex(n) - columnIndex(from) !== direction) continue;
+          lit.add(n);
+          walk(n, direction);
+        }
+      };
+      walk(id, 1);
+      walk(id, -1);
+      return lit;
+    }
+
+    function draw() {
+      const box = graph.getBoundingClientRect();
+      svg.setAttribute('width', String(box.width));
+      svg.setAttribute('height', String(box.height));
+      for (const path of paths) {
+        const a = byId.get(path.dataset.from!)?.getBoundingClientRect();
+        const b = byId.get(path.dataset.to!)?.getBoundingClientRect();
+        if (!a || !b) continue;
+        const x1 = a.right - box.left;
+        const y1 = a.top + a.height / 2 - box.top;
+        const x2 = b.left - box.left;
+        const y2 = b.top + b.height / 2 - box.top;
+        const bend = Math.max(24, (x2 - x1) / 2);
+        path.setAttribute('d', `M${x1},${y1} C${x1 + bend},${y1} ${x2 - bend},${y2} ${x2},${y2}`);
+      }
+    }
+
+    function show(id: string | null) {
+      selected = id;
+      const lit = id ? trace(id) : null;
+      root.classList.toggle('has-selection', Boolean(id));
+      for (const c of cards) {
+        const on = lit?.has(c.dataset.node!) ?? false;
+        c.classList.toggle('is-lit', on);
+        c.setAttribute('aria-pressed', String(c.dataset.node === id));
+      }
+      for (const p of paths) p.classList.toggle('is-lit', Boolean(lit?.has(p.dataset.from!) && lit?.has(p.dataset.to!)));
+      for (const d of details) d.hidden = d.dataset.detail !== (id ?? '');
+      root.querySelector<HTMLElement>('[data-idle]')!.hidden = Boolean(id);
+      root.querySelector<HTMLElement>('[data-active]')!.hidden = !id;
+      if (id) root.querySelector('[data-selected-name]')!.textContent = byId.get(id)?.querySelector('.ex-card__title')?.textContent ?? '';
+      panel.classList.toggle('is-open', Boolean(id));
+      if (id) panel.scrollTop = 0;
+    }
+
+    for (const c of cards) c.addEventListener('click', () => show(selected === c.dataset.node ? null : c.dataset.node!));
+    root.addEventListener('click', (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLElement>('[data-select], [data-clear]');
+      if (!target) return;
+      if (target.dataset.select) {
+        show(target.dataset.select);
+        byId.get(target.dataset.select)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } else show(null);
+    });
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && selected) {
+        const was = byId.get(selected);
+        show(null);
+        was?.focus();
+      }
+    });
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      root.classList.toggle('is-searching', Boolean(q));
+      for (const c of cards) c.classList.toggle('is-match', Boolean(q) && (c.textContent ?? '').toLowerCase().includes(q));
+    });
+
+    new ResizeObserver(draw).observe(graph);
+    document.fonts?.ready.then(draw);
+    draw();
+  }
+</script>
+
+<style>
+  .ex { margin: 0 0 2.5rem; }
+  .ex__bar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-bottom: 1rem; }
+  .ex__bar h2 { margin: 0; font-size: 1.375rem; }
+  .ex__search { display: flex; align-items: center; gap: .45rem; flex: 1 1 18rem; max-width: 28rem; padding: 0 .7rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-muted); }
+  .ex__search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .ex__search input { flex: 1; min-width: 0; height: 2.4rem; border: 0; background: none; color: var(--text); font: inherit; font-size: .9375rem; outline: none; }
+  .ex__status { flex-basis: 100%; margin: 0; font-size: .9375rem; color: var(--text-muted); }
+  .ex__clear { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
+
+  .ex__body { display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: 1.25rem; align-items: start; }
+  .ex__graph { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(1.75rem, 4vw, 3.5rem); }
+  .ex__lines { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+  .ex__lines path { fill: none; stroke: var(--border-strong); stroke-width: 1.25; opacity: .7; transition: opacity .15s, stroke .15s; }
+  .ex__lines path.is-partial { stroke-dasharray: 4 4; }
+  .has-selection .ex__lines path { opacity: .18; }
+  .has-selection .ex__lines path.is-lit { stroke: var(--accent); stroke-width: 2.25; opacity: 1; }
+
+  .ex__col { position: relative; min-width: 0; }
+  .ex__col-head { display: flex; align-items: baseline; gap: .45rem; margin: 0 0 .6rem; padding-bottom: .4rem; border-bottom: 2px solid var(--tc); font-size: .9375rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--tc); }
+  .ex__col-head span { font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
+  .ex__group + .ex__group { margin-top: .9rem; }
+  .ex__group-head { margin: 0 0 .35rem; font-size: .75rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+  .ex__cards { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+
+  .ex-card { display: grid; gap: .15rem; width: 100%; padding: .55rem .7rem; border: 1px solid color-mix(in srgb, var(--tc) 30%, var(--border)); border-left: 3px solid var(--tc); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; transition: opacity .15s, box-shadow .15s, border-color .15s, background .15s; }
+  .ex-card:hover { border-color: var(--tc); }
+  .ex-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .ex-card__title { font-weight: 600; font-size: .9375rem; line-height: 1.3; }
+  .ex-card__meta { font-size: .8125rem; color: var(--text-muted); }
+  .ex-card__meta:empty { display: none; }
+  .has-selection .ex-card:not(.is-lit) { opacity: .35; }
+  .ex-card.is-lit { background: var(--tc-bg); }
+  .ex-card[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--accent); }
+  .is-searching .ex-card:not(.is-match) { opacity: .3; }
+  .is-searching .ex-card.is-match { box-shadow: 0 0 0 2px var(--tc); }
+
+  .ex__panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); max-height: calc(100vh - 2rem); overflow-y: auto; padding: 1rem 1.1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-size: .9375rem; }
+  .ex__panel-close { display: none; }
+  .ex__detail > :first-child { margin-top: 0; }
+  .ex__detail p { margin: 0 0 .7rem; }
+  .ex__detail h4 { margin: 1rem 0 .4rem; font-size: .75rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+  .ex__kicker { font-size: .8125rem; font-weight: 600; color: var(--tc, var(--text-muted)); }
+  .ex__title { margin: 0 0 .5rem; font-size: 1.1875rem; line-height: 1.3; }
+  .ex__list { margin: 0; padding-left: 1.1rem; }
+  .ex__list li { margin-bottom: .3rem; }
+  .ex__muted { color: var(--text-muted); font-size: .875rem; }
+  .ex__counts { color: var(--text-muted); font-size: .875rem; }
+  .ex__chips { display: grid; gap: .35rem; }
+  .ex-chip { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; width: 100%; padding: .35rem .6rem; border: 1px solid color-mix(in srgb, var(--tc) 35%, transparent); border-radius: var(--radius-sm); background: var(--tc-bg); color: var(--tc); font: inherit; font-size: .8125rem; font-weight: 600; text-align: left; text-decoration: none; cursor: pointer; }
+  .ex-chip:hover { border-color: var(--tc); }
+  .ex-chip__note { flex: none; font-weight: 500; font-size: .75rem; opacity: .8; }
+  .ex__open { margin-top: 1rem !important; font-weight: 600; }
+
+  /* Narrower: the panel opens as a sheet over the bottom of the screen. */
+  @media (max-width: 74.99rem) {
+    .ex__body { grid-template-columns: minmax(0, 1fr); }
+    .ex__panel { position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 60vh; padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -8px 24px rgb(0 0 0 / .18); transform: translateY(105%); transition: transform .2s; }
+    .ex__panel.is-open { transform: none; }
+    .ex__panel-close { display: block; position: sticky; top: 0; float: right; margin: -.25rem -.25rem 0 .5rem; padding: .25rem .5rem; border: 0; border-radius: var(--radius-sm); background: var(--surface-muted); color: var(--text); font: inherit; cursor: pointer; }
+    .ex__detail[data-detail=''] { display: none; }
+  }
+  /* A phone: the columns stack, and the lines give way to the lit cards. */
+  @media (max-width: 47.99rem) {
+    .ex__graph { grid-template-columns: minmax(0, 1fr); row-gap: 1.5rem; }
+    .ex__lines { display: none; }
+  }
+</style>

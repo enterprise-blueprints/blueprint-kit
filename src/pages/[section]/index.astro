@@ -1,35 +1,44 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
-import ResourceCard from '../../components/ResourceCard.astro';
-import { elements, groupLabel, resourcesByKind, typesInUse } from '../../kit';
+import ElementTable from '../../components/ElementTable.astro';
+import { indexGroups, indexParents, typesInUse } from '../../lib/library';
+import { groupings } from '../../lib/vocabulary';
+import { plural } from '../../lib/format';
 
-export const getStaticPaths = (() => typesInUse().map(([type, info]) => ({ params: { section: info.section }, props: { type, info } }))) satisfies GetStaticPaths;
+export const getStaticPaths = (() =>
+  typesInUse().map(([type, info]) => ({ params: { section: info.section }, props: { type, info } }))) satisfies GetStaticPaths;
 
 const { type, info } = Astro.props;
-const items = elements.filter((e) => e.type === type);
+const groups = indexGroups(type);
+const parents = indexParents(type);
+const grouped = groups.length > 1;
+const count = (n: number) => plural(n, info.label.toLowerCase(), info.plural.toLowerCase());
+// Outcomes, capabilities, and requirements are grouped across missions, so each row says which one it's from.
+const grouping = groupings[type];
 ---
 <Base title={info.plural} description={info.definition}>
   <div class="container">
-    <h1>{info.plural}</h1>
-    <p class="lede">{info.definition}</p>
-    {type === 'resource'
-      ? resourcesByKind().map((g) => (
-          <section>
-            <h2>{g.label}</h2>
-            <ul class="cards">{g.items.map((r) => <ResourceCard resource={r} />)}</ul>
-          </section>
-        ))
-      : (
-          <ul class="cards">
-            {items.map((e) => (
-              <li class={`card type-${e.type}`}>
-                <p class="kicker">{groupLabel(e) ?? e.typeInfo.label}</p>
-                <a class="card__title" href={e.url}>{e.title}</a>
-                <p class="card__about">{e.description}</p>
-              </li>
-            ))}
-          </ul>
+    <header class="page-header">
+      <h1>{info.plural}</h1>
+      <p class="lede">{info.definition}</p>
+    </header>
+    {grouped && (
+      <nav class="index-jump" aria-label={`${info.plural} by ${grouping ? grouping.label.toLowerCase() : 'group'}`}>
+        {grouping && <span class="index-jump__by">By {grouping.label.toLowerCase()}</span>}
+        {groups.map((g) => <a href={`#${g.id}`}>{g.label} <span class="index-jump__count">{g.items.length}</span></a>)}
+      </nav>
+    )}
+    {groups.map((g) => (
+      <section class="index-group" id={grouped ? g.id : undefined} aria-labelledby={grouped ? `${g.id}-heading` : undefined}>
+        {grouped && (
+          <header class="index-group__header">
+            <h2 id={`${g.id}-heading`}>{g.label}</h2>
+            <p class="muted">{g.hint && <>{g.hint}{' '}</>}{count(g.items.length)}.</p>
+          </header>
         )}
+        <ElementTable elements={g.items} parents={parents} showPackage={type === 'implementationPattern' || !!grouping} />
+      </section>
+    ))}
   </div>
 </Base>

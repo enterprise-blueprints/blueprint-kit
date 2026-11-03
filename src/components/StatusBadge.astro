@@ -1,0 +1,10 @@
+---
+import { statuses } from '../lib/vocabulary';
+
+interface Props {
+  status?: string;
+}
+
+const { status } = Astro.props;
+---
+{status && <span class={`status-badge status-${status}`}>{statuses[status] ?? status}</span>}

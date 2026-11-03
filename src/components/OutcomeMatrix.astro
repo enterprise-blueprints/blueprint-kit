@@ -1,0 +1,55 @@
+---
+// Which capabilities contribute to which of a mission's outcomes, as a grid.
+import type { MissionBlueprint } from '../lib/library';
+
+interface Props {
+  blueprint: MissionBlueprint;
+}
+
+const { outcomes, capabilities } = Astro.props.blueprint;
+---
+<div class="table-wrap">
+  <table class="outcome-matrix">
+    <caption class="sr-only">Capabilities, and the outcomes each contributes to</caption>
+    <thead>
+      <tr>
+        <th scope="col">Capability</th>
+        {outcomes.map(({ outcome }) => (
+          <th scope="col" class="outcome-matrix__outcome"><a href={outcome.url}>{outcome.title}</a></th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {capabilities.map(({ capability, outcomes: served, sharedFrom }) => (
+        <tr>
+          <th scope="row">
+            <a href={capability.url}>{capability.title}</a>
+            {sharedFrom && <span class="outcome-matrix__shared">Shared</span>}
+          </th>
+          {outcomes.map(({ outcome }) =>
+            served.includes(outcome) ? (
+              <td class="outcome-matrix__cell"><span aria-hidden="true" class="outcome-matrix__dot"></span><span class="sr-only">Contributes</span></td>
+            ) : (
+              <td class="outcome-matrix__cell"><span class="sr-only">No</span></td>
+            ),
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  /* Positioned, so the hidden labels stay inside the scrolling box. */
+  .outcome-matrix { min-width: 40rem; position: relative; }
+  .outcome-matrix th[scope='row'] { font-weight: 600; min-width: 13rem; }
+  .outcome-matrix th[scope='row'] a { text-decoration: none; color: var(--t-capability); }
+  .outcome-matrix th[scope='row'] a:hover { text-decoration: underline; }
+  .outcome-matrix__outcome { font-size: .8125rem; font-weight: 600; line-height: 1.3; letter-spacing: 0; text-transform: none; vertical-align: bottom; width: 8.5rem; }
+  .outcome-matrix__outcome a { color: var(--t-outcome); text-decoration: none; }
+  .outcome-matrix__outcome a:hover { text-decoration: underline; }
+  .outcome-matrix__shared { display: inline-block; margin-left: .4rem; padding: 0 .35rem; border: 1px dashed var(--border-strong); border-radius: 4px; font-size: .6875rem; font-weight: 600; color: var(--text-muted); vertical-align: middle; }
+  .outcome-matrix__cell { text-align: center; vertical-align: middle; }
+  .outcome-matrix__dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; background: var(--t-outcome); }
+  .outcome-matrix tbody tr:hover { background: var(--surface-muted); }
+</style>

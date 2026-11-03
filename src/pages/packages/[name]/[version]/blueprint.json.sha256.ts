@@ -1,5 +1,5 @@
 import type { GetStaticPaths } from 'astro';
-import { published } from '../../../../kit';
+import { published } from '../../../../publish';
 
 type Published = (typeof published)[number];
 

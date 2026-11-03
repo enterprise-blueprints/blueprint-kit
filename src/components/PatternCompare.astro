@@ -1,0 +1,61 @@
+---
+// A capability's candidate patterns side by side: each one's approach, when
+// it fits, what to watch for, and anything its link says about this capability.
+import { coversPartly, patternDetails, relationNote, shortTitle, type LibraryElement } from '../lib/library';
+
+interface Props {
+  capability: LibraryElement;
+  patterns: LibraryElement[];
+}
+
+const { capability, patterns } = Astro.props;
+const rows = patterns.map((p) => {
+  const details = patternDetails(p);
+  const field = (key: string) => details.fields.find((f) => f.key === key)?.items ?? [];
+  return {
+    pattern: p,
+    approach: details.sourcing,
+    fitsWhen: field('fitsWhen'),
+    watchFor: field('watchFor'),
+    note: relationNote(capability, 'candidate_pattern', p),
+    partial: coversPartly(capability, p),
+    shared: p.package !== capability.package ? shortTitle(p.package) : undefined,
+  };
+});
+---
+<div class="table-wrap">
+  <table class="stack-table pattern-compare">
+    <thead>
+      <tr><th scope="col">Pattern</th><th scope="col">Fits when</th><th scope="col">Watch for</th></tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">
+            <a class="element-link type-implementationPattern" href={r.pattern.url}>{r.pattern.title}</a>
+            {r.approach && <span class="pattern-compare__approach">{r.approach}</span>}
+            {r.shared && <span class="pattern-compare__from">From {r.shared}</span>}
+            {r.partial && <span class="pattern-compare__from"><span class="partial-badge">Covers part of it</span></span>}
+            {r.note && <p class="pattern-compare__note"><strong>Here:</strong> {r.note}</p>}
+          </th>
+          <td data-label="Fits when">{r.fitsWhen.length ? <ul>{r.fitsWhen.map((s) => <li>{s}</li>)}</ul> : <span class="muted">Not described</span>}</td>
+          <td data-label="Watch for">{r.watchFor.length ? <ul>{r.watchFor.map((s) => <li>{s}</li>)}</ul> : <span class="muted">Not described</span>}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .pattern-compare th[scope='row'] { font-weight: 400; vertical-align: top; }
+  .pattern-compare td { vertical-align: top; }
+  .pattern-compare .element-link { font-weight: 600; }
+  .pattern-compare ul { margin: 0; padding-left: 1.05rem; display: grid; gap: .3rem; font-size: .9rem; }
+  .pattern-compare__approach,
+  .pattern-compare__from { display: block; margin-top: .4rem; font-size: .8125rem; color: var(--text-muted); }
+  .pattern-compare__approach { font-weight: 600; color: var(--text); }
+  .pattern-compare__note { margin: .5rem 0 0; font-size: .875rem; color: var(--text-muted); }
+  @media (min-width: 46rem) {
+    .pattern-compare th[scope='row'] { width: 30%; }
+  }
+</style>

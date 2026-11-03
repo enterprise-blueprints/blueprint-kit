@@ -1,0 +1,37 @@
+---
+import type { ElementResource } from '../lib/library';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  resources: ElementResource[];
+}
+
+const { resources } = Astro.props;
+---
+<ul class="resource-list">
+  {resources.map(({ resource, details, way, note }) => (
+    <li class="resource type-resource">
+      <p class="resource__kind">{details.kind}{way && <> · for <a href={`#way-${way.id}`}>{way.title}</a></>}</p>
+      <a class="resource__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
+      <p class="resource__by">{details.by ?? resource.package.publisher.name}</p>
+      <p class="resource__about">{note ?? resource.description}</p>
+      <p class="resource__more">
+        <a href={resource.url}>What else it helps with</a>
+        {details.lastReviewedAt && <span class="muted"> · Checked {formatDate(details.lastReviewedAt)}</span>}
+      </p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .resource-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+  @media (min-width: 46rem) { .resource-list { grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); } }
+  .resource { display: grid; align-content: start; gap: .2rem; padding: .8rem 1rem; border: 1px solid color-mix(in srgb, var(--tc) 28%, var(--border)); border-left: 3px solid var(--tc); border-radius: var(--radius-sm); background: var(--surface); }
+  .resource p { margin: 0; }
+  .resource__kind { font-size: .8125rem; font-weight: 650; color: var(--tc); }
+  .resource__kind a { color: inherit; }
+  .resource__title { font-weight: 650; line-height: 1.35; }
+  .resource__by { font-size: .875rem; color: var(--text-muted); }
+  .resource__about { margin-top: .3rem !important; font-size: .9375rem; }
+  .resource__more { margin-top: .35rem !important; font-size: .875rem; }
+</style>

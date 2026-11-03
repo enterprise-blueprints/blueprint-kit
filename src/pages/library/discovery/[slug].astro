@@ -1,0 +1,10 @@
+---
+import type { GetStaticPaths } from 'astro';
+import DiscoveryPage from '../../../components/DiscoveryPage.astro';
+import { assessments, isOwn } from '../../../lib/library';
+
+// On a publisher's site, the library's discovery sets its packages build on. The library's own site has none here.
+export const getStaticPaths = (() =>
+  assessments.filter((a) => !isOwn(a.package)).map((assessment) => ({ params: { slug: assessment.slug }, props: { assessment } }))) satisfies GetStaticPaths;
+---
+<DiscoveryPage assessment={Astro.props.assessment} />

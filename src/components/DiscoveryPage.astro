@@ -1,0 +1,176 @@
+---
+import Base from '../layouts/Base.astro';
+import { discoveryTarget, downloadUrl, upstream, type DiscoveryTarget, type LibraryAssessment } from '../lib/library';
+import type { Question } from '../lib/package';
+import { href } from '../lib/paths';
+import { elementTypes } from '../lib/vocabulary';
+
+interface Props {
+  assessment: LibraryAssessment;
+}
+
+// A discovery set's page. On a publisher's site, a library set's page says so
+// and links to the library's own.
+const { assessment } = Astro.props;
+// What an answer points at: an element, or an outcome's measure. Each is looked up once, so counts can compare them.
+const found = new Map<string, DiscoveryTarget | undefined>();
+const byId = { get: (id: string) => (found.has(id) ? found.get(id) : found.set(id, discoveryTarget(id)).get(id)) };
+const typeOrder = Object.keys(elementTypes);
+const ordered = (list: DiscoveryTarget[]) =>
+  [...list].sort((a, b) => typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type) || a.title.localeCompare(b.title));
+
+const KIND: Record<Question['kind'], string> = {
+  'single-choice': 'Choose one',
+  'multiple-choice': 'Choose any that apply',
+  boolean: 'Yes or no',
+  number: 'A number',
+  text: 'In their own words',
+};
+
+const optionsOf = (q: Question) => (q.kind === 'boolean' ? [{ value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }] : (q.options ?? []));
+
+/** The elements a question's answers point to, each once. */
+const targets = (q: Question) => ordered([...new Set((q.candidateMappings ?? []).map((m) => m.elementId))].map((id) => byId.get(id)!));
+
+/**
+ * How each answer points, for the disclosure under a question. A mapping
+ * every answer shares is listed once, as "Any answer".
+ */
+function reasons(q: Question) {
+  const options = optionsOf(q);
+  const mappings = q.candidateMappings ?? [];
+  const same = (a: (typeof mappings)[number], b: (typeof mappings)[number]) => a.elementId === b.elementId && a.interpretation === b.interpretation;
+  const shared =
+    options.length > 1 ? mappings.filter((m) => m.answerValue === options[0].value && options.every((o) => mappings.some((x) => x.answerValue === o.value && same(x, m)))) : [];
+  const point = (m: (typeof mappings)[number]) => ({ element: byId.get(m.elementId)!, why: m.interpretation });
+  return [
+    { answer: 'Any answer', points: shared.map(point) },
+    ...options.map((o) => ({ answer: o.label, points: mappings.filter((m) => m.answerValue === o.value && !shared.some((s) => same(s, m))).map(point) })),
+  ].filter((r) => r.points.length);
+}
+
+// What the whole set explores: each element and how many questions point to it.
+const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets(q)))]).map((element) => ({
+  element,
+  count: assessment.questions.filter((q) => targets(q).includes(element)).length,
+}));
+---
+<Base title={assessment.title} description={assessment.description ?? `Discovery questions from ${assessment.package.title}.`}>
+  <div class="container container--narrow">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href={href('')}>Home</a></li>
+        <li><a href={href('discovery/')}>Discovery</a></li>
+        <li aria-current="page">{assessment.title}</li>
+      </ol>
+    </nav>
+
+    <header class="page-header">
+      <p class="kicker">Discovery · {assessment.questions.length} questions</p>
+      <h1>{assessment.title}</h1>
+      {assessment.description && <p class="lede">{assessment.description}</p>}
+      <p class="muted">
+        From {assessment.package.title} <span class="nowrap">v{assessment.package.version}</span> ·{' '}
+        {assessment.canonicalUrl
+          ? <><a href={downloadUrl(assessment.package)} target="_blank" rel="noopener">Download JSON<span class="sr-only"> (opens in a new tab)</span></a> · <a href={assessment.canonicalUrl} target="_blank" rel="noopener">See it in {upstream!.title}<span class="sr-only"> (opens in a new tab)</span></a></>
+          : <a href={downloadUrl(assessment.package)}>Download JSON</a>}
+      </p>
+    </header>
+
+    {explores.length > 0 && (
+      <section class="explores" aria-labelledby="explores">
+        <h2 id="explores" class="explores__title">What these questions explore</h2>
+        <ul class="explores__list">
+          {explores.map(({ element, count }) => (
+            <li>
+              <a class={`element-link type-${element.type}`} href={element.url}>{element.title}</a>
+              <span class="explores__count">{count} {count === 1 ? 'question' : 'questions'}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <ol class="questions">
+      {assessment.questions.map((q) => (
+        <li id={q.id.split(':')[1]} class="question">
+          <h2 class="question__prompt">{q.prompt}</h2>
+          <p class="question__kind">{KIND[q.kind]}</p>
+          {optionsOf(q).length > 0 && q.kind !== 'boolean' && (
+            <ul class="options" aria-label="Answers">
+              {optionsOf(q).map((o) => <li>{o.label}</li>)}
+            </ul>
+          )}
+          {targets(q).length > 0 && (
+            <div class="points">
+              <p class="points__line">
+                <span class="points__label">Points to</span>
+                {targets(q).map((e) => (
+                  <a class={`chip type-${e.type}`} href={e.url}>{e.title}</a>
+                ))}
+              </p>
+              <details class="reasons">
+                <summary>How the answers point</summary>
+                <dl>
+                  {reasons(q).map((r) => (
+                    <div class="reason">
+                      <dt>{r.answer}</dt>
+                      {r.points.map((p) => (
+                        <dd>
+                          <a class={`chip type-${p.element.type}`} href={p.element.url}>{p.element.title}</a>
+                          <span class="reason__why">{p.why}</span>
+                        </dd>
+                      ))}
+                    </div>
+                  ))}
+                </dl>
+              </details>
+            </div>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+</Base>
+
+<style>
+  .explores { margin-bottom: 1.5rem; padding: 1rem 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-muted); }
+  .explores__title { margin: 0 0 .75rem; font-size: .8125rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); }
+  .explores__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+  .explores__list li { display: flex; align-items: center; gap: .5rem; }
+  .explores__count { color: var(--text-muted); font-size: .875rem; white-space: nowrap; }
+
+  .questions { list-style: none; counter-reset: q; margin: 0; padding: 0; display: grid; gap: .75rem; }
+  .question { counter-increment: q; position: relative; padding: 1.1rem 1.25rem 1.1rem 3.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); scroll-margin-top: 1rem; }
+  .question::before { content: counter(q); position: absolute; left: 1.25rem; top: 1.1rem; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: .85rem; }
+  .question:target { border-color: var(--accent); }
+  .question__prompt { margin: 0; font-size: 1.125rem; line-height: 1.4; }
+  .question__kind { margin: .2rem 0 0; color: var(--text-muted); font-size: .875rem; }
+
+  .options { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+  .options li { padding: .2rem .6rem; border: 1px solid var(--border); border-radius: 999px; font-size: .875rem; }
+
+  .points { margin-top: .8rem; padding-top: .7rem; border-top: 1px solid var(--border); }
+  .points__line { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: 0; }
+  .points__label { margin-right: .15rem; color: var(--text-muted); font-size: .8125rem; }
+
+  /* A smaller element link, tinted by type like the rest of the site. */
+  .chip { display: inline-flex; align-items: center; padding: .1rem .5rem; border-radius: var(--radius-sm); background: var(--tc-bg, var(--accent-soft)); color: var(--tc, var(--accent)); font-size: .8125rem; font-weight: 600; text-decoration: none; }
+  .chip:hover { text-decoration: underline; }
+
+  .reasons { margin-top: .5rem; font-size: .875rem; }
+  .reasons summary { cursor: pointer; width: fit-content; color: var(--text-muted); }
+  .reasons summary:hover { color: var(--accent); }
+  .reasons dl { margin: .6rem 0 0; display: grid; gap: .5rem; }
+  .reason { display: grid; grid-template-columns: minmax(8rem, 13rem) 1fr; gap: .2rem 1rem; }
+  .reason dt { grid-column: 1; font-weight: 600; }
+  .reason dd { grid-column: 2; margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .5rem; }
+  .reason__why { color: var(--text-muted); }
+
+  @media (max-width: 560px) {
+    .question { padding: 1rem; }
+    .question::before { position: static; margin-bottom: .5rem; }
+    .reason { grid-template-columns: 1fr; }
+    .reason dd { grid-column: 1; }
+  }
+</style>

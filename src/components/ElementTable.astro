@@ -1,0 +1,52 @@
+---
+import { shortTitle, tagline, type LibraryElement } from '../lib/library';
+
+interface Props {
+  elements: LibraryElement[];
+  /** What the link to each element says, by element ID, shown under its description. */
+  notes?: Map<string, string>;
+  /** Candidate patterns, or their capabilities, where the pattern covers only part of the capability. */
+  partial?: Set<string>;
+  /** The element each one belongs to, such as a requirement's capability, by element ID. */
+  parents?: Map<string, LibraryElement>;
+  /** Say which package each element comes from, for lists that mix packages. */
+  showPackage?: boolean;
+}
+
+const { elements, notes, partial, parents, showPackage } = Astro.props;
+---
+<div class="table-wrap">
+  <table class="stack-table element-table">
+    <thead>
+      <tr><th scope="col">Name</th><th scope="col">Description</th></tr>
+    </thead>
+    <tbody>
+      {elements.map((e) => (
+        <tr>
+          <th scope="row"><a class={`element-link type-${e.type}`} href={e.url}>{e.title}</a></th>
+          <td class="muted">
+            {tagline(e) && <strong class="element-table__tagline">{tagline(e)}</strong>}
+            {e.description}
+            {partial?.has(e.id) && <p class="element-table__note"><span class="partial-badge">Covers part of it</span></p>}
+            {notes?.get(e.id) && <p class="element-table__note"><strong>Here:</strong> {notes.get(e.id)}</p>}
+            {parents?.get(e.id) && <p class="element-table__note">For <a href={parents.get(e.id)!.url}>{parents.get(e.id)!.title}</a></p>}
+            {showPackage && <p class="element-table__note element-table__from">From {shortTitle(e.package)}</p>}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  /* Every button fills the column and fits two lines, so they're all one size. */
+  .element-table .element-link { display: flex; width: 100%; min-height: 3.25rem; }
+  .element-table__note { margin: .45rem 0 0; color: var(--text); font-size: .875rem; }
+  .element-table__from { color: var(--text-muted); }
+  .element-table__tagline { display: block; margin-bottom: .2rem; color: var(--text); font-weight: 600; }
+  @media (min-width: 46rem) {
+    /* A 1px height lets the button take the row's full height, however tall the description makes it. */
+    .element-table th[scope='row'] { width: 34%; height: 1px; }
+    .element-table .element-link { height: 100%; }
+  }
+</style>

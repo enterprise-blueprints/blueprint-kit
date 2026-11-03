@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { sources } from '../lib/library';
+import { sourceKinds } from '../lib/vocabulary';
+import { formatDate } from '../lib/format';
+---
+<Base title="Sources" description="The official references and other sources the packages here cite.">
+  <div class="container">
+    <header class="page-header">
+      <h1>Sources</h1>
+      <p class="lede">Every factual statement about a mission or capability cites one of these sources.</p>
+    </header>
+    <div class="table-wrap">
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th scope="col">Source</th>
+            <th scope="col">Kind</th>
+            <th scope="col">Reviewed</th>
+            <th scope="col">Cited by</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sources.map((s) => (
+            <tr>
+              <th scope="row">
+                <a href={s.url} target="_blank" rel="noopener">{s.title}<span class="sr-only"> (opens in a new tab)</span></a>
+                {s.note && <p class="source-list__meta">{s.note}</p>}
+              </th>
+              <td data-label="Kind" class="nowrap">{sourceKinds[s.kind]}</td>
+              <td data-label="Reviewed" class="nowrap">{s.lastReviewedAt ? formatDate(s.lastReviewedAt) : '—'}</td>
+              <td data-label="Cited by">
+                {s.citedBy.length
+                  ? <div class="element-links">{s.citedBy.map((e) => <a class={`element-link type-${e.type}`} href={e.url}>{e.title}</a>)}</div>
+                  : <span class="muted">Not cited by an item</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Base>
+
+<style>
+  th[scope='row'] { font-weight: 600; min-width: 16rem; }
+  .source-list__meta { font-weight: 400; }
+</style>

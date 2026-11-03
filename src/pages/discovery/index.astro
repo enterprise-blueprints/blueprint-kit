@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { assessments } from '../../lib/library';
+---
+<Base title="Discovery" description="Question sets for the first conversations of an engagement, with answers that point to capabilities and patterns.">
+  <div class="container">
+    <header class="page-header">
+      <h1>Discovery</h1>
+      <p class="lede">
+        Question sets for the first conversations of an engagement. Each one asks how an office works today, and
+        some answers point to capabilities or patterns worth exploring next.
+      </p>
+    </header>
+    <div class="discovery-grid">
+      {assessments.map((a) => (
+        <article class="card">
+          <p class="kicker">{a.questions.length} questions</p>
+          <h2 class="card__title"><a href={a.url}>{a.title}</a></h2>
+          {a.description && <p class="card__summary">{a.description}</p>}
+          <p class="muted">{a.package.title}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .discovery-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
+</style>

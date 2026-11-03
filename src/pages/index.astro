@@ -1,57 +1,117 @@
 ---
+// Your home page: what you offer, your missions and the library's your
+// packages build on, and your packages. Everything else is the library's pages.
 import Base from '../layouts/Base.astro';
-import ResourceCard from '../components/ResourceCard.astro';
-import { downloadUrl, elements, kit, libraryRelease, libraryUrl, newTab, packages, release, resourcesByKind } from '../kit';
+import TypeBadge from '../components/TypeBadge.astro';
+import ResourceCard from '../kit/ResourceCard.astro';
+import { downloadUrl, elementsOfType, helpsWith, isOwn, missionBlueprint, ownPackages, release, scopeLabel, tagline, upstream, type LibraryElement } from '../lib/library';
+import { plural } from '../lib/format';
 import { href } from '../lib/paths';
+import { resourceKinds } from '../lib/vocabulary';
+import { site } from '../site';
 
-// Every resource in one grid, kind by kind.
-const offered = resourcesByKind().flatMap((g) => g.items);
-// Missions, outcomes, capabilities, and the rest that aren't resources: what your packages add to the model.
-const own = elements.filter((e) => e.type !== 'resource' && e.type !== 'requirement');
+// Your resources, kind by kind, in the library's order of kinds.
+const kinds = Object.keys(resourceKinds.groups);
+const offered = elementsOfType('resource')
+  .filter((r) => isOwn(r.package))
+  .sort((a, b) => kinds.indexOf(String(a.attributes?.kind)) - kinds.indexOf(String(b.attributes?.kind)));
+
+// Each mission with what's under it, and how many of your resources help with any of it.
+const missions = elementsOfType('mission').map((m) => {
+  const b = missionBlueprint(m);
+  const within = new Set<LibraryElement>([m, ...b.outcomes.map((o) => o.outcome), ...b.capabilities.map((c) => c.capability), ...b.requirements, ...b.patterns]);
+  const helping = offered.filter((r) => helpsWith(r).some((h) => within.has(h.element))).length;
+  return { m, outcomes: b.outcomes.length, capabilities: b.capabilities.length, patterns: b.patterns.length, helping };
+});
+const own = missions.filter((x) => isOwn(x.m.package));
+const library = missions.filter((x) => !isOwn(x.m.package)).sort((a, b) => b.helping - a.helping || a.m.title.localeCompare(b.m.title));
 const catalog = new URL(href('catalog.json'), Astro.site).href;
 ---
 <Base>
   <div class="container">
-    <h1>{kit.site.title}</h1>
-    <p class="lede">{kit.site.description}</p>
-    <p class="muted">Release {release}, built on <a href={libraryUrl} {...newTab}>Enterprise Blueprints<span class="sr-only"> (opens in a new tab)</span></a> {libraryRelease}.</p>
-
-    {offered.length > 0 && (
-      <section>
-        <h2>What we offer</h2>
-        <ul class="cards">{offered.map((r) => <ResourceCard resource={r} />)}</ul>
-      </section>
-    )}
-
-    {own.length > 0 && (
-      <section>
-        <h2>Added to the model</h2>
-        <p class="muted">Missions, outcomes, and capabilities of our own, built on the library’s.</p>
-        <ul class="chips">
-          {own.map((e) => <li class={`type-${e.type}`}><a class="chip" href={e.url}>{e.title}<span class="chip__note"> · {e.typeInfo.label}</span></a></li>)}
-        </ul>
-      </section>
-    )}
-
-    <section>
-      <h2>Packages</h2>
+    <header class="page-header">
+      <h1>{site.title}</h1>
+      <p class="lede">{site.description}</p>
       <p class="muted">
-        Tools such as Solution Studio read these from the catalog at <code>{catalog}</code>, beside the library’s.
+        Release {release}, built on{' '}
+        <a href={upstream!.url} target="_blank" rel="noopener">{upstream!.title}<span class="sr-only"> (opens in a new tab)</span></a> {upstream!.release}.
       </p>
-      <div class="table-scroll">
-        <table class="packages">
-          <thead><tr><th>Package</th><th>Version</th><th>Download</th></tr></thead>
+    </header>
+  </div>
+
+  {offered.length > 0 && (
+    <section class="section-band" aria-labelledby="offer-heading">
+      <div class="container">
+        <div class="section-intro">
+          <h2 id="offer-heading">What we offer</h2>
+          <p>Each one names the missions, capabilities, and patterns it helps with, so you can find it where it fits.</p>
+        </div>
+        <ul class="offer-grid">{offered.map((r) => <ResourceCard resource={r} />)}</ul>
+      </div>
+    </section>
+  )}
+
+  {missions.length > 0 && (
+    <section class="section-band section-band--muted" aria-labelledby="missions-heading">
+      <div class="container">
+        <div class="section-intro">
+          <h2 id="missions-heading">Missions</h2>
+          <p>
+            {own.length > 0 ? 'Missions of our own, and the missions' : 'The missions'} from {upstream!.title} that our work builds on,
+            with what we offer shown where it helps.
+          </p>
+        </div>
+        <div class="mission-grid">
+          {[...own, ...library].map(({ m, outcomes, capabilities, patterns, helping }) => (
+            <article class={`card type-${m.type}`}>
+              <div class="card__meta">
+                <TypeBadge type={m.type} />
+                {scopeLabel(m.package) && <span class="scope-badge">{scopeLabel(m.package)}</span>}
+                <span class="scope-badge">{isOwn(m.package) ? 'Ours' : `From ${upstream!.title}`}</span>
+              </div>
+              <h3 class="card__title"><a href={m.url}>{m.title}</a></h3>
+              {tagline(m) && <p class="card__tagline">{tagline(m)}</p>}
+              <p class="card__summary">{m.description}</p>
+              <ul class="card__facts">
+                {outcomes > 0 && <li><strong>{outcomes}</strong> {outcomes === 1 ? 'outcome' : 'outcomes'}</li>}
+                <li><strong>{capabilities}</strong> {capabilities === 1 ? 'capability' : 'capabilities'}</li>
+                {patterns > 0 && <li><strong>{patterns}</strong> candidate {patterns === 1 ? 'pattern' : 'patterns'}</li>}
+                {helping > 0 && <li><strong>{helping}</strong> of what we offer</li>}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section-band" aria-labelledby="packages-heading">
+    <div class="container">
+      <div class="section-intro">
+        <h2 id="packages-heading">Packages</h2>
+        <p>Tools such as Solution Studio read these from the catalog at <code>{catalog}</code>, beside the library’s.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="stack-table">
+          <thead><tr><th scope="col">Package</th><th scope="col">Version</th><th scope="col">Holds</th><th scope="col">Download</th></tr></thead>
           <tbody>
-            {packages.map((p) => (
+            {ownPackages.map((p) => (
               <tr>
-                <td><strong>{p.title}</strong><br /><span class="muted">{p.description}</span></td>
+                <th scope="row">{p.title}<p class="muted">{p.description}</p></th>
                 <td>{p.version}</td>
+                <td>{plural(p.elements.length, 'item', 'items')}</td>
                 <td><a href={downloadUrl(p)}>JSON</a></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 </Base>
+
+<style>
+  .offer-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); }
+  .stack-table th[scope='row'] { font-weight: 650; }
+  .stack-table th[scope='row'] p { margin: .25rem 0 0; font-weight: 400; }
+</style>

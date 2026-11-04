@@ -6,8 +6,8 @@ templates, and training, each linked to the library's missions, capabilities, an
 and, if you like, missions and capabilities of your own.
 
 Your packages use the library's own format and are checked by the library's own validator, so anything
-that reads the library, such as Solution Studio, reads yours the same way. You publish them from your own
-repository, with a site that works like the library's: the same mission explorer, outcome, capability,
+that reads the library, such as Solution Studio, reads yours the same way. You publish them from your
+own site, on GitHub Pages or anywhere else, that works like the library's: the same mission explorer, outcome, capability,
 and pattern pages, and discovery questions. It shows your own missions and items beside the library's,
 with what you offer shown wherever it helps.
 
@@ -39,8 +39,9 @@ The sample's two packages:
 
 ## Start
 
-On GitHub, choose **Use this template** to make a repository of your own from this one, and clone it.
-You need Node 22.12 or later and pnpm.
+On GitHub, choose **Use this template** to make a repository of your own from this one, and clone it. If
+you won't publish from GitHub, you can download the kit as a ZIP instead. You need Node 22.12 or later and
+pnpm.
 
 ```sh
 pnpm install
@@ -126,6 +127,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | --- | --- |
 | `pnpm content:build` | Builds `content/` from `source/`, at your next release when anything changed. |
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
+| `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
 | `pnpm sync --latest` | Moves `kit.yaml` to the library's current release first. |
@@ -133,19 +135,42 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 
 ## Publish
 
-Push to a GitHub repository with Pages turned on, using GitHub Actions as the source, and the workflow in
-`.github/workflows/` checks everything, builds the site, and deploys it. It publishes, beside the pages:
+Your site is a folder of static files, so it can live anywhere that serves files: GitHub Pages, your
+organization's own server, or a static host. It publishes, beside the pages:
 
 - `catalog.json`, the same shape as the library's, naming the library catalog and release your packages
   build on;
 - `packages/<name>/<version>/blueprint.json`, each package exactly as built, with its SHA-256 digest;
 - `vocabulary.json` and `schemas/`, the library's, so tools can read your packages on their own.
 
-**A published version never changes.** A release counts as published once it's on `origin/main`; after
-that, `pnpm content:build` puts any change in the next release. Before then, it rebuilds the same one.
+**A published version never changes.** Tools such as Solution Studio keep what they read, and refuse a
+different file under a version they already have. Until a release is published it's a draft, which
+`pnpm content:build` rebuilds in place. After that, any change goes in the next release. Pushing to
+`origin/main` publishes a release, and so does `pnpm content:publish`.
 
-**To keep your packages private,** host the built site anywhere your team can reach instead, or hand the
-`content/` files around. Studio can open a package file from disk.
+### On GitHub Pages
+
+Push to a GitHub repository with Pages turned on, using GitHub Actions as the source, and the workflow in
+`.github/workflows/` checks everything, builds the site, and deploys it.
+
+### Anywhere else
+
+With no GitHub involved:
+
+1. In `kit.yaml`, set `site.url` to where the site will live, with any folder it's under, such as
+   `https://intranet.example.org/architecture`.
+2. Run `pnpm content:publish` when the release is ready to share.
+3. Run `pnpm verify`, which checks everything and builds the site into `dist/`.
+4. Copy what's in `dist/` to where you host it. `pnpm preview` shows it on your own machine first.
+
+`pnpm content:publish` records a digest of each package in `published.json`. That file is how your copy
+knows what's published, so keep it with your copy, and commit it if you use Git. If a published file in
+`content/` changes, the `content` commands stop and name it. A copy with no `origin` remote starts
+`published.json` on its first build, and counts any versions already in `content/` as published, so delete
+the sample's `content/` first if you haven't.
+
+A site that isn't on the web works too: Studio reads a catalog from a folder holding a built copy of your
+site, and can open a package file from disk.
 
 ## Staying current
 

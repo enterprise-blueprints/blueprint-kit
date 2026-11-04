@@ -17,6 +17,7 @@
     "sync": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync.ts",
     "content:build": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/content.ts build",
     "content:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/content.ts check",
+    "content:publish": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/content.ts publish",
     "verify": "pnpm content:check && pnpm check && pnpm test && pnpm build"
   },
   "pnpm": {

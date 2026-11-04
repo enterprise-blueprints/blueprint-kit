@@ -25,6 +25,10 @@ pnpm verify          # content check, type check, tests, and site build
   `public/favicon.svg`), copied as they are. Change them in the library, then
   `pnpm sync --tools ../enterprise-blueprints.github.io` (or a Git ref).
 - `schemas/` and `library/` come from `pnpm sync`. Keep their files byte for byte, with LF endings.
+- `scripts/content.ts` counts a version as published when it's on `origin/main` or in `published.json`, which
+  `pnpm content:publish` writes. The kit's own repo has no `published.json`, since its sample is published
+  by pushing; keep it that way, so a copy's first record is its own. `tests/kit.test.ts` runs the script in a
+  copy with no remote.
 - The sample publisher, My Organization, is fictional: `example.com` addresses and the `example` prefix.
   Keep it that way; it must never look like a real organization.
 - The kit's own files: `src/site.ts` (the site config, read from `kit.yaml`), the home page

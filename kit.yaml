@@ -7,6 +7,9 @@ site:
   description: My organization’s services, demos, and products for public-sector missions, mapped to the Enterprise Blueprints library.
   # The site's main color, for links and buttons, as a hex color.
   accent: "#0b6e69"
+  # Where the site will live, if you host it yourself, with any folder it's under, such as
+  # https://intranet.example.org/architecture. GitHub Pages sets this for you.
+  # url: https://blueprints.example.org
 
 library:
   # Where the library publishes its catalog, and the release your packages build on.

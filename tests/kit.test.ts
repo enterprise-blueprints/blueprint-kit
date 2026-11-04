@@ -1,6 +1,8 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { elements, elementsOfType, helpsWith, inUse, isOwn, ownPackages, packages, release, upstream } from '../src/lib/library';
 import { plan, readSources, type Resolved } from '../src/lib/compile';
 import type { BlueprintPackage } from '../src/lib/package';
@@ -67,5 +69,80 @@ describe('the library on your site', () => {
       expect(e.url, e.id).toContain(`/library/${e.typeInfo.section}/${e.slug}/`);
       expect(e.canonicalUrl, e.id).toBe(new URL(`${e.typeInfo.section}/${e.slug}/`, upstream!.base).href);
     }
+  });
+});
+
+// Runs the content script in a copy with no Git remote, the way an organization
+// hosting its own site does, so what it keeps and rewrites is what's tested.
+describe('publishing without a Git remote', () => {
+  let dir: string;
+  const run = (mode: string) =>
+    spawnSync(process.execPath, ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', 'scripts/content.ts', mode], { cwd: dir, encoding: 'utf8' });
+  const versions = (name: string) => readdirSync(join(dir, 'content', name)).sort();
+  const packageText = (name: string, version: string) => readFileSync(join(dir, 'content', name, version, 'blueprint.json'), 'utf8');
+  const record = () => JSON.parse(readFileSync(join(dir, 'published.json'), 'utf8'));
+  const edit = (title: string) => {
+    const path = join(dir, 'source', 'offerings', 'package.yaml');
+    writeFileSync(path, readFileSync(path, 'utf8').replace(/^title: .*$/m, `title: ${title}`));
+  };
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'kit-'));
+    for (const path of ['kit.yaml', 'package.json', 'source', 'library', 'schemas', 'scripts', 'src/lib']) cpSync(path, join(dir, path), { recursive: true });
+    symlinkSync(resolve('node_modules'), join(dir, 'node_modules'), 'junction');
+  });
+  afterEach(() => {
+    unlinkSync(join(dir, 'node_modules'));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('rebuilds a draft in place, freezes it on publishing, and starts the next release after that', { timeout: 60_000 }, () => {
+    expect(run('build').stdout).toContain('Release 0.1.0 is a draft');
+    edit('First draft');
+    expect(run('build').status).toBe(0);
+    expect(versions('offerings')).toEqual(['0.1.0']);
+    expect(packageText('offerings', '0.1.0')).toContain('First draft');
+
+    expect(run('publish').stdout).toContain('Published release 0.1.0');
+    const frozen = packageText('offerings', '0.1.0');
+    expect(Object.keys(record()).sort()).toEqual(['local-audit', 'offerings']);
+    expect(run('publish').stdout).toContain('Release 0.1.0 is already published');
+
+    edit('Second');
+    run('build');
+    edit('Third');
+    run('build');
+    expect(versions('offerings')).toEqual(['0.1.0', '0.2.0']);
+    expect(packageText('offerings', '0.1.0')).toBe(frozen);
+    expect(packageText('offerings', '0.2.0')).toContain('Third');
+
+    // Back to what's published, the draft is no longer needed.
+    edit('First draft');
+    run('build');
+    expect(versions('offerings')).toEqual(['0.1.0']);
+  });
+
+  it('refuses to go on when a published version has changed', { timeout: 60_000 }, () => {
+    run('publish');
+    const path = join(dir, 'content', 'offerings', '0.1.0', 'blueprint.json');
+    writeFileSync(path, `${readFileSync(path, 'utf8')}\n`);
+    for (const mode of ['check', 'build', 'publish']) {
+      const result = run(mode);
+      expect(result.status, mode).toBe(1);
+      expect(result.stderr, mode).toContain('A published version never changes');
+    }
+  });
+
+  it('keeps the versions already in content/ the first time it runs', { timeout: 60_000 }, () => {
+    cpSync('content', join(dir, 'content'), { recursive: true });
+    const before = versions('offerings');
+    const newest = before.at(-1)!;
+    const text = packageText('offerings', newest);
+    edit('Edited');
+    expect(run('build').status).toBe(0);
+    expect(versions('offerings').slice(0, before.length)).toEqual(before);
+    expect(versions('offerings')).toHaveLength(before.length + 1);
+    expect(packageText('offerings', newest)).toBe(text);
+    expect(Object.keys(record().offerings)).toEqual(before);
   });
 });

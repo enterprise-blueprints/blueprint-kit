@@ -30,7 +30,7 @@ pnpm verify          # content check, type check, tests, and site build
   by pushing; keep it that way, so a copy's first record is its own. `tests/kit.test.ts` runs the script in a
   copy with no remote.
 - `editor/` is the editor, part of the engine, so it's changed in the library and comes here with
-  `pnpm sync --tools`, as `scripts/editor.ts` and `tests/editor.test.ts` do. `pnpm editor` sets `SITE_EDITOR`, and
+  `pnpm sync --tools`, as `scripts/editor.ts`, `tests/editor.test.ts`, and the guide, `EDITING.md`, do. `pnpm editor` sets `SITE_EDITOR`, and
   only then does `astro.config.mjs` load `editor/server.ts`, an integration on the dev server, so builds and
   `pnpm dev` never have it. `store.ts` edits `source/*.yaml` in place with the `yaml` library's Document API; `forms` there lists
   the types it handles and what each form holds, and a change's files are written and undone together. A save

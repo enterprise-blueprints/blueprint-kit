@@ -191,45 +191,21 @@ Instead of editing the YAML by hand, you can work on the site itself:
 pnpm editor      # starts the editor at http://127.0.0.1:4322
 ```
 
-It's your site with an editing bar across the top, and it edits everything in your packages:
-
-- **Resources.** Go to anything, in the library or your own, and choose **Add a resource here**.
-- **Missions.** Choose **+ Add** on the bar, then **Add an outcome** and **Add a capability** on the
-  mission's page.
-- **The library's capabilities.** On an outcome's form, choose them under **Capabilities that contribute**,
-  and your mission reuses them without changing them. If one brings in a pattern that needs another, the
-  form says which capability to add as well.
-- **Requirements and patterns.** Choose **Add a requirement** or **Add a pattern** on a capability's page. A
-  requirement belongs to one of your capabilities. A pattern has a layer and at least one way to source it,
-  and it can also go on the library's capabilities, under **Capabilities it could provide**.
-- **Sources.** Choose **+ Add a source** on the bar, or **Add a new source** on any item's form, and cite them
-  under **Sources** there. A package's items cite its own sources.
-- **Discovery questions.** Choose **+ Add a question set** on the bar, which starts with its first question,
-  then **Add a question** on the set's page. An answer can point to outcomes, measures, capabilities,
-  requirements, and patterns, yours or the library's, with the reason why.
-- **Packages.** Choose **+ Add a package** on the bar. It takes your publisher's details from your other
-  packages, and builds on nothing until a link needs it to. If you've removed them all, `pnpm editor` asks a
-  few questions in the terminal first, since the site needs a package to show.
-- **Anything of your own.** Choose **Edit** on its page, or in the mission explorer's panel. The library's
-  own items can't be changed here; you add yours beside them.
-
-The forms search everything a link can reach, and add the package to `dependencies` when a link needs a new
-one. When that's one of your own packages, the package's references to the library are written out in full,
-as in `eb:capability:records-management`, since the short form could then mean either. Deleting something
-takes the links to it along too. If that would leave a resource with nothing to help with, or a requirement
-with no capability, the form says so first.
+It's your site with an editing bar across the top, for everything in your packages: resources, missions,
+outcomes, capabilities, requirements, patterns, sources, discovery questions, and new packages. The library's
+own items can't be changed here; you add yours beside them, and reuse them without changing them.
 
 Saving writes to your files under `source/<package>/`, keeping your comments and any fields the forms don't
-show, and rebuilds your draft release with the same checks as `pnpm content:build`. If those checks refuse a
-change, the form says why and your files stay as they were. So you can still edit the YAML by hand, or use
-Git, whenever you like. An item's ID comes from its title and doesn't change after that, since tools link
-to it.
+show, with the same checks as `pnpm content:build`. So you can still edit the YAML by hand, or use Git,
+whenever you like.
+
+[EDITING.md](EDITING.md) is the guide: the ways of running your site, building a mission step by step, how
+saving and publishing work, and what to do when something goes wrong.
 
 **Publish** on the bar does what `pnpm content:publish` does, and builds the site into `dist/`.
 
 The editor is for you alone. It listens only on your own computer, and only with `pnpm editor`, so neither
-`pnpm dev` nor your built site has any of it. A few things are still written in the YAML files: the sources
-of a measure or a link, the order of items and questions, and a package's own details once it's started.
+`pnpm dev` nor your built site has any of it.
 
 ## The library's missions on your site
 

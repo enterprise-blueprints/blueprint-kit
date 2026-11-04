@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { parse } from 'yaml';
-import { elementTypes, groupings, statuses } from '../src/lib/vocabulary.ts';
+import { elementTypes, groupings, patternApproaches, patternFields, patternLayers, statuses } from '../src/lib/vocabulary.ts';
 import { capabilitiesProviding, deleteElement, EditError, forms, packageList, readElements, readTargets, saveElement, type ElementFields, type Target } from './store.ts';
 
 const root = process.cwd();
@@ -53,7 +53,7 @@ function whatWouldFix(line: string, targets: Target[]) {
   const missing = line.match(/needs ([a-z0-9-]+:implementationPattern:[a-z0-9-]+), but none of the mission's capabilities points to it/)?.[1];
   if (!missing) return line;
   const titles = capabilitiesProviding(root, libraryRelease(), missing, targets).slice(0, 3).map((c) => `“${c.title}”`);
-  return titles.length ? `${line}. Add ${new Intl.ListFormat('en', { type: 'disjunction' }).format(titles)} to the mission's capabilities, which brings it in.` : line;
+  return titles.length ? `${line}. Add ${new Intl.ListFormat('en', { type: 'disjunction' }).format(titles)} to the mission's capabilities, which brings it in.` : `${line}. Add it to one of the mission's capabilities.`;
 }
 
 /** The problems in the content script's output, one to a line, in words, with the items they name by their titles. */
@@ -77,7 +77,12 @@ async function state() {
     ...(status.ok ? (JSON.parse(status.stdout) as { release: string; draft: boolean }) : { problems: problemsIn(status.stderr) }),
     today: new Date().toLocaleDateString('en-CA'),
     packages: packageList(root),
-    groups: Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
+    groups: {
+      ...Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
+      layer: Object.entries(patternLayers).map(([id, l]) => ({ id, label: l.label, hint: l.hint })),
+      approach: Object.entries(patternApproaches).map(([id, label]) => ({ id, label })),
+    },
+    patternFields: Object.entries(patternFields).map(([id, f]) => ({ id, label: f.label, hint: f.definition })),
     statuses: Object.entries(statuses).map(([id, label]) => ({ id, label })),
     sections: Object.fromEntries(Object.keys(forms).map((t) => [t, elementTypes[t].section])),
     elements: readElements(root, targets),

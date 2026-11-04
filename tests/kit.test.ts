@@ -50,7 +50,8 @@ describe('the library on your site', () => {
 
   it('uses the library packages yours build on, and the ones those build on', () => {
     const used = shown.filter(inUse);
-    const wanted = new Set(ownPackages.flatMap((p) => (p.dependencies ?? []).map((d) => d.packageId)));
+    const own = ownPackages.map((p) => p.packageId);
+    const wanted = new Set(ownPackages.flatMap((p) => (p.dependencies ?? []).map((d) => d.packageId)).filter((id) => !own.includes(id)));
     for (const id of wanted) expect(used.map((p) => p.packageId), id).toContain(id);
     for (const p of used) {
       const needed = wanted.has(p.packageId) || used.some((q) => q.dependencies?.some((d) => d.packageId === p.packageId));

@@ -191,8 +191,8 @@ Instead of editing the YAML by hand, you can work on the site itself:
 pnpm editor      # starts the editor at http://127.0.0.1:4322
 ```
 
-It's your site with an editing bar across the top, and it edits your resources, missions, outcomes, and
-capabilities:
+It's your site with an editing bar across the top, and it edits your resources, missions, outcomes,
+capabilities, requirements, and patterns:
 
 - **Resources.** Go to anything, in the library or your own, and choose **Add a resource here**.
 - **Missions.** Choose **+ Add** on the bar, then **Add an outcome** and **Add a capability** on the
@@ -200,11 +200,16 @@ capabilities:
 - **The library's capabilities.** On an outcome's form, choose them under **Capabilities that contribute**,
   and your mission reuses them without changing them. If one brings in a pattern that needs another, the
   form says which capability to add as well.
+- **Requirements and patterns.** Choose **Add a requirement** or **Add a pattern** on a capability's page. A
+  requirement belongs to one of your capabilities. A pattern has a layer and at least one way to source it,
+  and it can also go on the library's capabilities, under **Capabilities it could provide**.
 - **Anything of your own.** Choose **Edit** on its page, or in the mission explorer's panel. The library's
   own items can't be changed here; you add yours beside them.
 
 The forms search everything a link can reach, and add the package to `dependencies` when a link needs a new
-one. Deleting something takes the links to it along too.
+one. When that's one of your own packages, the package's references to the library are written out in full,
+as in `eb:capability:records-management`, since the short form could then mean either. Deleting something
+takes the links to it along too, unless a resource helps with nothing else, and then the form says so.
 
 Saving writes to your files under `source/<package>/`, keeping your comments and any fields the forms don't
 show, and rebuilds your draft release with the same checks as `pnpm content:build`. If those checks refuse a
@@ -215,8 +220,8 @@ to it.
 **Publish** on the bar does what `pnpm content:publish` does, and builds the site into `dist/`.
 
 The editor is for you alone. It listens only on your own computer, and only with `pnpm editor`, so neither
-`pnpm dev` nor your built site has any of it. Requirements, patterns, sources, and discovery questions are
-still written in their YAML files, and a new package starts as a folder under `source/`.
+`pnpm dev` nor your built site has any of it. Sources and discovery questions are still written in their
+YAML files, and a new package starts as a folder under `source/`.
 
 ## The library's missions on your site
 
@@ -249,7 +254,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
 | `pnpm dev` | Shows your site at http://localhost:4321. |
-| `pnpm editor` | Shows your site with the editor on, for editing your resources, missions, outcomes, and capabilities in the browser. |
+| `pnpm editor` | Shows your site with the editor on, for editing your resources, missions, outcomes, capabilities, requirements, and patterns in the browser. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
 | `pnpm sync --latest` | Moves `kit.yaml` to the library's current release first. |

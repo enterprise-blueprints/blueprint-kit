@@ -5,9 +5,9 @@
 
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { Document, isMap, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
+import { Document, isMap, isScalar, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
 import { compareVersions } from '../src/lib/format.ts';
-import { elementTypes, groupings, predicates, statuses } from '../src/lib/vocabulary.ts';
+import { elementTypes, groupings, patternApproaches, patternLayers, predicates, statuses } from '../src/lib/vocabulary.ts';
 
 /** A link to an element, by its full ID, with what the link can say about itself. */
 export interface Link {
@@ -22,6 +22,31 @@ export interface MeasureFields {
   id?: string;
   title: string;
   description: string;
+}
+
+/** What a pattern and each of its ways can say about themselves, one statement to an item. */
+const STATEMENTS = ['strengths', 'fitsWhen', 'watchFor'] as const;
+
+/** One way to source a pattern. */
+export interface WayFields {
+  /** Absent on a new way, which takes one from its title. */
+  id?: string;
+  approach: string;
+  title: string;
+  description?: string;
+  strengths?: string[];
+  fitsWhen?: string[];
+  watchFor?: string[];
+}
+
+/** What a pattern says about itself, which it holds in its attributes. */
+export interface PatternFields {
+  layer: string;
+  parts?: string[];
+  strengths?: string[];
+  fitsWhen?: string[];
+  watchFor?: string[];
+  ways: WayFields[];
 }
 
 /** An element as the editor's form shows it. */
@@ -39,6 +64,7 @@ export interface ElementFields {
   tagline?: string;
   principles?: string[];
   measures?: MeasureFields[];
+  pattern?: PatternFields;
   /** What it links to, by predicate. */
   links?: Record<string, Link[]>;
   /** What links to it, by predicate, as full IDs. */
@@ -70,6 +96,8 @@ export const forms: Record<string, { values: string[]; links: string[]; incoming
   mission: { values: [], links: ['seeks'], incoming: [] },
   outcome: { values: ['theme'], links: [], incoming: ['seeks', 'contributes_to'] },
   capability: { values: ['stage'], links: ['contributes_to', 'candidate_pattern', 'satisfies'], incoming: [] },
+  requirement: { values: ['kind'], links: [], incoming: ['satisfies'] },
+  implementationPattern: { values: [], links: ['depends_on', 'works_with'], incoming: ['candidate_pattern'] },
   resource: { values: ['kind', 'url', 'by', 'lastReviewedAt'], links: ['helps_with'], incoming: [] },
 };
 
@@ -173,6 +201,22 @@ function readIncoming(root: string, name: string, predicate: string, elementId: 
   ];
 }
 
+const statementsIn = (raw: Raw, keys: readonly string[]) => Object.fromEntries(keys.filter((k) => raw[k] !== undefined).map((k) => [k, asList(raw[k]).map(String)]));
+
+function patternFrom(attributes: Raw): PatternFields {
+  return {
+    layer: String(attributes.layer ?? ''),
+    ...statementsIn(attributes, ['parts', ...STATEMENTS]),
+    ways: (asList(attributes.ways) as Raw[]).map((w) => ({
+      id: String(w.id),
+      approach: String(w.approach ?? ''),
+      title: String(w.title ?? ''),
+      ...(w.description ? { description: String(w.description) } : {}),
+      ...statementsIn(w, STATEMENTS),
+    })),
+  };
+}
+
 function elementFrom(root: string, name: string, type: string, raw: Raw, targets: Target[]): EditorElement {
   const form = forms[type];
   const id = String(raw.id);
@@ -190,6 +234,7 @@ function elementFrom(root: string, name: string, type: string, raw: Raw, targets
     ...(type === 'resource' && raw.attributes ? { details: Object.fromEntries(Object.entries(attributes).map(([k, v]) => [k, String(v)])) } : {}),
     ...(type === 'mission' ? { tagline: String(attributes.tagline ?? ''), principles: asList(attributes.principles).map(String) } : {}),
     ...(type === 'outcome' ? { measures: (asList(raw.measures) as Raw[]).map((m) => ({ id: String(m.id), title: String(m.title ?? ''), description: String(m.description ?? '') })) } : {}),
+    ...(type === 'implementationPattern' ? { pattern: patternFrom(attributes) } : {}),
     links: Object.fromEntries(form.links.map((p) => [p, asList(raw[p]).map((entry) => linkOf(entry, p, name, targets))])),
     incoming: Object.fromEntries(form.incoming.map((p) => [p, readIncoming(root, name, p, elementId, targets)])),
   };
@@ -217,7 +262,7 @@ export function newId(title: string, taken: string[]): string {
   return id;
 }
 
-function check(input: ElementFields, targets: Target[], before: Raw | undefined) {
+function check(input: ElementFields & { id?: string }, targets: Target[], before: Raw | undefined, current: Record<string, string[]>) {
   const { type } = input;
   const form = forms[type];
   const values = input.values ?? {};
@@ -235,7 +280,24 @@ function check(input: ElementFields, targets: Target[], before: Raw | undefined)
   if (type === 'outcome' && !groupings.outcome.groups[values.theme]) problems.push('Choose what the public gets from it.');
   if (type === 'capability') {
     if (!groupings.capability.groups[values.stage]) problems.push('Choose its stage of the work.');
-    if (!input.links?.contributes_to?.length) problems.push('Choose at least one outcome it contributes to.');
+    // Only a new one: a shared capability can get its outcomes from other packages' links.yaml.
+    if (!before && !input.links?.contributes_to?.length) problems.push('Choose at least one outcome it contributes to.');
+  }
+  if (type === 'requirement') {
+    if (!groupings.requirement.groups[values.kind]) problems.push('Choose what kind of requirement it is.');
+    const capabilities = input.incoming?.satisfies ?? [];
+    const added = capabilities.filter((id) => !current.satisfies.includes(id));
+    if (!capabilities.length) problems.push('Choose the capability it belongs to.');
+    else if (capabilities.length > 1 && added.length) problems.push('A requirement belongs to one capability.');
+    for (const target of targets.filter((t) => added.includes(t.id) && t.folder !== input.package)) problems.push(`${target.title} is in another package, and a requirement belongs to a capability in its own.`);
+  }
+  if (type === 'implementationPattern') {
+    if (!patternLayers[input.pattern?.layer ?? '']) problems.push('Choose its layer.');
+    if (!input.pattern?.ways?.length) problems.push('Give it at least one way to source it.');
+    for (const way of input.pattern?.ways ?? []) {
+      if (!patternApproaches[way.approach]) problems.push('Choose an approach for each way.');
+      if (!way.title?.trim()) problems.push('Give each way a title.');
+    }
   }
   for (const m of input.measures ?? []) if (!m.title?.trim() || !m.description?.trim()) problems.push('Give each measure a title and a description.');
 
@@ -247,16 +309,31 @@ function check(input: ElementFields, targets: Target[], before: Raw | undefined)
       if (!target) {
         if (!had(predicate, link.to)) problems.push(`Can't find ${link.to}.`);
       } else if (!predicates[predicate].to.includes(target.type)) problems.push(`${target.title} can't go there.`);
-      else if (link.way && !target.ways.some((w) => w.id === link.way)) problems.push(`${target.title} has no way called ${link.way}.`);
+      else if (target.type === type && target.folder === input.package && keyOf(target.id) === input.id) problems.push('It can’t link to itself.');
+      // A need names a way of this pattern, the one that has the need. Anything else names a way of what it links to.
+      else if (predicate === 'depends_on' && link.way && !input.pattern?.ways?.some((w) => w.id === link.way)) problems.push(`The way that needs ${target.title} isn’t one of this pattern’s any more.`);
+      else if (predicate !== 'depends_on' && link.way && !target.ways.some((w) => w.id === link.way)) problems.push(`${target.title} has no way called ${link.way}.`);
     }
   }
   for (const predicate of form.incoming) {
     for (const id of input.incoming?.[predicate] ?? []) {
       const target = targets.find((t) => t.id === id);
-      if (!target) problems.push(`Can't find ${id}.`);
-      else if (!predicates[predicate].from.includes(target.type)) problems.push(`${target.title} can't go there.`);
+      if (!target) {
+        if (!current[predicate].includes(id)) problems.push(`Can't find ${id}.`);
+      } else if (!predicates[predicate].from.includes(target.type)) problems.push(`${target.title} can't go there.`);
     }
   }
+  if (problems.length) throw new EditError([...new Set(problems)].join('\n'));
+}
+
+/** Refuses taking away a way that a resource is about, which the resource has to let go of first. */
+function checkWaysInUse(root: string, input: ElementFields, before: Raw, elementId: string, targets: Target[]) {
+  const had = (asList((before.attributes as Raw | undefined)?.ways) as Raw[]).map((w) => ({ id: String(w.id), title: String(w.title) }));
+  const gone = had.filter((w) => !input.pattern?.ways.some((x) => x.id === w.id));
+  if (!gone.length) return;
+  const problems = readElements(root, targets)
+    .filter((e) => e.type === 'resource')
+    .flatMap((e) => (e.links?.helps_with ?? []).filter((l) => l.to === elementId && gone.some((w) => w.id === l.way)).map((l) => `“${e.title}” is about the way “${gone.find((w) => w.id === l.way)!.title}”, so change that resource before taking the way away.`));
   if (problems.length) throw new EditError(problems.join('\n'));
 }
 
@@ -327,6 +404,7 @@ function writtenLinks(existing: unknown[], links: Link[], predicate: string, pac
       if (link[field]) merged[field] = link[field];
       else delete merged[field];
     }
+    if (same(merged, before)) return before;
     return Object.keys(merged).length === 1 ? merged.to : merged;
   });
 }
@@ -381,8 +459,50 @@ function removeIncoming(edits: Edits, root: string, name: string, predicate: str
   }
 }
 
+/**
+ * A package that builds on one prefix can leave it off, as in capability:records.
+ * Once it builds on a second, the compiler can't tell which is meant, so its
+ * references to what it builds on are written out in full.
+ */
+function writeOutReferences(edits: Edits, root: string, name: string, prefix: string) {
+  const itemsOf = (file: string) => {
+    const { contents } = edits.doc(join(root, 'source', name, file));
+    return isSeq(contents) ? (contents.items.filter(isMap) as YAMLMap[]) : [];
+  };
+  const elementFiles = Object.entries(elementTypes).map(([type, info]) => ({ type, file: `${info.section}.yaml` }));
+  const own = new Set(
+    elementFiles.flatMap(({ type, file }) =>
+      itemsOf(file).flatMap((item) => [`${type}:${item.get('id')}`, ...(asList((item.toJSON() as Raw).measures) as Raw[]).map((m) => `measure:${m.id}`)]),
+    ),
+  );
+  const writeOut = (node: unknown, type?: string) => {
+    if (isSeq(node)) for (const item of node.items) writeOut(item, type);
+    else if (isMap(node)) writeOut(node.get('to', true), type);
+    else if (isScalar(node)) {
+      const text = String(node.value);
+      const written = text.includes(':') || !type ? text : `${type}:${text}`;
+      if (written.split(':').length === 2 && !own.has(written)) node.value = `${prefix}:${written}`;
+    }
+  };
+  const writeOutLinks = (item: YAMLMap) => {
+    for (const [predicate, info] of Object.entries(predicates)) if (item.has(predicate)) writeOut(item.get(predicate, true), info.to.length === 1 ? info.to[0] : undefined);
+  };
+  for (const { file } of elementFiles) itemsOf(file).forEach(writeOutLinks);
+  for (const item of itemsOf('links.yaml')) {
+    writeOut(item.get('from', true));
+    writeOutLinks(item);
+  }
+  for (const set of itemsOf('discovery.yaml')) {
+    const questions = set.get('questions', true);
+    for (const question of isSeq(questions) ? questions.items.filter(isMap) : []) {
+      const points = (question as YAMLMap).get('points', true);
+      for (const group of isSeq(points) ? points.items.filter(isMap) : []) writeOut((group as YAMLMap).get('to', true));
+    }
+  }
+}
+
 /** Adds the packages a change's links need to its package.yaml, the way you'd add them by hand. */
-function addDependencies(edits: Edits, root: string, packageName: string, needed: string[]) {
+function addDependencies(edits: Edits, root: string, packageName: string, needed: string[], targets: Target[]) {
   const doc = edits.doc(join(root, 'source', packageName, 'package.yaml'));
   const have = asList((doc.toJS() as Raw).dependencies).map(String);
   const missing = [...new Set(needed)].filter((f) => f !== packageName && !have.includes(f));
@@ -390,6 +510,10 @@ function addDependencies(edits: Edits, root: string, packageName: string, needed
   const list = doc.get('dependencies');
   if (isSeq(list)) for (const name of missing) list.add(doc.createNode(name));
   else doc.set('dependencies', doc.createNode(missing));
+
+  const prefixes = (names: string[]) => [...new Set(names.map((f) => (sourcePackages(root).includes(f) ? prefixOf(root, f) : (targets.find((t) => t.folder === f)?.id.split(':')[0] ?? 'eb'))))];
+  const before = prefixes(have);
+  if (before.length === 1 && prefixes([...have, ...missing]).length > 1) writeOutReferences(edits, root, packageName, before[0]);
 }
 
 /** A mission's tagline and principles, set in its attributes beside whatever else is there. */
@@ -416,6 +540,35 @@ function writtenMeasures(before: Raw | undefined, measures: MeasureFields[], tak
   });
 }
 
+const statementsOf = (list: string[] = []) => list.map((s) => s.trim()).filter(Boolean);
+
+/** Ways in the form's order, each keeping its ID, with a new one taking an ID from its title. */
+function writtenWays(before: Raw[], ways: WayFields[]) {
+  const used = before.map((w) => String(w.id));
+  return ways.map((w) => {
+    const existing = before.find((x) => String(x.id) === w.id);
+    const id = existing?.id ?? newId(w.title, used);
+    used.push(String(id));
+    const way: Raw = { ...(existing ?? { id }), approach: w.approach, title: w.title.trim() };
+    const fields: [string, unknown][] = [['description', w.description?.trim()], ...STATEMENTS.map((k): [string, string[]] => [k, statementsOf(w[k])])];
+    for (const [key, value] of fields) {
+      if (!value || !Object.keys(value).length) delete way[key];
+      else way[key] = value;
+    }
+    return way;
+  });
+}
+
+/** A pattern's layer, statements, and ways, set in its attributes. */
+function setPatternAttributes(doc: Document, map: YAMLMap, pattern: PatternFields) {
+  if (!isMap(map.get('attributes', true))) map.set('attributes', doc.createNode({}));
+  const attributes = map.get('attributes', true) as unknown as YAMLMap;
+  const before = asList((attributes.toJSON() as Raw).ways) as Raw[];
+  setField(doc, attributes, 'layer', pattern.layer);
+  for (const key of ['parts', ...STATEMENTS] as const) setField(doc, attributes, key, statementsOf(pattern[key]));
+  setField(doc, attributes, 'ways', writtenWays(before, pattern.ways));
+}
+
 /**
  * Adds an element, or changes the one with this ID, writing its file, any
  * other files its links reach, and package.yaml when they reach a new package.
@@ -433,10 +586,12 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
   const at = input.id ? itemIndex(seq, input.id) : -1;
   if (input.id && at < 0) throw new EditError(`There's no ${elementTypes[type].label.toLowerCase()} called ${input.id} in ${input.package}.`);
   const before = at >= 0 ? ((seq.items[at] as YAMLMap).toJSON() as Raw) : undefined;
-  check(input, targets, before);
+  const current = Object.fromEntries(form.incoming.map((p) => [p, input.id ? readIncoming(root, input.package, p, fullIdOf(root, input.package, type, input.id), targets) : []]));
+  check(input, targets, before, current);
 
   const id = input.id ?? newId(input.title, readElements(root, targets).filter((e) => e.type === type).map((e) => e.id));
   const elementId = fullIdOf(root, input.package, type, id);
+  if (type === 'implementationPattern' && before) checkWaysInUse(root, input, before, elementId, targets);
   let map: YAMLMap;
   if (at >= 0) map = seq.items[at] as YAMLMap;
   else {
@@ -463,6 +618,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
     const taken = itemsIn(root, input.package, fileOf('outcome')).flatMap((o) => (asList(o.measures) as Raw[]).map((m) => String(m.id)));
     setField(doc, map, 'measures', writtenMeasures(before, input.measures ?? [], taken));
   }
+  if (type === 'implementationPattern') setPatternAttributes(doc, map, input.pattern!);
   for (const predicate of form.links) {
     setField(doc, map, predicate, writtenLinks(asList(before?.[predicate]), input.links?.[predicate] ?? [], predicate, input.package, targets));
   }
@@ -471,22 +627,24 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
   const reached = form.links.flatMap((p) => (input.links?.[p] ?? []).map((l) => targetOf(l.to)?.folder ?? input.package));
   for (const predicate of form.incoming) {
     const next = input.incoming?.[predicate] ?? [];
-    const current = input.id ? readIncoming(root, input.package, predicate, elementId, targets) : [];
-    for (const from of next.filter((f) => !current.includes(f))) addIncoming(edits, root, input.package, predicate, targetOf(from)!, id, targets);
-    for (const from of current.filter((f) => !next.includes(f))) {
+    const had = current[predicate];
+    for (const from of next.filter((f) => !had.includes(f))) addIncoming(edits, root, input.package, predicate, targetOf(from)!, id, targets);
+    for (const from of had.filter((f) => !next.includes(f))) {
       const target = targetOf(from);
       if (target) removeIncoming(edits, root, input.package, predicate, target, elementId, targets);
     }
-    reached.push(...next.map((f) => targetOf(f)!.folder));
+    reached.push(...next.map((f) => targetOf(f)?.folder ?? input.package));
   }
-  addDependencies(edits, root, input.package, reached);
+  addDependencies(edits, root, input.package, reached, targets);
   return { id, undo: edits.commit() };
 }
 
 /**
  * Takes an element out of source/, with every link to it there. Published
- * versions keep it; the next release won't have it. The validator still gets
- * the last word, on anything else that names it, such as a discovery answer.
+ * versions keep it; the next release won't have it. A resource has to help with
+ * something, so one that helps only with this is left for you to decide about.
+ * The validator still gets the last word, on anything else that names it, such
+ * as a discovery answer.
  */
 export function deleteElement(root: string, packageName: string, type: string, id: string, targets: Target[]): { undo: () => void } {
   if (!forms[type]) throw new EditError(`The editor doesn't handle ${type}.`);
@@ -498,6 +656,8 @@ export function deleteElement(root: string, packageName: string, type: string, i
   seq.items.splice(at, 1);
 
   const elementId = fullIdOf(root, packageName, type, id);
+  const stranded = readElements(root, targets).filter((e) => e.type === 'resource' && e.links?.helps_with?.length && e.links.helps_with.every((l) => l.to === elementId));
+  if (stranded.length) throw new EditError(stranded.map((e) => `“${e.title}” helps only with this, so change or delete that resource first.`).join('\n'));
   const linksTo = Object.entries(predicates).filter(([, info]) => info.to.includes(type));
   for (const name of sourcePackages(root)) {
     for (const [predicate, info] of linksTo) {

@@ -112,6 +112,46 @@ const LINKS = `# Links from the library's elements.
   contributes_to: [ findings-closed ]
 `;
 
+const REQUIREMENTS = `# Requirements, in the order the pages show them.
+
+- id: publish-the-plan
+  title: Publish the plan
+  kind: transparency-reporting
+  status: draft
+  description: Publish the audit plan once the council approves it.
+  sources: [ audit-standards ]
+`;
+
+const PATTERNS = `# Patterns, each with the links it holds.
+
+- id: audit-workbench
+  title: Audit Workbench
+  status: draft
+  description: "An example architecture: one place for workpapers and findings."
+  sources: [ audit-standards ]
+  attributes:
+    layer: business-applications
+    parts:
+      - Workpapers linked to each finding
+      - Review steps with sign-off
+    strengths:
+      - Reviewers see the evidence beside the finding
+    ways:
+      - id: product
+        approach: product
+        title: An audit management product
+        description: Configured for the office’s methods.
+        watchFor:
+          - Licenses priced per auditor
+      - id: built
+        approach: build
+        title: Built on the case platform
+  depends_on:
+    - to: eb:implementationPattern:case-platform
+      way: built
+      note: It runs on the platform.
+`;
+
 const AUDIT = `packageId: com.example.audit
 idPrefix: example
 title: Audit
@@ -128,13 +168,17 @@ const FILES: Record<string, string> = {
   'source/audit/outcomes.yaml': OUTCOMES,
   'source/audit/capabilities.yaml': CAPABILITIES,
   'source/audit/links.yaml': LINKS,
+  'source/audit/requirements.yaml': REQUIREMENTS,
+  'source/audit/patterns.yaml': PATTERNS,
   'content/audit/0.1.0/blueprint.json': library('Audit', [
     { id: 'example:mission:local-audit', type: 'mission', title: 'Local Audit' },
     { id: 'example:outcome:on-plan', type: 'outcome', title: 'The audit plan is carried out' },
     { id: 'example:outcome:findings-closed', type: 'outcome', title: 'Findings are closed' },
     { id: 'example:capability:audit-planning', type: 'capability', title: 'Audit Planning' },
     { id: 'example:requirement:publish-the-plan', type: 'requirement', title: 'Publish the plan' },
+    { id: 'example:implementationPattern:audit-workbench', type: 'implementationPattern', title: 'Audit Workbench', attributes: { ways: [{ id: 'product', title: 'An audit management product' }, { id: 'built', title: 'Built on the case platform' }] } },
   ]),
+  'content/offerings/0.1.0/blueprint.json': library('Offerings', [{ id: 'example:capability:advice', type: 'capability', title: 'Advice' }]),
   [`library/packages/common/${RELEASE}/blueprint.json`]: library('Common', [
     { id: 'eb:capability:records-management', type: 'capability', title: 'Records management' },
     { id: 'eb:capability:identity', type: 'capability', title: 'Identity' },
@@ -174,6 +218,25 @@ describe('the editor’s files', () => {
     links: { contributes_to: [{ to: 'example:outcome:on-plan' }] },
     ...over,
   });
+  const requirement = (over: Partial<ElementFields> = {}): ElementFields => ({
+    package: 'audit',
+    type: 'requirement',
+    title: 'Report to the council',
+    description: 'Report to the council each quarter.',
+    status: 'draft',
+    values: { kind: 'transparency-reporting' },
+    incoming: { satisfies: ['example:capability:audit-planning'] },
+    ...over,
+  });
+  const pattern = (over: Partial<ElementFields> = {}): ElementFields => ({
+    package: 'audit',
+    type: 'implementationPattern',
+    title: 'Findings Tracker',
+    description: 'An example architecture: a list of findings and what’s been done about them.',
+    status: 'draft',
+    pattern: { layer: 'business-applications', ways: [{ approach: 'platform', title: 'The agency’s platform' }] },
+    ...over,
+  });
 
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), 'kit-editor-'));
@@ -189,7 +252,7 @@ describe('the editor’s files', () => {
     expect(targets.map((t) => t.id)).not.toContain('eb:resource:a-guide');
     expect(targets.map((t) => t.id)).not.toContain('eb:capability:old');
     expect(targets.find((t) => t.id === 'example:outcome:on-plan')).toMatchObject({ own: true, folder: 'audit' });
-    expect(targets.find((t) => t.ways.length)).toMatchObject({ own: false, ways: [{ id: 'platform', title: 'A platform' }] });
+    expect(targets.find((t) => !t.own && t.ways.length)).toMatchObject({ ways: [{ id: 'platform', title: 'A platform' }] });
     expect(packageList(root)).toEqual([{ name: 'audit', title: 'Audit' }, { name: 'offerings', title: 'Offerings' }]);
   });
 
@@ -214,10 +277,24 @@ describe('the editor’s files', () => {
     it('reads a capability’s links with what they say', () => {
       expect(element('capability', 'audit-planning')).toMatchObject({ values: { stage: 'plan-prepare' }, links: { candidate_pattern: [{ to: 'eb:implementationPattern:case-platform', coverage: 'partial', note: 'Holds the plan once it’s approved.' }], satisfies: [{ to: 'example:requirement:publish-the-plan' }] } });
     });
+
+    it('reads a requirement’s kind and the capability it belongs to', () => {
+      expect(element('requirement', 'publish-the-plan')).toMatchObject({ values: { kind: 'transparency-reporting' }, incoming: { satisfies: ['example:capability:audit-planning'] } });
+    });
+
+    it('reads a pattern’s layer, statements, ways, and links', () => {
+      const { pattern: fields, links } = element('implementationPattern', 'audit-workbench');
+      expect(fields).toMatchObject({ layer: 'business-applications', parts: ['Workpapers linked to each finding', 'Review steps with sign-off'], strengths: ['Reviewers see the evidence beside the finding'] });
+      expect(fields!.ways).toEqual([
+        { id: 'product', approach: 'product', title: 'An audit management product', description: 'Configured for the office’s methods.', watchFor: ['Licenses priced per auditor'] },
+        { id: 'built', approach: 'build', title: 'Built on the case platform' },
+      ]);
+      expect(links!.depends_on).toEqual([{ to: 'eb:implementationPattern:case-platform', way: 'built', note: 'It runs on the platform.' }]);
+    });
   });
 
   it('writes nothing different when nothing changed, for every type', () => {
-    const files = ['offerings/resources.yaml', 'offerings/package.yaml', 'audit/missions.yaml', 'audit/outcomes.yaml', 'audit/capabilities.yaml', 'audit/links.yaml', 'audit/package.yaml'];
+    const files = ['offerings/resources.yaml', 'offerings/package.yaml', 'audit/missions.yaml', 'audit/outcomes.yaml', 'audit/capabilities.yaml', 'audit/requirements.yaml', 'audit/patterns.yaml', 'audit/links.yaml', 'audit/package.yaml'];
     const before = files.map(text);
     for (const e of readElements(root, targets)) saveElement(root, e, targets);
     expect(files.map(text)).toEqual(before);
@@ -251,6 +328,48 @@ describe('the editor’s files', () => {
       undo();
       expect(text('offerings/resources.yaml')).toBe(RESOURCES);
       expect(text('offerings/package.yaml')).toBe(PACKAGE);
+    });
+
+    it('writes out the package’s short references when a link brings in a second prefix, and undoes that with the rest', () => {
+      const before = [text('offerings/package.yaml'), text('offerings/resources.yaml')];
+      const { undo } = saveElement(root, resource({ links: { helps_with: [{ to: 'example:outcome:on-plan' }] } }), targets);
+      expect((parse(text('offerings/package.yaml')) as { dependencies: string[] }).dependencies).toEqual(['common', 'audit']);
+      const after = text('offerings/resources.yaml');
+      expect(after).toContain('- eb:capability:records-management');
+      expect(after).toContain('- to: eb:implementationPattern:case-platform');
+      expect(after).toContain('helps_with: [ eb:capability:records-management ]');
+      expect(after).toContain('# A comment that should stay.');
+      expect(list('offerings/resources.yaml').at(-1)!.helps_with).toEqual(['example:outcome:on-plan']);
+      undo();
+      expect([text('offerings/package.yaml'), text('offerings/resources.yaml')]).toEqual(before);
+    });
+
+    it('leaves your own items short, and reaches links.yaml, bare keys, and discovery', () => {
+      const discoveryFile = `- id: set
+  title: Set
+  questions:
+    - id: q
+      prompt: Q?
+      kind: boolean
+      points:
+        - when: "true"
+          to: capability:records-management
+          why: Why
+        - when: "false"
+          to: [ capability:audit-planning, measure:plan-completed ]
+          why: Why
+`;
+      writeFileSync(join(root, 'source', 'audit', 'discovery.yaml'), discoveryFile);
+      const other: Target = { id: 'other:capability:x', title: 'X', type: 'capability', typeLabel: 'Capability', packageTitle: 'Other', folder: 'other', own: false, ways: [] };
+      saveElement(root, pattern({ incoming: { candidate_pattern: [other.id, 'example:capability:audit-planning'] } }), [...targets, other]);
+      const [planning] = list('audit/capabilities.yaml');
+      expect(planning.candidate_pattern).toEqual([{ to: 'eb:implementationPattern:case-platform', coverage: 'partial', note: 'Holds the plan once it’s approved.' }, 'findings-tracker']);
+      expect(planning.contributes_to).toEqual(['on-plan']);
+      expect(text('audit/links.yaml')).toContain('from: eb:capability:records-management');
+      expect(text('audit/links.yaml')).toContain('from: other:capability:x');
+      const discovery = text('audit/discovery.yaml');
+      expect(discovery).toContain('to: eb:capability:records-management');
+      expect(discovery).toContain('to: [ capability:audit-planning, measure:plan-completed ]');
     });
 
     it('starts a file for a package that has none, and takes it away again', () => {
@@ -355,12 +474,130 @@ describe('the editor’s files', () => {
       expect(list('audit/capabilities.yaml')[0].sources).toEqual(['audit-standards']);
     });
 
+    it('keeps a link written out with only its to', () => {
+      const path = join(root, 'source', 'audit', 'capabilities.yaml');
+      writeFileSync(path, CAPABILITIES.replace('satisfies: [ publish-the-plan ]', 'satisfies:\n    - to: publish-the-plan'));
+      saveElement(root, element('capability', 'audit-planning'), targets);
+      expect(text('audit/capabilities.yaml')).toContain('- to: publish-the-plan');
+    });
+
+    it('saves a shared capability whose outcomes are in other packages', () => {
+      const was = element('capability', 'audit-planning');
+      saveElement(root, { ...was, title: 'Changed', links: { ...was.links, contributes_to: [] } }, targets);
+      expect(list('audit/capabilities.yaml')[0].title).toBe('Changed');
+    });
+
     it('keeps a link to something the form can’t offer any more', () => {
       const was = element('capability', 'audit-planning');
       const path = join(root, 'source', 'audit', 'capabilities.yaml');
       writeFileSync(path, CAPABILITIES.replace('satisfies: [ publish-the-plan ]', 'satisfies: [ eb:requirement:gone ]'));
       saveElement(root, { ...was, title: 'Changed', links: { ...was.links, satisfies: [{ to: 'eb:requirement:gone' }] } }, targets);
       expect(text('audit/capabilities.yaml')).toContain('satisfies: [ eb:requirement:gone ]');
+    });
+  });
+
+  describe('requirements', () => {
+    it('adds a requirement, with its link written on its capability', () => {
+      expect(saveElement(root, requirement(), targets).id).toBe('report-to-the-council');
+      expect(list('audit/requirements.yaml').at(-1)).toEqual({ id: 'report-to-the-council', title: 'Report to the council', kind: 'transparency-reporting', status: 'draft', description: 'Report to the council each quarter.' });
+      expect(list('audit/capabilities.yaml')[0].satisfies).toEqual(['publish-the-plan', 'report-to-the-council']);
+      expect(text('audit/requirements.yaml').startsWith(REQUIREMENTS)).toBe(true);
+    });
+
+    it('moves a requirement to another capability, keeping its sources', () => {
+      const { id } = saveElement(root, capability(), targets);
+      targets = [...targets, { id: `example:capability:${id}`, title: 'Report Publishing', type: 'capability', typeLabel: 'Capability', packageTitle: 'Audit', folder: 'audit', own: true, ways: [] }];
+      saveElement(root, { ...element('requirement', 'publish-the-plan'), incoming: { satisfies: [`example:capability:${id}`] } }, targets);
+      const [planning, publishing] = list('audit/capabilities.yaml');
+      expect(planning.satisfies).toBeUndefined();
+      expect(publishing.satisfies).toEqual(['publish-the-plan']);
+      expect(list('audit/requirements.yaml')[0].sources).toEqual(['audit-standards']);
+    });
+
+    it('keeps a requirement that was already on two capabilities', () => {
+      const path = join(root, 'source', 'audit', 'links.yaml');
+      writeFileSync(path, `${LINKS}\n- from: capability:identity\n  satisfies: [ publish-the-plan ]\n`);
+      const before = text('audit/links.yaml');
+      saveElement(root, { ...element('requirement', 'publish-the-plan'), title: 'Publish it' }, targets);
+      expect(text('audit/links.yaml')).toBe(before);
+      expect(list('audit/requirements.yaml')[0].title).toBe('Publish it');
+    });
+  });
+
+  describe('patterns', () => {
+    it('adds a pattern with its attributes in the library’s order', () => {
+      saveElement(root, pattern({
+        pattern: {
+          layer: 'data-records',
+          parts: [' A list of findings ', ''],
+          watchFor: ['Findings that never close'],
+          ways: [{ approach: 'product', title: 'A Tracking Product', description: ' Bought. ', strengths: ['Quick to start'] }, { approach: 'build', title: 'A Tracking Product' }],
+        },
+      }), targets);
+      const added = list('audit/patterns.yaml').at(-1)!;
+      expect(Object.keys(added)).toEqual(['id', 'title', 'status', 'description', 'attributes']);
+      expect(added.attributes).toEqual({
+        layer: 'data-records',
+        parts: ['A list of findings'],
+        watchFor: ['Findings that never close'],
+        ways: [
+          { id: 'a-tracking-product', approach: 'product', title: 'A Tracking Product', description: 'Bought.', strengths: ['Quick to start'] },
+          { id: 'a-tracking-product-2', approach: 'build', title: 'A Tracking Product' },
+        ],
+      });
+      expect(text('audit/patterns.yaml').startsWith(PATTERNS)).toBe(true);
+    });
+
+    it('writes a link from your capability on it, and from a library capability in links.yaml', () => {
+      saveElement(root, pattern({ incoming: { candidate_pattern: ['example:capability:audit-planning', 'eb:capability:identity'] } }), targets);
+      const [planning] = list('audit/capabilities.yaml');
+      expect(planning.candidate_pattern).toEqual([{ to: 'case-platform', coverage: 'partial', note: 'Holds the plan once it’s approved.' }, 'findings-tracker']);
+      expect(list('audit/links.yaml').at(-1)).toEqual({ from: 'eb:capability:identity', candidate_pattern: ['findings-tracker'] });
+    });
+
+    it('changes a way without changing its ID, and keeps what’s around it', () => {
+      const was = element('implementationPattern', 'audit-workbench');
+      const ways = was.pattern!.ways.map((w) => (w.id === 'product' ? { ...w, title: 'A product for audit offices' } : w));
+      saveElement(root, { ...was, pattern: { ...was.pattern!, ways } }, targets);
+      const after = text('audit/patterns.yaml');
+      expect(after).toContain('- id: product');
+      expect(after).toContain('title: A product for audit offices');
+      expect(after).toContain('sources: [ audit-standards ]');
+      expect(after).toContain('way: built');
+      expect(after.startsWith('# Patterns, each with the links it holds.')).toBe(true);
+    });
+
+    it('takes an empty list away, since the format won’t have one', () => {
+      const was = element('implementationPattern', 'audit-workbench');
+      saveElement(root, { ...was, pattern: { ...was.pattern!, strengths: [] } }, targets);
+      expect(list('audit/patterns.yaml')[0].attributes).not.toHaveProperty('strengths');
+    });
+
+    it('reads a need’s way as this pattern’s, not the other one’s', () => {
+      const was = element('implementationPattern', 'audit-workbench');
+      const needs = (way: string) => ({ ...was, title: 'Changed', links: { ...was.links, depends_on: [{ to: 'eb:implementationPattern:case-platform', way }] } });
+      expect(() => saveElement(root, needs('platform'), targets)).toThrow('isn’t one of this pattern’s');
+      expect(() => saveElement(root, needs('product'), targets)).not.toThrow();
+    });
+
+    it('adds the package a need reaches', () => {
+      saveElement(root, pattern({ package: 'offerings', links: { depends_on: [{ to: 'eb:implementationPattern:case-platform', note: 'Runs on it.' }], works_with: [{ to: 'example:implementationPattern:audit-workbench' }] } }), targets);
+      expect(list('offerings/patterns.yaml').at(-1)).toMatchObject({ depends_on: [{ to: 'eb:implementationPattern:case-platform', note: 'Runs on it.' }], works_with: ['example:implementationPattern:audit-workbench'] });
+      expect((parse(text('offerings/package.yaml')) as { dependencies: string[] }).dependencies).toEqual(['common', 'audit']);
+    });
+
+    it('won’t take away a way that a resource is about', () => {
+      saveElement(root, resource({ links: { helps_with: [{ to: 'example:implementationPattern:audit-workbench', way: 'product' }] } }), targets);
+      const was = element('implementationPattern', 'audit-workbench');
+      const fewer = { ...was, links: { ...was.links }, pattern: { ...was.pattern!, ways: was.pattern!.ways.filter((w) => w.id !== 'product') } };
+      expect(() => saveElement(root, fewer, targets)).toThrow('“Records review” is about the way “An audit management product”');
+      expect(text('audit/patterns.yaml')).toBe(PATTERNS);
+    });
+
+    it('undoes a new pattern and everything its links touched', () => {
+      const before = [text('audit/patterns.yaml'), text('audit/capabilities.yaml'), text('audit/links.yaml')];
+      saveElement(root, pattern({ incoming: { candidate_pattern: ['example:capability:audit-planning', 'eb:capability:identity'] } }), targets).undo();
+      expect([text('audit/patterns.yaml'), text('audit/capabilities.yaml'), text('audit/links.yaml')]).toEqual(before);
     });
   });
 
@@ -395,6 +632,33 @@ describe('the editor’s files', () => {
       expect(list('audit/missions.yaml')).toEqual([]);
       expect(list('audit/outcomes.yaml')).toHaveLength(2);
     });
+
+    it('won’t leave a resource with nothing to help with', () => {
+      const id = 'example:implementationPattern:audit-workbench';
+      saveElement(root, resource({ links: { helps_with: [{ to: id }] } }), targets);
+      expect(() => deleteElement(root, 'audit', 'implementationPattern', 'audit-workbench', targets)).toThrow('“Records review” helps only with this');
+      expect(text('audit/patterns.yaml')).toBe(PATTERNS);
+    });
+
+    it('takes a requirement off its capability', () => {
+      deleteElement(root, 'audit', 'requirement', 'publish-the-plan', targets);
+      expect(list('audit/requirements.yaml')).toEqual([]);
+      expect(list('audit/capabilities.yaml')[0].satisfies).toBeUndefined();
+    });
+
+    it('takes a pattern’s links with it, from capabilities, links.yaml, other patterns, and resources', () => {
+      const id = 'example:implementationPattern:audit-workbench';
+      saveElement(root, pattern({ links: { works_with: [{ to: id }], depends_on: [{ to: id }] } }), targets);
+      saveElement(root, resource({ links: { helps_with: [{ to: id, way: 'product' }, { to: 'eb:capability:identity' }] } }), targets);
+      saveElement(root, { ...element('implementationPattern', 'audit-workbench'), incoming: { candidate_pattern: ['example:capability:audit-planning', 'eb:capability:identity'] } }, targets);
+      deleteElement(root, 'audit', 'implementationPattern', 'audit-workbench', targets);
+      expect(list('audit/patterns.yaml').map((p) => p.id)).toEqual(['findings-tracker']);
+      expect(list('audit/patterns.yaml')[0]).not.toHaveProperty('works_with');
+      expect(list('audit/patterns.yaml')[0]).not.toHaveProperty('depends_on');
+      expect(list('audit/capabilities.yaml')[0].candidate_pattern).toEqual([{ to: 'case-platform', coverage: 'partial', note: 'Holds the plan once it’s approved.' }]);
+      expect(text('audit/links.yaml')).not.toContain('audit-workbench');
+      expect(list('offerings/resources.yaml').at(-1)!.helps_with).toEqual(['eb:capability:identity']);
+    });
   });
 
   it('finds which capabilities would bring a pattern into a mission', () => {
@@ -426,12 +690,32 @@ describe('the editor’s files', () => {
     expect(save(capability({ values: {} }))).toThrow('stage of the work');
     expect(save(capability({ links: {} }))).toThrow('at least one outcome');
     expect(save(capability({ links: { contributes_to: [{ to: 'eb:capability:identity' }] } }))).toThrow("can't go there");
+    expect(save(requirement({ values: {} }))).toThrow('what kind of requirement');
+    expect(save(requirement({ incoming: {} }))).toThrow('the capability it belongs to');
+    expect(save(requirement({ incoming: { satisfies: ['example:capability:audit-planning', 'eb:capability:identity'] } }))).toThrow('belongs to one capability');
+    expect(save(requirement({ incoming: { satisfies: ['eb:capability:identity'] } }))).toThrow('in another package');
+    expect(save(requirement({ incoming: { satisfies: ['example:capability:advice'] } }))).toThrow('in another package');
+    expect(save(pattern({ pattern: undefined }))).toThrow('Choose its layer');
+    expect(save(pattern({ pattern: { layer: 'processing', ways: [{ approach: 'build', title: 'Built' }] } }))).toThrow('Choose its layer');
+    expect(save(pattern({ pattern: { layer: 'connections', ways: [] } }))).toThrow('at least one way');
+    expect(save(pattern({ pattern: { layer: 'connections', ways: [{ approach: 'nonsense', title: ' ' }, { approach: '', title: '' }] } }))).toThrow('Choose an approach for each way.\nGive each way a title.');
+    expect(() => saveElement(root, { ...pattern(), id: 'audit-workbench', links: { works_with: [{ to: 'example:implementationPattern:audit-workbench' }] } }, targets)).toThrow('link to itself');
     expect(save({ ...resource(), package: '../outside' })).toThrow(EditError);
     expect(save({ ...resource(), type: 'solution' })).toThrow('doesn’t handle'.replace('’', "'"));
     expect(() => saveElement(root, { ...resource(), id: 'nothing-here' }, targets)).toThrow(EditError);
     expect(() => deleteElement(root, 'offerings', 'resource', 'nothing-here', targets)).toThrow(EditError);
     expect(text('offerings/resources.yaml')).toBe(RESOURCES);
     expect(text('audit/outcomes.yaml')).toBe(OUTCOMES);
+    expect(text('audit/requirements.yaml')).toBe(REQUIREMENTS);
+    expect(text('audit/patterns.yaml')).toBe(PATTERNS);
+  });
+
+  it('keeps a link from something the form can’t offer any more, on the element it points to', () => {
+    writeFileSync(join(root, 'source', 'audit', 'links.yaml'), `${LINKS}\n- from: capability:old\n  contributes_to: [ on-plan ]\n`);
+    const before = text('audit/links.yaml');
+    saveElement(root, { ...element('outcome', 'on-plan'), title: 'Changed' }, targets);
+    expect(text('audit/links.yaml')).toBe(before);
+    expect(list('audit/outcomes.yaml')[0].title).toBe('Changed');
   });
 });
 

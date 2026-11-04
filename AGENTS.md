@@ -35,6 +35,9 @@ pnpm verify          # content check, type check, tests, and site build
   the types it handles and what each form holds, and a change's files are written and undone together. A save
   runs `scripts/content.ts build`, whose checks decide; a refused change is undone. A link that can't go on
   the other end's element, such as a library capability contributing to your outcome, goes in `links.yaml`.
+  A link's `way` is the linked pattern's, except on `depends_on`, where it's the way of the pattern that has the
+  need. A package that gains a second prefix among its dependencies has its short references written out, or
+  the compiler can't tell them apart.
   `client.ts` finds its places by the attributes the library's pages carry: `data-resources-for`,
   `data-resource-id`, `data-element`, and `data-detail`. Try it in a scratch copy, since a save writes `source/`
   and `content/`. Tests in `tests/` run in every organization's copy, so they can't rely on the sample. Keep `allowed()` in `server.ts`: any site

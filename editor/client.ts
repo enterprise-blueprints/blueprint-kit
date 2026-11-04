@@ -8,10 +8,12 @@ import './client.css';
 
 interface Link { to: string; way?: string; coverage?: 'partial'; note?: string }
 interface Measure { id?: string; title: string; description: string }
+interface Way { id?: string; approach: string; title: string; description?: string; strengths?: string[]; fitsWhen?: string[]; watchFor?: string[] }
+interface Pattern { layer: string; parts?: string[]; strengths?: string[]; fitsWhen?: string[]; watchFor?: string[]; ways: Way[] }
 interface Item {
   package: string; type: string; id: string; elementId: string; title: string; description: string; status?: string;
   values?: Record<string, string>; details?: Record<string, string>; tagline?: string; principles?: string[];
-  measures?: Measure[]; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
+  measures?: Measure[]; pattern?: Pattern; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
 }
 interface Target { id: string; title: string; type: string; typeLabel: string; packageTitle: string; folder: string; own: boolean; ways: { id: string; title: string }[] }
 interface Choice { id: string; label: string; hint?: string }
@@ -19,6 +21,7 @@ interface State {
   release?: string; draft?: boolean; problems?: string[]; today: string;
   packages: { name: string; title: string }[];
   groups: Record<string, Choice[]>;
+  patternFields: Choice[];
   statuses: Choice[];
   sections: Record<string, string>;
   elements: Item[];
@@ -39,6 +42,8 @@ const names: Record<string, { a: string; word: string }> = {
   mission: { a: 'a mission', word: 'mission' },
   outcome: { a: 'an outcome', word: 'outcome' },
   capability: { a: 'a capability', word: 'capability' },
+  requirement: { a: 'a requirement', word: 'requirement' },
+  implementationPattern: { a: 'a pattern', word: 'pattern' },
   resource: { a: 'a resource', word: 'resource' },
 };
 
@@ -92,8 +97,18 @@ interface PickerOptions {
   placeholder: string;
   /** Offers a choice of one of a pattern's ways. */
   ways?: boolean;
+  /** Offers a choice of these ways of the pattern being edited, for saying which one has the need. */
+  ownWays?: { id?: string; title: string }[];
   /** Offers saying a pattern covers only part, with a note about it. */
   coverage?: boolean;
+  /** Offers a note about each link. */
+  note?: boolean;
+  /** Takes one item, not a list. */
+  one?: boolean;
+  /** Only items in this package. */
+  inPackage?: string;
+  /** An item not to offer, which is the one being edited. */
+  not?: string;
   /** Items to offer before any search. */
   suggest?: string[];
 }
@@ -108,10 +123,11 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
 
   const extras = (link: Link, target?: Target) => {
     const parts: HTMLElement[] = [];
-    if (options.ways && target?.ways.length) {
-      parts.push(h('select', { 'aria-label': 'Which way of sourcing it', onchange: (e: Event) => (link.way = (e.target as HTMLSelectElement).value || undefined) },
-        h('option', { value: '' }, 'Any way of sourcing it'),
-        ...target.ways.map((w) => h('option', { value: w.id, selected: w.id === link.way }, w.title))));
+    const ways = options.ownWays ?? (options.ways ? target?.ways : undefined);
+    if (ways?.length) {
+      parts.push(h('select', { 'aria-label': options.ownWays ? 'Which way needs it' : 'Which way of sourcing it', onchange: (e: Event) => (link.way = (e.target as HTMLSelectElement).value || undefined) },
+        h('option', { value: '' }, options.ownWays ? 'Whichever way it’s sourced' : 'Any way of sourcing it'),
+        ...ways.map((w) => h('option', { value: w.id ?? '', selected: w.id === link.way }, w.title))));
     }
     if (options.coverage) {
       parts.push(h('label', { className: 'kit-editor-check' },
@@ -125,7 +141,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
     chosen.replaceChildren(
       ...links.map((link, i) => {
         const target = byId.get(link.to);
-        const note = (options.ways || options.coverage) && h('input', { className: 'kit-editor-links__note', value: link.note ?? '', placeholder: 'A note about this link, if it needs one', 'aria-label': 'A note about this link', oninput: (e: Event) => (link.note = (e.target as HTMLInputElement).value.trim() || undefined) });
+        const note = (options.ways || options.coverage || options.note) && h('input', { className: 'kit-editor-links__note', value: link.note ?? '', placeholder: 'A note about this link, if it needs one', 'aria-label': 'A note about this link', oninput: (e: Event) => (link.note = (e.target as HTMLInputElement).value.trim() || undefined) });
         return h('li', {},
           h('span', { className: 'kit-editor-links__name' }, h('strong', {}, target?.title ?? link.to), h('small', {}, target ? ` ${target.typeLabel} · ${target.packageTitle}` : '')),
           ...extras(link, target),
@@ -143,6 +159,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   const redraw = () => {
     drawChosen();
     drawSuggestions();
+    search.hidden = Boolean(options.one && links.length);
   };
 
   const add = (target: Target) => {
@@ -157,7 +174,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
     const words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return [];
     return state.targets
-      .filter((t) => options.types.includes(t.type) && (!options.ownOnly || t.own) && !links.some((l) => l.to === t.id))
+      .filter((t) => options.types.includes(t.type) && (!options.ownOnly || t.own) && (!options.inPackage || t.folder === options.inPackage) && t.id !== options.not && !links.some((l) => l.to === t.id))
       .filter((t) => words.every((w) => `${t.title} ${t.typeLabel} ${t.packageTitle}`.toLowerCase().includes(w)))
       .slice(0, 12);
   };
@@ -216,6 +233,32 @@ function measureRows(measures: Measure[]) {
   return rows;
 }
 
+const lines = (list: string[] = []) => list.join('\n');
+const statements = (text: string) => text.split('\n').map((s) => s.trim()).filter(Boolean);
+
+/** Rows of a pattern's ways to source it, each with its fit tucked away until it's wanted. */
+function wayRows(state: State, ways: Way[]) {
+  const rows = h('div', { className: 'kit-editor-ways' });
+  const said = state.patternFields.filter((f) => f.id !== 'parts');
+  const draw = () => {
+    rows.replaceChildren(
+      ...ways.map((way, i) =>
+        h('div', { className: 'kit-editor-way' },
+          h('div', { className: 'kit-editor-way__top' },
+            h('select', { required: true, 'aria-label': 'Approach', onchange: (e: Event) => (way.approach = (e.target as HTMLSelectElement).value) }, h('option', { value: '' }, 'Choose an approach'), ...options(state.groups.approach, way.approach)),
+            ways.length > 1 && h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this way', onclick: () => { ways.splice(i, 1); draw(); } }, '✕'),
+            h('input', { value: way.title, required: true, placeholder: 'What it is, such as “The agency’s case platform”', 'aria-label': 'Way title', oninput: (e: Event) => (way.title = (e.target as HTMLInputElement).value) })),
+          h('textarea', { rows: '2', value: way.description ?? '', placeholder: 'How this way works, if that needs saying', 'aria-label': 'Way description', oninput: (e: Event) => (way.description = (e.target as HTMLTextAreaElement).value) }),
+          h('details', { open: said.some((f) => way[f.id as 'strengths']?.length) },
+            h('summary', {}, 'What’s particular to this way'),
+            ...said.map((f) => field(f.label, h('textarea', { rows: '2', value: lines(way[f.id as 'strengths']), oninput: (e: Event) => (way[f.id as 'strengths'] = statements((e.target as HTMLTextAreaElement).value)) }), 'One to a line.'))))),
+      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { ways.push({ approach: '', title: '' }); draw(); } }, '+ Add a way'),
+    );
+  };
+  draw();
+  return rows;
+}
+
 const field = (label: string, control: HTMLElement, hint?: string) => h('label', { className: 'kit-editor-field' }, h('span', {}, label), control, hint && h('small', {}, hint));
 const group = (label: string, body: HTMLElement, hint?: string) => h('fieldset', {}, h('legend', {}, label), hint && h('small', {}, hint), body);
 const options = (choices: Choice[], current?: string) => choices.map((c) => h('option', { value: c.id, selected: c.id === current }, c.label));
@@ -227,10 +270,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
   const links: Record<string, Link[]> = { ...copy(start.links ?? {}), ...copy(existing?.links ?? {}) };
   const linksFor = (predicate: string) => (links[predicate] ??= []);
-  const incoming: Record<string, Link[]> = {
-    seeks: asLinks(existing?.incoming?.seeks ?? start.incoming?.seeks),
-    contributes_to: asLinks(existing?.incoming?.contributes_to ?? start.incoming?.contributes_to),
-  };
+  const incoming: Record<string, Link[]> = Object.fromEntries(['seeks', 'contributes_to', 'satisfies', 'candidate_pattern'].map((p) => [p, asLinks(existing?.incoming?.[p] ?? start.incoming?.[p])]));
   const details = Object.entries(existing?.details ?? {});
   const measures: Measure[] = copy(existing?.measures ?? []);
 
@@ -303,6 +343,43 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
     read = () => ({ values: { stage: stage.value } });
   }
 
+  if (type === 'requirement') {
+    const kind = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.requirement, existing?.values?.kind));
+    parts.push(
+      h('div', { className: 'kit-editor-pair' }, field('Kind', kind), field('Status', status)),
+      field('Description', description, 'What it asks for, with any figure from the law or policy, such as 20 working days.'),
+      group('Capability it belongs to', linkPicker(state, incoming.satisfies, { types: ['capability'], ownOnly: true, one: true, inPackage: existing?.package ?? start.package, placeholder: 'Search your capabilities' })),
+    );
+    // A requirement goes in its capability's package, so that's what says where.
+    const home = () => (existing ? undefined : state.targets.find((t) => t.id === incoming.satisfies[0]?.to)?.folder);
+    read = () => ({ values: { kind: kind.value }, incoming: { satisfies: incoming.satisfies.map((l) => l.to) }, ...(home() && { package: home() }) });
+  }
+
+  if (type === 'implementationPattern') {
+    const pattern: Pattern = copy(existing?.pattern ?? { layer: '', ways: [{ approach: '', title: '' }] });
+    const layer = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.layer, pattern.layer));
+    const layerHint = () => state.groups.layer.find((l) => l.id === layer.value)?.hint ?? '';
+    const layerField = field('Layer', layer, layerHint() || ' ');
+    layer.addEventListener('change', () => (layerField.querySelector('small')!.textContent = layerHint()));
+    const listOf = (id: string) => pattern[id as 'parts'];
+    const areas = new Map(state.patternFields.map((f) => [f.id, h('textarea', { rows: '3', value: lines(listOf(f.id)) })]));
+    // A need can name one of the ways, so it needs ways that are saved, and more than one to choose from.
+    const saved = existing?.pattern?.ways ?? [];
+    parts.push(
+      h('div', { className: 'kit-editor-pair' }, layerField, field('Status', status)),
+      field('Description', description, 'What it is, in a sentence or two. The library’s start “An example architecture:”.'),
+      group('Ways to source it', wayRows(state, pattern.ways), 'One is enough. Add more if it could also be bought, built, or run on a platform the agency has.'),
+      ...state.patternFields.map((f) => field(f.label, areas.get(f.id)!, `${f.hint} One to a line.`)),
+      group('Capabilities it could provide', linkPicker(state, incoming.candidate_pattern, { types: ['capability'], placeholder: 'Search capabilities, yours and the library’s' }), 'Choosing one of the library’s offers this pattern there, without changing it.'),
+      group('Needs', linkPicker(state, linksFor('depends_on'), { types: ['implementationPattern'], placeholder: 'Search patterns', not: existing?.elementId, note: true, ownWays: saved.length > 1 ? saved : undefined }), 'Patterns it can’t work without. A mission with this pattern has to have them too.'),
+      group('Works with', linkPicker(state, linksFor('works_with'), { types: ['implementationPattern'], placeholder: 'Search patterns', not: existing?.elementId, note: true })),
+    );
+    read = () => ({
+      pattern: { ...pattern, layer: layer.value, ...Object.fromEntries(state.patternFields.map((f) => [f.id, statements(areas.get(f.id)!.value)])) },
+      incoming: { candidate_pattern: incoming.candidate_pattern.map((l) => l.to) },
+    });
+  }
+
   const failed = (e: unknown) => {
     save.disabled = false;
     problemList(problems, e instanceof Error ? e.message : String(e));
@@ -354,9 +431,9 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   },
     h('header', {}, h('h2', {}, existing ? `Change this ${name.word}` : `Add ${name.a}`), h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Close', onclick: close }, '✕')),
     problems,
-    field('Title', title),
+    field('Title', title, type === 'requirement' ? 'An instruction, such as “Publish the approved audit plan”.' : undefined),
     ...parts.filter((p): p is HTMLElement => Boolean(p)),
-    !existing && !start.package && state.packages.length > 1 && field('Package', inPackage),
+    !existing && !start.package && type !== 'requirement' && state.packages.length > 1 && field('Package', inPackage),
     h('footer', {},
       existing && h('button', { type: 'button', className: 'kit-editor-danger', onclick: (e: Event) => void remove(e.currentTarget as HTMLButtonElement) }, 'Delete'),
       h('span', { className: 'kit-editor-spacer' }),
@@ -410,7 +487,7 @@ function drawBar(state: State) {
     : h('span', {}, `Release ${state.release}`, h('span', { className: state.draft ? 'kit-editor-pill kit-editor-pill--draft' : 'kit-editor-pill' }, state.draft ? 'Draft' : 'Published'));
   const menu = h('details', { className: 'kit-editor-menu' },
     h('summary', {}, '+ Add'),
-    h('div', {}, ...['resource', 'mission', 'outcome', 'capability'].map((type) =>
+    h('div', {}, ...['resource', 'mission', 'outcome', 'capability', 'requirement', 'implementationPattern'].map((type) =>
       h('button', { type: 'button', onclick: () => { menu.open = false; openForm(state, type); } }, `+ Add ${names[type].a}`))));
   document.addEventListener('click', (e) => {
     if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
@@ -433,11 +510,15 @@ function actions(state: State, item: Item) {
     capability: () => openForm(state, 'capability', undefined, item.type === 'outcome'
       ? { package: item.package, links: { contributes_to: [{ to: item.elementId }] } }
       : { package: item.package, suggest: outcomes }),
+    requirement: () => openForm(state, 'requirement', undefined, { package: item.package, incoming: { satisfies: [item.elementId] } }),
+    pattern: () => openForm(state, 'implementationPattern', undefined, { package: item.package, incoming: { candidate_pattern: [item.elementId] } }),
   };
   return h('div', { className: 'kit-editor-actions' },
     button(`Edit this ${names[item.type].word}`, () => openForm(state, item.type, item)),
     item.type === 'mission' && button('+ Add an outcome', add.outcome),
-    (item.type === 'mission' || item.type === 'outcome') && button('+ Add a capability', add.capability));
+    (item.type === 'mission' || item.type === 'outcome') && button('+ Add a capability', add.capability),
+    item.type === 'capability' && button('+ Add a requirement', add.requirement),
+    item.type === 'capability' && button('+ Add a pattern', add.pattern));
 }
 
 function drawButtons(state: State) {

@@ -76,9 +76,15 @@
 .kit-editor-way__top input { grid-column: 1 / -1; }
 .kit-editor-way details > summary { color: var(--text-muted); font-size: .875rem; cursor: pointer; }
 .kit-editor-way details[open] { display: grid; gap: .5rem; }
+.kit-editor-answer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem; align-items: center; }
+.kit-editor-answers { display: flex; flex-wrap: wrap; gap: .2rem .75rem; min-width: 0; }
+.kit-editor-answers .kit-editor-check { white-space: normal; }
+.kit-editor-dialog fieldset[hidden] { display: none; }
 .kit-editor-remove { flex: none; padding: .1rem .4rem; border: 0; border-radius: var(--radius-sm); background: none; color: var(--text-muted); font: inherit; cursor: pointer; }
 .kit-editor-remove:hover { background: var(--surface-muted); color: var(--text); }
 .kit-editor-link { justify-self: start; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer; }
+
+[data-source] th .kit-editor-edit { display: block; margin-top: .35rem; }
 
 .kit-editor-problems { padding: .55rem .75rem; border-left: 3px solid #b42318; border-radius: var(--radius-sm); background: color-mix(in srgb, #b42318 10%, var(--surface)); font-size: .9375rem; }
 .kit-editor-problems[hidden] { display: none; }

@@ -39,7 +39,10 @@ pnpm verify          # content check, type check, tests, and site build
   need. A package that gains a second prefix among its dependencies has its short references written out, or
   the compiler can't tell them apart.
   `client.ts` finds its places by the attributes the library's pages carry: `data-resources-for`,
-  `data-resource-id`, `data-element`, and `data-detail`. Try it in a scratch copy, since a save writes `source/`
+  `data-resource-id`, `data-element`, `data-detail`, `data-source`, `data-assessment`, `data-question`, and
+  `data-package`. Sources, discovery, and packages aren't elements, so `store.ts` has functions of their own for
+  them. A set has to have a question, so a new set comes with its first. The site won't load with no packages,
+  so `scripts/editor.ts` starts the first in the terminal. Try it in a scratch copy, since a save writes `source/`
   and `content/`. Tests in `tests/` run in every organization's copy, so they can't rely on the sample. Keep `allowed()` in `server.ts`: any site
   open in the browser can reach a server on this computer.
 - The README's quickstart is for someone who has only Node, or nothing yet, and no GitHub. Keep it working

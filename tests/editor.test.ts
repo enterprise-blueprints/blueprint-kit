@@ -4,7 +4,10 @@ import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import { allowed } from '../editor/server';
-import { capabilitiesProviding, deleteElement, EditError, newId, packageList, readElements, readTargets, saveElement, type ElementFields, type Target } from '../editor/store';
+import {
+  addPackage, capabilitiesProviding, deleteElement, deleteQuestion, deleteSet, deleteSource, EditError, newId, packageList, readDiscovery, readElements, readSources, readTargets,
+  saveElement, saveQuestion, saveSet, saveSource, type ElementFields, type QuestionFields, type SourceFields, type Target,
+} from '../editor/store';
 
 // Every copy of the kit runs these, whatever it has made of the sample, so they
 // work on files of their own rather than on source/.
@@ -152,6 +155,45 @@ const PATTERNS = `# Patterns, each with the links it holds.
       note: It runs on the platform.
 `;
 
+const SOURCES = `# The references this package cites.
+
+- id: audit-standards
+  title: Government Auditing Standards
+  url: https://example.com/standards
+  kind: official-reference
+  publicationDate: 2024-02-01
+  lastReviewedAt: 2026-10-30
+  note: What an audit has to do.
+`;
+
+const DISCOVERY = `# Discovery question sets.
+
+- id: audit-results
+  title: Audit results discovery
+  description: For the start of an engagement.
+  questions:
+    - id: priority-results
+      prompt: Which of these results matter most?
+      kind: multiple-choice
+      options:
+        - on-plan: The plan is carried out
+        - closed: Findings are closed
+      points:
+        - when: on-plan
+          to: outcome:on-plan
+          why: This effort is meant to advance it.
+        - when: [ on-plan, closed ]
+          to: [ measure:plan-completed, capability:records-management ]
+          why: Either one needs it.
+    - id: publishes-reports
+      prompt: Does the office publish its reports?
+      kind: boolean
+      points:
+        - when: "false"
+          to: capability:audit-planning
+          why: It may need a way to publish.
+`;
+
 const AUDIT = `packageId: com.example.audit
 idPrefix: example
 title: Audit
@@ -170,9 +212,11 @@ const FILES: Record<string, string> = {
   'source/audit/links.yaml': LINKS,
   'source/audit/requirements.yaml': REQUIREMENTS,
   'source/audit/patterns.yaml': PATTERNS,
+  'source/audit/sources.yaml': SOURCES,
+  'source/audit/discovery.yaml': DISCOVERY,
   'content/audit/0.1.0/blueprint.json': library('Audit', [
     { id: 'example:mission:local-audit', type: 'mission', title: 'Local Audit' },
-    { id: 'example:outcome:on-plan', type: 'outcome', title: 'The audit plan is carried out' },
+    { id: 'example:outcome:on-plan', type: 'outcome', title: 'The audit plan is carried out', attributes: { measures: [{ id: 'plan-completed', title: 'Share of the plan completed' }] } },
     { id: 'example:outcome:findings-closed', type: 'outcome', title: 'Findings are closed' },
     { id: 'example:capability:audit-planning', type: 'capability', title: 'Audit Planning' },
     { id: 'example:requirement:publish-the-plan', type: 'requirement', title: 'Publish the plan' },
@@ -238,6 +282,10 @@ describe('the editor’s files', () => {
     ...over,
   });
 
+  const source = (over: Partial<SourceFields> = {}): SourceFields => ({ package: 'audit', title: 'City Charter, Article 5', url: 'https://example.com/charter', kind: 'official-reference', lastReviewedAt: '2026-11-04', ...over });
+  const question = (over: Partial<QuestionFields> = {}): QuestionFields => ({ package: 'audit', set: 'audit-results', prompt: 'How does the office plan its audits?', kind: 'text', ...over });
+  const askedIn = (id: string) => readDiscovery(root, targets).flatMap((s) => s.questions).find((q) => q.id === id)!;
+
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), 'kit-editor-'));
     for (const [path, content] of Object.entries(FILES)) {
@@ -294,9 +342,14 @@ describe('the editor’s files', () => {
   });
 
   it('writes nothing different when nothing changed, for every type', () => {
-    const files = ['offerings/resources.yaml', 'offerings/package.yaml', 'audit/missions.yaml', 'audit/outcomes.yaml', 'audit/capabilities.yaml', 'audit/requirements.yaml', 'audit/patterns.yaml', 'audit/links.yaml', 'audit/package.yaml'];
+    const files = ['offerings/resources.yaml', 'offerings/package.yaml', 'audit/missions.yaml', 'audit/outcomes.yaml', 'audit/capabilities.yaml', 'audit/requirements.yaml', 'audit/patterns.yaml', 'audit/sources.yaml', 'audit/discovery.yaml', 'audit/links.yaml', 'audit/package.yaml'];
     const before = files.map(text);
     for (const e of readElements(root, targets)) saveElement(root, e, targets);
+    for (const s of readSources(root)) saveSource(root, s);
+    for (const set of readDiscovery(root, targets)) {
+      saveSet(root, set);
+      for (const q of set.questions) saveQuestion(root, q, targets);
+    }
     expect(files.map(text)).toEqual(before);
   });
 
@@ -598,6 +651,212 @@ describe('the editor’s files', () => {
       const before = [text('audit/patterns.yaml'), text('audit/capabilities.yaml'), text('audit/links.yaml')];
       saveElement(root, pattern({ incoming: { candidate_pattern: ['example:capability:audit-planning', 'eb:capability:identity'] } }), targets).undo();
       expect([text('audit/patterns.yaml'), text('audit/capabilities.yaml'), text('audit/links.yaml')]).toEqual(before);
+    });
+  });
+
+  describe('sources', () => {
+    it('reads a package’s sources', () => {
+      expect(readSources(root)).toEqual([{ package: 'audit', id: 'audit-standards', sourceId: 'src:audit-standards', packageId: 'com.example.audit', title: 'Government Auditing Standards', url: 'https://example.com/standards', kind: 'official-reference', publicationDate: '2024-02-01', lastReviewedAt: '2026-10-30', note: 'What an audit has to do.' }]);
+    });
+
+    it('adds a source, starting the file for a package with none, and undoes that', () => {
+      expect(saveSource(root, source()).id).toBe('city-charter-article-5');
+      expect(list('audit/sources.yaml').at(-1)).toEqual({ id: 'city-charter-article-5', title: 'City Charter, Article 5', url: 'https://example.com/charter', kind: 'official-reference', lastReviewedAt: '2026-11-04' });
+      expect(text('audit/sources.yaml').startsWith(SOURCES)).toBe(true);
+      const { undo } = saveSource(root, source({ package: 'offerings' }));
+      expect(list('offerings/sources.yaml')).toHaveLength(1);
+      undo();
+      expect(existsSync(join(root, 'source', 'offerings', 'sources.yaml'))).toBe(false);
+    });
+
+    it('changes a source without changing its ID', () => {
+      const [was] = readSources(root);
+      saveSource(root, { ...was, title: 'Yellow Book', publicationDate: undefined, note: '' });
+      expect(list('audit/sources.yaml')[0]).toEqual({ id: 'audit-standards', title: 'Yellow Book', url: 'https://example.com/standards', kind: 'official-reference', lastReviewedAt: '2026-10-30' });
+    });
+
+    it('cites sources on an element, and takes them off', () => {
+      const was = element('outcome', 'findings-closed');
+      expect(was.sources).toEqual([]);
+      saveElement(root, { ...was, sources: ['audit-standards'] }, targets);
+      expect(list('audit/outcomes.yaml')[1].sources).toEqual(['audit-standards']);
+      saveElement(root, { ...element('outcome', 'findings-closed'), sources: [] }, targets);
+      expect(list('audit/outcomes.yaml')[1]).not.toHaveProperty('sources');
+    });
+
+    it('leaves a citation written on its own as it is', () => {
+      const path = join(root, 'source', 'audit', 'requirements.yaml');
+      writeFileSync(path, REQUIREMENTS.replace('sources: [ audit-standards ]', 'sources: audit-standards'));
+      saveElement(root, { ...element('requirement', 'publish-the-plan'), title: 'Changed' }, targets);
+      expect(text('audit/requirements.yaml')).toContain('sources: audit-standards');
+    });
+
+    it('takes a source’s citations with it, on elements, measures, and links, and undoes that', () => {
+      const path = join(root, 'source', 'audit', 'capabilities.yaml');
+      writeFileSync(path, CAPABILITIES.replace('      note: Holds the plan once it’s approved.', '      note: Holds the plan once it’s approved.\n      sources: [ audit-standards ]'));
+      const before = ['audit/sources.yaml', 'audit/capabilities.yaml', 'audit/outcomes.yaml', 'audit/requirements.yaml', 'audit/patterns.yaml'].map(text);
+      const { undo } = deleteSource(root, 'audit', 'audit-standards');
+      expect(list('audit/sources.yaml')).toEqual([]);
+      const [planning] = list('audit/capabilities.yaml');
+      expect(planning).not.toHaveProperty('sources');
+      expect(planning.candidate_pattern).toEqual([{ to: 'case-platform', coverage: 'partial', note: 'Holds the plan once it’s approved.' }]);
+      expect((list('audit/outcomes.yaml')[0].measures as Record<string, unknown>[])[0]).not.toHaveProperty('sources');
+      expect(list('audit/requirements.yaml')[0]).not.toHaveProperty('sources');
+      expect(list('audit/patterns.yaml')[0]).not.toHaveProperty('sources');
+      undo();
+      expect(['audit/sources.yaml', 'audit/capabilities.yaml', 'audit/outcomes.yaml', 'audit/requirements.yaml', 'audit/patterns.yaml'].map(text)).toEqual(before);
+    });
+
+    it('says what’s wrong with a source', () => {
+      expect(() => saveSource(root, source({ title: ' ' }))).toThrow('Give it a title.');
+      expect(() => saveSource(root, source({ url: 'nope' }))).toThrow('http://');
+      expect(() => saveSource(root, source({ kind: 'nonsense' }))).toThrow('what kind of source');
+      expect(() => saveSource(root, source({ lastReviewedAt: '' }))).toThrow('last checked');
+      expect(() => saveSource(root, source({ publicationDate: 'soon' }))).toThrow('publication date');
+      expect(() => saveSource(root, source({ id: 'nothing-here' }))).toThrow(EditError);
+      expect(() => deleteSource(root, 'audit', 'nothing-here')).toThrow(EditError);
+      expect(text('audit/sources.yaml')).toBe(SOURCES);
+    });
+  });
+
+  describe('discovery', () => {
+    it('reads sets, answers, and what they point to, as full IDs', () => {
+      const [set] = readDiscovery(root, targets);
+      expect(set).toMatchObject({ assessmentId: 'assessment:audit-results', packageId: 'com.example.audit', title: 'Audit results discovery' });
+      expect(askedIn('priority-results')).toMatchObject({
+        questionId: 'question:priority-results',
+        options: [{ value: 'on-plan', label: 'The plan is carried out' }, { value: 'closed', label: 'Findings are closed' }],
+        points: [
+          { when: ['on-plan'], to: ['example:outcome:on-plan'], why: 'This effort is meant to advance it.' },
+          { when: ['on-plan', 'closed'], to: ['example:measure:plan-completed', 'eb:capability:records-management'], why: 'Either one needs it.' },
+        ],
+      });
+      expect(targets.find((t) => t.id === 'example:measure:plan-completed')).toMatchObject({ title: 'Share of the plan completed', type: 'measure', typeLabel: 'Measure', folder: 'audit' });
+    });
+
+    it('adds a question to a set, and leaves the others as they were', () => {
+      expect(saveQuestion(root, question(), targets)).toMatchObject({ id: 'how-does-the-office-plan-its-audits', set: 'audit-results' });
+      expect(text('audit/discovery.yaml').startsWith(DISCOVERY)).toBe(true);
+      expect(askedIn('how-does-the-office-plan-its-audits')).toMatchObject({ prompt: 'How does the office plan its audits?', kind: 'text', options: [], points: [] });
+    });
+
+    it('gives new answers values from their words, and turns pointers’ keys into them', () => {
+      saveQuestion(root, question({
+        prompt: 'How are findings tracked?',
+        kind: 'single-choice',
+        options: [{ key: 'new-1', label: 'In a spreadsheet' }, { key: 'new-2', label: 'In a tracking system' }],
+        points: [{ when: ['new-1'], to: ['example:capability:audit-planning', 'eb:capability:request-intake'], why: 'A spreadsheet may not hold up.' }],
+      }), targets);
+      const written = (list('audit/discovery.yaml')[0].questions as Record<string, unknown>[]).at(-1)!;
+      expect(written.options).toEqual([{ 'in-a-spreadsheet': 'In a spreadsheet' }, { 'in-a-tracking-system': 'In a tracking system' }]);
+      expect(written.points).toEqual([{ when: 'in-a-spreadsheet', to: ['capability:audit-planning', 'eb:capability:request-intake'], why: 'A spreadsheet may not hold up.' }]);
+      expect((parse(text('audit/package.yaml')) as { dependencies: string[] }).dependencies).toEqual(['common', 'foia']);
+    });
+
+    it('keeps an answer’s value and what points at it when its words change', () => {
+      const was = askedIn('priority-results');
+      saveQuestion(root, { ...was, options: [{ value: 'on-plan', label: 'Audits happen as planned' }, was.options![1]] }, targets);
+      const after = text('audit/discovery.yaml');
+      expect(after).toContain('- on-plan: Audits happen as planned');
+      expect(after).toContain('when: [ on-plan, closed ]');
+      expect(after).toContain('to: [ measure:plan-completed, capability:records-management ]');
+    });
+
+    it('writes a yes-or-no answer so it stays text', () => {
+      saveQuestion(root, question({ prompt: 'Is the plan public?', kind: 'boolean', points: [{ when: ['true'], to: ['example:outcome:on-plan'], why: 'It’s already open.' }] }), targets);
+      expect(text('audit/discovery.yaml')).toContain('when: "true"');
+    });
+
+    it('takes answers and pointers away when a question stops having them', () => {
+      saveQuestion(root, { ...askedIn('priority-results'), kind: 'text', options: [], points: [] }, targets);
+      const [first] = list('audit/discovery.yaml')[0].questions as Record<string, unknown>[];
+      expect(first).toEqual({ id: 'priority-results', prompt: 'Which of these results matter most?', kind: 'text' });
+    });
+
+    it('starts a set with its first question, in a package with no discovery yet', () => {
+      const saved = saveQuestion(root, { package: 'offerings', newSet: { title: 'Getting started', description: 'For a first meeting.' }, prompt: 'What brought you here?', kind: 'text' }, targets);
+      expect(saved).toMatchObject({ set: 'getting-started', id: 'what-brought-you-here' });
+      expect(list('offerings/discovery.yaml')).toEqual([{ id: 'getting-started', title: 'Getting started', description: 'For a first meeting.', questions: [{ id: 'what-brought-you-here', prompt: 'What brought you here?', kind: 'text' }] }]);
+      saved.undo();
+      expect(existsSync(join(root, 'source', 'offerings', 'discovery.yaml'))).toBe(false);
+    });
+
+    it('changes a set’s title without touching its questions, and deletes a set', () => {
+      saveSet(root, { package: 'audit', id: 'audit-results', title: 'Results', description: '' });
+      expect(list('audit/discovery.yaml')[0]).toMatchObject({ id: 'audit-results', title: 'Results' });
+      expect(list('audit/discovery.yaml')[0]).not.toHaveProperty('description');
+      expect(list('audit/discovery.yaml')[0].questions).toHaveLength(2);
+      deleteSet(root, 'audit', 'audit-results');
+      expect(list('audit/discovery.yaml')).toEqual([]);
+    });
+
+    it('deletes a question, but not a set’s last one', () => {
+      deleteQuestion(root, 'audit', 'audit-results', 'publishes-reports');
+      expect(list('audit/discovery.yaml')[0].questions).toHaveLength(1);
+      expect(() => deleteQuestion(root, 'audit', 'audit-results', 'priority-results')).toThrow('delete the set instead');
+    });
+
+    it('takes what answers say about a deleted element with it, and a pointer left with nothing', () => {
+      deleteElement(root, 'audit', 'capability', 'audit-planning', targets);
+      const [, second] = list('audit/discovery.yaml')[0].questions as Record<string, unknown>[];
+      expect(second).not.toHaveProperty('points');
+      expect(text('audit/discovery.yaml').startsWith('# Discovery question sets.')).toBe(true);
+    });
+
+    it('takes what answers say about an outcome’s measures with it too', () => {
+      deleteElement(root, 'audit', 'outcome', 'on-plan', targets);
+      const [first] = list('audit/discovery.yaml')[0].questions as { points: unknown[] }[];
+      expect(first.points).toEqual([{ when: ['on-plan', 'closed'], to: ['capability:records-management'], why: 'Either one needs it.' }]);
+    });
+
+    it('says what’s wrong with a question, and writes nothing', () => {
+      const save = (over: Partial<QuestionFields>) => () => saveQuestion(root, question(over), targets);
+      expect(save({ prompt: ' ' })).toThrow('Write the question.');
+      expect(save({ kind: 'nonsense' })).toThrow('how it’s answered');
+      expect(save({ kind: 'single-choice', options: [{ label: 'Only one' }] })).toThrow('at least two answers');
+      expect(save({ kind: 'single-choice', options: [{ label: 'One' }, { label: ' ' }] })).toThrow('each answer some words');
+      expect(save({ kind: 'boolean', points: [{ when: [], to: ['example:outcome:on-plan'], why: 'Why' }] })).toThrow('which answers');
+      expect(save({ kind: 'boolean', points: [{ when: ['true'], to: [], why: 'Why' }] })).toThrow('points to');
+      expect(save({ kind: 'boolean', points: [{ when: ['true'], to: ['example:outcome:on-plan'], why: ' ' }] })).toThrow('why each pointer');
+      expect(save({ kind: 'boolean', points: [{ when: ['true'], to: ['example:outcome:gone'], why: 'Why' }] })).toThrow("Can't find");
+      expect(save({ set: 'nothing-here' })).toThrow(EditError);
+      expect(save({ set: undefined, newSet: { title: ' ' } })).toThrow('Give the set a title.');
+      expect(save({ id: 'nothing-here' })).toThrow(EditError);
+      expect(text('audit/discovery.yaml')).toBe(DISCOVERY);
+    });
+  });
+
+  describe('new packages', () => {
+    it('takes its publisher’s details from your first package, and builds on nothing yet', () => {
+      writeFileSync(join(root, 'source', 'audit', 'package.yaml'), `schemaVersion: 0.6.0\n${AUDIT}publisher:\n  name: Acme\n  url: https://example.com\nlicense: MIT\ndomain: public-sector\n`);
+      const { name, undo } = addPackage(root, { title: 'Our Services', description: 'What we offer.' });
+      expect(name).toBe('our-services');
+      expect(parse(text('our-services/package.yaml'))).toEqual({ schemaVersion: '0.6.0', packageId: 'com.example.our-services', idPrefix: 'example', title: 'Our Services', description: 'What we offer.', publisher: { name: 'Acme', url: 'https://example.com' }, license: 'MIT', domain: 'public-sector' });
+      expect(text('our-services/package.yaml').startsWith('# The package itself.')).toBe(true);
+      undo();
+      expect(existsSync(join(root, 'source', 'our-services'))).toBe(false);
+    });
+
+    it('won’t take a folder name your packages or the library’s have', () => {
+      writeFileSync(join(root, 'source', 'audit', 'package.yaml'), `schemaVersion: 0.6.0\n${AUDIT}`);
+      expect(addPackage(root, { title: 'Common', description: 'x', publisher: 'Acme' }).name).toBe('common-2');
+      expect(addPackage(root, { title: 'Audit', description: 'x', publisher: 'Acme' }).name).toBe('audit-2');
+    });
+
+    it('asks your first package who you are, on the newest schema', () => {
+      rmSync(join(root, 'source'), { recursive: true });
+      mkdirSync(join(root, 'source'));
+      mkdirSync(join(root, 'schemas'));
+      for (const v of ['0.5.0', '0.10.0', '0.6.0']) writeFileSync(join(root, 'schemas', `blueprint-package-${v}.schema.json`), '{}');
+      expect(() => addPackage(root, { title: 'First', description: 'x' })).toThrow('ID prefix');
+      expect(() => addPackage(root, { title: 'First', description: 'x', prefix: 'eb', publisher: 'Acme' })).toThrow('library’s');
+      expect(() => addPackage(root, { title: 'First', description: 'x', prefix: 'acme' })).toThrow('who publishes');
+      addPackage(root, { title: 'First', description: 'x', prefix: 'acme', publisher: 'Acme County' });
+      expect(parse(text('first/package.yaml'))).toMatchObject({ schemaVersion: '0.10.0', packageId: 'org.acme.first', idPrefix: 'acme', publisher: { name: 'Acme County' } });
+    });
+
+    it('says what’s missing', () => {
+      expect(() => addPackage(root, { title: ' ', description: ' ' })).toThrow('Give it a title.\nGive it a description.');
     });
   });
 

@@ -11,8 +11,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { parse } from 'yaml';
-import { elementTypes, groupings, patternApproaches, patternFields, patternLayers, statuses } from '../src/lib/vocabulary.ts';
-import { capabilitiesProviding, deleteElement, EditError, forms, packageList, readElements, readTargets, saveElement, type ElementFields, type Target } from './store.ts';
+import { elementTypes, groupings, patternApproaches, patternFields, patternLayers, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
+import {
+  addPackage, capabilitiesProviding, deleteElement, deleteQuestion, deleteSet, deleteSource, EditError, forms, packageList, questionKinds, readDiscovery, readElements, readSources, readTargets,
+  saveElement, saveQuestion, saveSet, saveSource, type ElementFields, type PackageFields, type QuestionFields, type SetFields, type SourceFields, type Target,
+} from './store.ts';
 
 const root = process.cwd();
 
@@ -81,11 +84,15 @@ async function state() {
       ...Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
       layer: Object.entries(patternLayers).map(([id, l]) => ({ id, label: l.label, hint: l.hint })),
       approach: Object.entries(patternApproaches).map(([id, label]) => ({ id, label })),
+      source: Object.entries(sourceKinds).map(([id, label]) => ({ id, label })),
+      question: Object.entries(questionKinds).map(([id, label]) => ({ id, label })),
     },
     patternFields: Object.entries(patternFields).map(([id, f]) => ({ id, label: f.label, hint: f.definition })),
     statuses: Object.entries(statuses).map(([id, label]) => ({ id, label })),
     sections: Object.fromEntries(Object.keys(forms).map((t) => [t, elementTypes[t].section])),
     elements: readElements(root, targets),
+    sources: readSources(root),
+    discovery: readDiscovery(root, targets),
     targets,
   };
 }
@@ -184,8 +191,19 @@ function routes(server: DevServer) {
       if (req.method === 'GET' && path === '/state') return reply(res, 200, await state());
       if (req.method !== 'POST') return reply(res, 404, {});
       const body = await readBody(req);
-      if (path === '/save') return reply(res, 200, await inTurn(() => change(server, (targets) => saveElement(root, body as unknown as ElementFields & { id?: string }, targets))));
-      if (path === '/delete') return reply(res, 200, await inTurn(() => change(server, (targets) => deleteElement(root, String(body.package), String(body.type), String(body.id), targets))));
+      const changes: Record<string, (targets: Target[]) => { undo: () => void }> = {
+        '/save': (targets) => saveElement(root, body as unknown as ElementFields & { id?: string }, targets),
+        '/delete': (targets) => deleteElement(root, String(body.package), String(body.type), String(body.id), targets),
+        '/source': () => saveSource(root, body as unknown as SourceFields),
+        '/delete-source': () => deleteSource(root, String(body.package), String(body.id)),
+        '/question': (targets) => saveQuestion(root, body as unknown as QuestionFields, targets),
+        '/delete-question': () => deleteQuestion(root, String(body.package), String(body.set), String(body.id)),
+        '/set': () => saveSet(root, body as unknown as SetFields),
+        '/delete-set': () => deleteSet(root, String(body.package), String(body.id)),
+        '/package': () => addPackage(root, body as unknown as PackageFields),
+      };
+      const make = changes[path ?? ''];
+      if (make) return reply(res, 200, await inTurn(() => change(server, make)));
       if (path === '/publish') return reply(res, 200, await inTurn(() => publish(server)));
       return reply(res, 404, {});
     } catch (e) {

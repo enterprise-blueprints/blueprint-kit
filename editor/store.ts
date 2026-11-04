@@ -3,11 +3,11 @@
 // comments and the fields it doesn't know about as they are. The compiler and
 // the validator decide whether the result is good, as they do for a hand edit.
 
-import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Document, isMap, isScalar, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
 import { compareVersions } from '../src/lib/format.ts';
-import { elementTypes, groupings, patternApproaches, patternLayers, predicates, statuses } from '../src/lib/vocabulary.ts';
+import { elementTypes, groupings, patternApproaches, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 
 /** A link to an element, by its full ID, with what the link can say about itself. */
 export interface Link {
@@ -65,6 +65,8 @@ export interface ElementFields {
   principles?: string[];
   measures?: MeasureFields[];
   pattern?: PatternFields;
+  /** The IDs of the sources it cites, from its own package's sources.yaml. */
+  sources?: string[];
   /** What it links to, by predicate. */
   links?: Record<string, Link[]>;
   /** What links to it, by predicate, as full IDs. */
@@ -75,6 +77,90 @@ export interface EditorElement extends ElementFields {
   id: string;
   /** Its full ID, as the pages know it. */
   elementId: string;
+}
+
+/** A reference a package cites. */
+export interface SourceFields {
+  /** The folder under source/ it's in. */
+  package: string;
+  /** Absent on a new source, which takes one from its title. */
+  id?: string;
+  title: string;
+  url: string;
+  kind: string;
+  publicationDate?: string;
+  lastReviewedAt: string;
+  note?: string;
+}
+
+export interface EditorSource extends SourceFields {
+  id: string;
+  /** Its ID as the pages know it, and its package's, which together say which source a page means. */
+  sourceId: string;
+  packageId: string;
+}
+
+/** The kinds of discovery question, in the words the pages use. */
+export const questionKinds: Record<string, string> = {
+  'single-choice': 'Choose one',
+  'multiple-choice': 'Choose any that apply',
+  boolean: 'Yes or no',
+  number: 'A number',
+  text: 'In their own words',
+};
+const CHOICE = ['single-choice', 'multiple-choice'];
+
+/** One answer to a question. A new one takes its value from its label, and until then `key` stands for it. */
+export interface AnswerFields {
+  value?: string;
+  key?: string;
+  label: string;
+}
+
+/** Answers that point to elements, for one reason, by answer value or key, and full ID. */
+export interface PointFields {
+  when: string[];
+  to: string[];
+  why: string;
+}
+
+export interface QuestionFields {
+  package: string;
+  /** The ID of the set it's in. Absent when it starts a new one, which `newSet` describes. */
+  set?: string;
+  newSet?: { title: string; description?: string };
+  id?: string;
+  prompt: string;
+  kind: string;
+  options?: AnswerFields[];
+  points?: PointFields[];
+}
+
+export interface EditorQuestion extends QuestionFields {
+  set: string;
+  id: string;
+  questionId: string;
+}
+
+export interface SetFields {
+  package: string;
+  id: string;
+  title: string;
+  description?: string;
+}
+
+export interface EditorSet extends SetFields {
+  assessmentId: string;
+  packageId: string;
+  questions: EditorQuestion[];
+}
+
+/** A new package. Its publisher's details come from your other packages, or from here if it's the first. */
+export interface PackageFields {
+  title: string;
+  description: string;
+  prefix?: string;
+  publisher?: string;
 }
 
 /** Something an element can link to. */
@@ -153,18 +239,14 @@ export function capabilitiesProviding(root: string, libraryRelease: string, patt
 export function readTargets(root: string, libraryRelease: string): Target[] {
   return builtPackages(root, libraryRelease)
     .flatMap(({ name, own: isOwn, pkg }) => {
+      const target = (id: string, title: string, type: string, ways: { id: string; title: string }[] = []): Target => ({ id, title, type, typeLabel: elementTypes[type].label, packageTitle: pkg.title, folder: name, own: isOwn, ways });
       return pkg.elements
         .filter((e) => predicates.helps_with.to.includes(e.type) && e.status !== 'deprecated')
-        .map((e) => ({
-          id: e.id,
-          title: e.title,
-          type: e.type,
-          typeLabel: elementTypes[e.type].label,
-          packageTitle: pkg.title,
-          folder: name,
-          own: isOwn,
-          ways: Array.isArray(e.attributes?.ways) ? (e.attributes.ways as { id: string; title: string }[]).map((w) => ({ id: w.id, title: w.title })) : [],
-        }));
+        .flatMap((e) => [
+          target(e.id, e.title, e.type, Array.isArray(e.attributes?.ways) ? (e.attributes.ways as { id: string; title: string }[]).map((w) => ({ id: w.id, title: w.title })) : []),
+          // An outcome's measures aren't elements, but a discovery answer can point to one.
+          ...(asList(e.attributes?.measures) as Raw[]).map((m) => target(`${e.id.split(':')[0]}:measure:${m.id}`, String(m.title), 'measure')),
+        ]);
     });
 }
 
@@ -235,6 +317,7 @@ function elementFrom(root: string, name: string, type: string, raw: Raw, targets
     ...(type === 'mission' ? { tagline: String(attributes.tagline ?? ''), principles: asList(attributes.principles).map(String) } : {}),
     ...(type === 'outcome' ? { measures: (asList(raw.measures) as Raw[]).map((m) => ({ id: String(m.id), title: String(m.title ?? ''), description: String(m.description ?? '') })) } : {}),
     ...(type === 'implementationPattern' ? { pattern: patternFrom(attributes) } : {}),
+    ...(type !== 'resource' ? { sources: asList(raw.sources).map(String) } : {}),
     links: Object.fromEntries(form.links.map((p) => [p, asList(raw[p]).map((entry) => linkOf(entry, p, name, targets))])),
     incoming: Object.fromEntries(form.incoming.map((p) => [p, readIncoming(root, name, p, elementId, targets)])),
   };
@@ -459,16 +542,25 @@ function removeIncoming(edits: Edits, root: string, name: string, predicate: str
   }
 }
 
+/** The maps in a file that holds a list of them, as this change has them so far. */
+function mapsIn(edits: Edits, path: string): YAMLMap[] {
+  const { contents } = edits.doc(path);
+  return isSeq(contents) ? (contents.items.filter(isMap) as YAMLMap[]) : [];
+}
+
+/** The maps in a list under a key of a map. */
+const mapsUnder = (map: YAMLMap, key: string): YAMLMap[] => {
+  const list = map.get(key, true);
+  return isSeq(list) ? (list.items.filter(isMap) as YAMLMap[]) : [];
+};
+
 /**
  * A package that builds on one prefix can leave it off, as in capability:records.
  * Once it builds on a second, the compiler can't tell which is meant, so its
  * references to what it builds on are written out in full.
  */
 function writeOutReferences(edits: Edits, root: string, name: string, prefix: string) {
-  const itemsOf = (file: string) => {
-    const { contents } = edits.doc(join(root, 'source', name, file));
-    return isSeq(contents) ? (contents.items.filter(isMap) as YAMLMap[]) : [];
-  };
+  const itemsOf = (file: string) => mapsIn(edits, join(root, 'source', name, file));
   const elementFiles = Object.entries(elementTypes).map(([type, info]) => ({ type, file: `${info.section}.yaml` }));
   const own = new Set(
     elementFiles.flatMap(({ type, file }) =>
@@ -493,11 +585,7 @@ function writeOutReferences(edits: Edits, root: string, name: string, prefix: st
     writeOutLinks(item);
   }
   for (const set of itemsOf('discovery.yaml')) {
-    const questions = set.get('questions', true);
-    for (const question of isSeq(questions) ? questions.items.filter(isMap) : []) {
-      const points = (question as YAMLMap).get('points', true);
-      for (const group of isSeq(points) ? points.items.filter(isMap) : []) writeOut((group as YAMLMap).get('to', true));
-    }
+    for (const question of mapsUnder(set, 'questions')) for (const group of mapsUnder(question, 'points')) writeOut(group.get('to', true));
   }
 }
 
@@ -607,6 +695,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
   if (type !== 'resource' && !(input.status === 'reference' && before?.status === undefined)) setField(doc, map, 'status', input.status);
   for (const field of rest) setField(doc, map, field, values[field]?.trim());
   setField(doc, map, 'description', input.description.trim());
+  if (type !== 'resource' && input.sources && !same(asList(before?.sources).map(String), input.sources)) setField(doc, map, 'sources', input.sources);
 
   if (type === 'resource') {
     const had = (before?.attributes ?? {}) as Raw;
@@ -643,8 +732,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
  * Takes an element out of source/, with every link to it there. Published
  * versions keep it; the next release won't have it. A resource has to help with
  * something, so one that helps only with this is left for you to decide about.
- * The validator still gets the last word, on anything else that names it, such
- * as a discovery answer.
+ * The validator still gets the last word, on anything else that names it.
  */
 export function deleteElement(root: string, packageName: string, type: string, id: string, targets: Target[]): { undo: () => void } {
   if (!forms[type]) throw new EditError(`The editor doesn't handle ${type}.`);
@@ -653,6 +741,7 @@ export function deleteElement(root: string, packageName: string, type: string, i
   const { seq } = edits.list(join(root, 'source', packageName, fileOf(type)));
   const at = itemIndex(seq, id);
   if (at < 0) throw new EditError(`There's no ${elementTypes[type].label.toLowerCase()} called ${id} in ${packageName}.`);
+  const measures = (asList(((seq.items[at] as YAMLMap).toJSON() as Raw).measures) as Raw[]).map((m) => fullIdOf(root, packageName, 'measure', String(m.id)));
   seq.items.splice(at, 1);
 
   const elementId = fullIdOf(root, packageName, type, id);
@@ -668,6 +757,7 @@ export function deleteElement(root: string, packageName: string, type: string, i
         for (const item of items.items) if (isMap(item)) removeLink(doc, item as YAMLMap, predicate, isIt);
       }
     }
+    removePoints(edits, join(root, 'source', name, 'discovery.yaml'), name, [elementId, ...measures], targets);
     const path = join(root, 'source', name, 'links.yaml');
     if (!existsSync(path)) continue;
     const { doc, seq: links } = edits.list(path);
@@ -680,4 +770,300 @@ export function deleteElement(root: string, packageName: string, type: string, i
     }
   }
   return { undo: edits.commit() };
+}
+
+/** Takes what discovery answers say about these elements out of a discovery file, and any point left with nothing to point to. */
+function removePoints(edits: Edits, path: string, name: string, ids: string[], targets: Target[]) {
+  if (!existsSync(path)) return;
+  const { doc } = edits.list(path);
+  const isIt = (entry: unknown) => ids.includes(fullId(String(entry), name, targets));
+  for (const set of mapsIn(edits, path)) {
+    for (const question of mapsUnder(set, 'questions')) {
+      const points = question.get('points', true);
+      if (!isSeq(points)) continue;
+      for (const group of mapsUnder(question, 'points')) if (removeLink(doc, group, 'to', isIt) && !group.has('to')) points.items.splice(points.items.indexOf(group), 1);
+      if (!points.items.length) question.delete('points');
+    }
+  }
+}
+
+const needPackage = (root: string, name: string) => {
+  if (!sourcePackages(root).includes(name)) throw new EditError(`There's no package called ${name}.`);
+};
+
+/** The sources in your packages, as the form shows them. */
+export function readSources(root: string): EditorSource[] {
+  return sourcePackages(root).flatMap((name) => {
+    const packageId = String(packageMeta(root, name).packageId);
+    return itemsIn(root, name, 'sources.yaml').map((raw) => ({
+      package: name,
+      id: String(raw.id),
+      sourceId: `src:${raw.id}`,
+      packageId,
+      title: String(raw.title ?? ''),
+      url: String(raw.url ?? ''),
+      kind: String(raw.kind ?? ''),
+      lastReviewedAt: String(raw.lastReviewedAt ?? ''),
+      ...(raw.publicationDate ? { publicationDate: String(raw.publicationDate) } : {}),
+      ...(raw.note ? { note: String(raw.note) } : {}),
+    }));
+  });
+}
+
+const isDate = (value: string | undefined) => /^\d{4}-\d{2}-\d{2}$/.test(value ?? '');
+
+/** Adds a source, or changes the one with this ID, whose ID stays as it is, since what cites it names it. */
+export function saveSource(root: string, input: SourceFields): { id: string; undo: () => void } {
+  needPackage(root, input.package);
+  const problems: string[] = [];
+  if (!input.title?.trim()) problems.push('Give it a title.');
+  if (!/^https?:\/\/\S+$/.test(input.url ?? '')) problems.push('Give it a link that starts with http:// or https://.');
+  if (!sourceKinds[input.kind]) problems.push('Choose what kind of source it is.');
+  if (!isDate(input.lastReviewedAt)) problems.push('Say when it was last checked, as a date.');
+  if (input.publicationDate && !isDate(input.publicationDate)) problems.push('Give its publication date as a date, or leave it out.');
+  if (problems.length) throw new EditError(problems.join('\n'));
+
+  const edits = new Edits();
+  const { doc, seq } = edits.list(join(root, 'source', input.package, 'sources.yaml'));
+  const at = input.id ? itemIndex(seq, input.id) : -1;
+  if (input.id && at < 0) throw new EditError(`There's no source called ${input.id} in ${input.package}.`);
+  const id = input.id ?? newId(input.title, seq.items.filter(isMap).map((item) => String((item as YAMLMap).get('id'))));
+  let map: YAMLMap;
+  if (at >= 0) map = seq.items[at] as YAMLMap;
+  else {
+    map = spaced(doc.createNode({ id }) as YAMLMap, seq);
+    seq.add(map);
+  }
+  setField(doc, map, 'title', input.title.trim());
+  setField(doc, map, 'url', input.url.trim());
+  setField(doc, map, 'kind', input.kind);
+  setField(doc, map, 'publicationDate', input.publicationDate);
+  setField(doc, map, 'lastReviewedAt', input.lastReviewedAt);
+  setField(doc, map, 'note', input.note?.trim());
+  return { id, undo: edits.commit() };
+}
+
+/** Takes a source out, and every citation of it in its package: on elements, their measures, and their links. */
+export function deleteSource(root: string, packageName: string, id: string): { undo: () => void } {
+  needPackage(root, packageName);
+  const edits = new Edits();
+  const path = (file: string) => join(root, 'source', packageName, file);
+  const { seq } = edits.list(path('sources.yaml'));
+  const at = itemIndex(seq, id);
+  if (at < 0) throw new EditError(`There's no source called ${id} in ${packageName}.`);
+  seq.items.splice(at, 1);
+
+  const isIt = (entry: unknown) => String(entry) === id;
+  for (const file of [...Object.values(elementTypes).map((info) => `${info.section}.yaml`), 'links.yaml']) {
+    if (!existsSync(path(file))) continue;
+    const { doc } = edits.list(path(file));
+    for (const item of mapsIn(edits, path(file))) {
+      removeLink(doc, item, 'sources', isIt);
+      for (const measure of mapsUnder(item, 'measures')) removeLink(doc, measure, 'sources', isIt);
+      for (const predicate of Object.keys(predicates)) for (const link of mapsUnder(item, predicate)) removeLink(doc, link, 'sources', isIt);
+    }
+  }
+  return { undo: edits.commit() };
+}
+
+function questionFrom(name: string, set: string, raw: Raw, targets: Target[]): EditorQuestion {
+  return {
+    package: name,
+    set,
+    id: String(raw.id),
+    questionId: `question:${raw.id}`,
+    prompt: String(raw.prompt ?? ''),
+    kind: String(raw.kind ?? ''),
+    // Each option is written "value: label".
+    options: (asList(raw.options) as Raw[]).map((o) => {
+      const [value, label] = Object.entries(o)[0] ?? [];
+      return { value: String(value), label: String(label) };
+    }),
+    points: (asList(raw.points) as Raw[]).map((p) => ({ when: asList(p.when).map(String), to: asList(p.to).map((to) => fullId(String(to), name, targets)), why: String(p.why ?? '') })),
+  };
+}
+
+/** The discovery sets in your packages, as the forms show them. */
+export function readDiscovery(root: string, targets: Target[]): EditorSet[] {
+  return sourcePackages(root).flatMap((name) => {
+    const packageId = String(packageMeta(root, name).packageId);
+    return itemsIn(root, name, 'discovery.yaml').map((raw) => ({
+      package: name,
+      id: String(raw.id),
+      assessmentId: `assessment:${raw.id}`,
+      packageId,
+      title: String(raw.title ?? ''),
+      ...(raw.description ? { description: String(raw.description) } : {}),
+      questions: (asList(raw.questions) as Raw[]).map((q) => questionFrom(name, String(raw.id), q, targets)),
+    }));
+  });
+}
+
+/** Changes a set's title and description. A new set comes with its first question, through saveQuestion. */
+export function saveSet(root: string, input: SetFields): { id: string; undo: () => void } {
+  needPackage(root, input.package);
+  if (!input.title?.trim()) throw new EditError('Give it a title.');
+  const edits = new Edits();
+  const { doc, seq } = edits.list(join(root, 'source', input.package, 'discovery.yaml'));
+  const at = itemIndex(seq, input.id);
+  if (at < 0) throw new EditError(`There's no question set called ${input.id} in ${input.package}.`);
+  const map = seq.items[at] as YAMLMap;
+  setField(doc, map, 'title', input.title.trim());
+  setField(doc, map, 'description', input.description?.trim());
+  return { id: input.id, undo: edits.commit() };
+}
+
+export function deleteSet(root: string, packageName: string, id: string): { undo: () => void } {
+  needPackage(root, packageName);
+  const edits = new Edits();
+  const { seq } = edits.list(join(root, 'source', packageName, 'discovery.yaml'));
+  const at = itemIndex(seq, id);
+  if (at < 0) throw new EditError(`There's no question set called ${id} in ${packageName}.`);
+  seq.items.splice(at, 1);
+  return { undo: edits.commit() };
+}
+
+function checkQuestion(input: QuestionFields, targets: Target[], had: string[]) {
+  const problems: string[] = [];
+  if (input.newSet && !input.newSet.title?.trim()) problems.push('Give the set a title.');
+  if (!input.prompt?.trim()) problems.push('Write the question.');
+  if (!questionKinds[input.kind]) problems.push('Choose how it’s answered.');
+  const options = input.options ?? [];
+  if (CHOICE.includes(input.kind)) {
+    if (options.length < 2) problems.push('Give it at least two answers.');
+    if (options.some((o) => !o.label?.trim())) problems.push('Give each answer some words.');
+  }
+  for (const point of input.points ?? []) {
+    if (!point.when?.length) problems.push('Choose which answers each pointer is for.');
+    if (!point.to?.length) problems.push('Choose what each pointer points to.');
+    if (!point.why?.trim()) problems.push('Say why each pointer matters.');
+    for (const to of point.to ?? []) if (!had.includes(to) && !targets.some((t) => t.id === to)) problems.push(`Can't find ${to}.`);
+  }
+  if (problems.length) throw new EditError([...new Set(problems)].join('\n'));
+}
+
+/** How a point names an element: by type and key in its own package, and in full otherwise. */
+function writtenPoint(to: string, packageName: string, targets: Target[]) {
+  const target = targets.find((t) => t.id === to);
+  return target?.folder === packageName ? `${target.type}:${keyOf(to)}` : to;
+}
+
+const oneOrMany = <T>(list: T[]) => (list.length === 1 ? list[0] : list);
+
+/**
+ * Adds a question, or changes the one with this ID, along with a new set when
+ * it starts one, since a set has to have a question. Answers keep their values
+ * and questions their IDs, since what's been recorded names them.
+ */
+export function saveQuestion(root: string, input: QuestionFields, targets: Target[]): { id: string; set: string; undo: () => void } {
+  needPackage(root, input.package);
+  const edits = new Edits();
+  const { doc, seq } = edits.list(join(root, 'source', input.package, 'discovery.yaml'));
+  const at = input.set ? itemIndex(seq, input.set) : -1;
+  if (input.set ? at < 0 : !input.newSet) throw new EditError(`There's no question set called ${input.set} in ${input.package}.`);
+
+  const sets = seq.items.filter(isMap) as YAMLMap[];
+  const inSet = at >= 0 ? mapsUnder(seq.items[at] as YAMLMap, 'questions') : [];
+  const asked = input.id ? inSet.find((q) => String(q.get('id')) === input.id) : undefined;
+  if (input.id && !asked) throw new EditError(`There's no question called ${input.id} in that set.`);
+  const before = asked ? questionFrom(input.package, input.set!, asked.toJSON() as Raw, targets) : undefined;
+
+  const choice = CHOICE.includes(input.kind);
+  const answerable = choice || input.kind === 'boolean';
+  const points = answerable ? (input.points ?? []) : [];
+  checkQuestion({ ...input, points }, targets, (before?.points ?? []).flatMap((p) => p.to));
+
+  // New answers take values from their words, and the pointers' keys become those values.
+  const used = (before?.options ?? []).map((o) => o.value!);
+  const valueOf = new Map<string, string>();
+  const answers = (choice ? (input.options ?? []) : []).map((o) => {
+    const value = o.value ?? newId(o.label, used);
+    used.push(value);
+    valueOf.set(o.key ?? value, value);
+    return { value, label: o.label.trim() };
+  });
+  const pointing = points.map((p) => ({ when: p.when.map((w) => valueOf.get(w) ?? w), to: p.to, why: p.why.trim() }));
+
+  let setMap: YAMLMap;
+  let setId = input.set;
+  if (at >= 0) setMap = seq.items[at] as YAMLMap;
+  else {
+    setId = newId(input.newSet!.title, sets.map((s) => String(s.get('id'))));
+    const description = input.newSet!.description?.trim();
+    setMap = spaced(doc.createNode({ id: setId, title: input.newSet!.title.trim(), ...(description ? { description } : {}), questions: [] }) as YAMLMap, seq);
+    seq.add(setMap);
+  }
+  const id = input.id ?? newId(input.prompt, sets.flatMap((s) => mapsUnder(s, 'questions').map((q) => String(q.get('id')))));
+  let map: YAMLMap;
+  if (asked) map = asked;
+  else {
+    map = doc.createNode({ id }) as YAMLMap;
+    (setMap.get('questions', true) as unknown as YAMLSeq).add(map);
+  }
+  setField(doc, map, 'prompt', input.prompt.trim());
+  setField(doc, map, 'kind', input.kind);
+  if (!same(before?.options ?? [], answers)) setField(doc, map, 'options', answers.map((a) => ({ [a.value]: a.label })));
+  if (!same(before?.points ?? [], pointing)) {
+    setField(doc, map, 'points', pointing.map((p) => ({ when: oneOrMany(p.when), to: oneOrMany(p.to.map((to) => writtenPoint(to, input.package, targets))), why: p.why })));
+  }
+  addDependencies(edits, root, input.package, pointing.flatMap((p) => p.to.map((to) => targets.find((t) => t.id === to)?.folder ?? input.package)), targets);
+  return { id, set: setId!, undo: edits.commit() };
+}
+
+export function deleteQuestion(root: string, packageName: string, set: string, id: string): { undo: () => void } {
+  needPackage(root, packageName);
+  const edits = new Edits();
+  const { seq } = edits.list(join(root, 'source', packageName, 'discovery.yaml'));
+  const at = itemIndex(seq, set);
+  if (at < 0) throw new EditError(`There's no question set called ${set} in ${packageName}.`);
+  const questions = (seq.items[at] as YAMLMap).get('questions', true) as unknown as YAMLSeq;
+  const index = itemIndex(questions, id);
+  if (index < 0) throw new EditError(`There's no question called ${id} in that set.`);
+  if (questions.items.length === 1) throw new EditError('A set needs at least one question, so delete the set instead.');
+  questions.items.splice(index, 1);
+  return { undo: edits.commit() };
+}
+
+const newestSchema = (root: string) =>
+  readdirSync(join(root, 'schemas'))
+    .filter((f) => f.startsWith('blueprint-package-'))
+    .map((f) => f.replace(/^blueprint-package-|\.schema\.json$/g, ''))
+    .sort(compareVersions)
+    .at(-1);
+
+/**
+ * Starts a package: a folder under source/ with a package.yaml. It takes its
+ * publisher's details from your first package, so your packages agree, or from
+ * the form if it's your first. It builds on nothing until a link needs it to.
+ */
+export function addPackage(root: string, input: PackageFields): { name: string; undo: () => void } {
+  const existing = sourcePackages(root);
+  const template = existing.length ? packageMeta(root, existing[0]) : undefined;
+  const prefix = String(template?.idPrefix ?? input.prefix ?? '').trim();
+  const publisher = template?.publisher ?? { name: input.publisher?.trim() };
+  const problems: string[] = [];
+  if (!input.title?.trim()) problems.push('Give it a title.');
+  if (!input.description?.trim()) problems.push('Give it a description.');
+  if (!/^[a-z][a-z0-9]*$/.test(prefix)) problems.push('Give it an ID prefix of lowercase letters and numbers, such as acme.');
+  else if (prefix === 'eb') problems.push('The prefix eb is the library’s, so pick one of your own.');
+  if (!(publisher as Raw).name) problems.push('Say who publishes it.');
+  if (problems.length) throw new EditError(problems.join('\n'));
+
+  // A folder named like one of the library's packages couldn't be told apart in dependencies.
+  const name = newId(input.title, [...existing, ...folders(join(root, 'library', 'packages'))]);
+  const doc = new Document({
+    schemaVersion: template?.schemaVersion ?? newestSchema(root),
+    packageId: template ? String(template.packageId).replace(/[^.]+$/, name) : `org.${prefix}.${name}`,
+    idPrefix: prefix,
+    title: input.title.trim(),
+    description: input.description.trim(),
+    publisher,
+    license: template?.license ?? 'CC-BY-4.0',
+    domain: template?.domain ?? 'public-sector',
+  });
+  doc.commentBefore = ' The package itself. Its version and date are set when it is built (pnpm content:build).';
+  const folder = join(root, 'source', name);
+  mkdirSync(folder, { recursive: true });
+  writeFileSync(join(folder, 'package.yaml'), doc.toString({ lineWidth: 0 }));
+  return { name, undo: () => rmSync(folder, { recursive: true }) };
 }

@@ -66,7 +66,7 @@ const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets
       </ol>
     </nav>
 
-    <header class="page-header">
+    <header class="page-header" data-assessment={assessment.id} data-package={assessment.package.packageId}>
       <p class="kicker">Discovery · {assessment.questions.length} questions</p>
       <h1>{assessment.title}</h1>
       {assessment.description && <p class="lede">{assessment.description}</p>}
@@ -94,7 +94,7 @@ const explores = ordered([...new Set(assessment.questions.flatMap((q) => targets
 
     <ol class="questions">
       {assessment.questions.map((q) => (
-        <li id={q.id.split(':')[1]} class="question">
+        <li id={q.id.split(':')[1]} class="question" data-question={q.id}>
           <h2 class="question__prompt">{q.prompt}</h2>
           <p class="question__kind">{KIND[q.kind]}</p>
           {optionsOf(q).length > 0 && q.kind !== 'boolean' && (

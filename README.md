@@ -191,8 +191,7 @@ Instead of editing the YAML by hand, you can work on the site itself:
 pnpm editor      # starts the editor at http://127.0.0.1:4322
 ```
 
-It's your site with an editing bar across the top, and it edits your resources, missions, outcomes,
-capabilities, requirements, and patterns:
+It's your site with an editing bar across the top, and it edits everything in your packages:
 
 - **Resources.** Go to anything, in the library or your own, and choose **Add a resource here**.
 - **Missions.** Choose **+ Add** on the bar, then **Add an outcome** and **Add a capability** on the
@@ -203,6 +202,14 @@ capabilities, requirements, and patterns:
 - **Requirements and patterns.** Choose **Add a requirement** or **Add a pattern** on a capability's page. A
   requirement belongs to one of your capabilities. A pattern has a layer and at least one way to source it,
   and it can also go on the library's capabilities, under **Capabilities it could provide**.
+- **Sources.** Choose **+ Add a source** on the bar, or **Add a new source** on any item's form, and cite them
+  under **Sources** there. A package's items cite its own sources.
+- **Discovery questions.** Choose **+ Add a question set** on the bar, which starts with its first question,
+  then **Add a question** on the set's page. An answer can point to outcomes, measures, capabilities,
+  requirements, and patterns, yours or the library's, with the reason why.
+- **Packages.** Choose **+ Add a package** on the bar. It takes your publisher's details from your other
+  packages, and builds on nothing until a link needs it to. If you've removed them all, `pnpm editor` asks a
+  few questions in the terminal first, since the site needs a package to show.
 - **Anything of your own.** Choose **Edit** on its page, or in the mission explorer's panel. The library's
   own items can't be changed here; you add yours beside them.
 
@@ -220,8 +227,8 @@ to it.
 **Publish** on the bar does what `pnpm content:publish` does, and builds the site into `dist/`.
 
 The editor is for you alone. It listens only on your own computer, and only with `pnpm editor`, so neither
-`pnpm dev` nor your built site has any of it. Sources and discovery questions are still written in their
-YAML files, and a new package starts as a folder under `source/`.
+`pnpm dev` nor your built site has any of it. A few things are still written in the YAML files: the sources
+of a measure or a link, the order of items and questions, and a package's own details once it's started.
 
 ## The library's missions on your site
 
@@ -254,7 +261,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
 | `pnpm dev` | Shows your site at http://localhost:4321. |
-| `pnpm editor` | Shows your site with the editor on, for editing your resources, missions, outcomes, capabilities, requirements, and patterns in the browser. |
+| `pnpm editor` | Shows your site with the editor on, for editing everything in your packages in the browser. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
 | `pnpm sync --latest` | Moves `kit.yaml` to the library's current release first. |

@@ -1,8 +1,9 @@
 // The editor on the pages, with `pnpm editor`: a bar across the top, a button
 // wherever something can be added or changed, and a form. The pages mark those
-// places with data-resources-for, data-resource-id, data-element, and
-// data-detail, and otherwise don't know about the editor. After a save the page
-// reloads, showing the real result.
+// places with data-resources-for, data-resource-id, data-element, data-detail,
+// data-source, data-assessment, data-question, and data-package, and otherwise
+// don't know about the editor. After a save the page reloads, showing the real
+// result.
 
 import './client.css';
 
@@ -13,8 +14,13 @@ interface Pattern { layer: string; parts?: string[]; strengths?: string[]; fitsW
 interface Item {
   package: string; type: string; id: string; elementId: string; title: string; description: string; status?: string;
   values?: Record<string, string>; details?: Record<string, string>; tagline?: string; principles?: string[];
-  measures?: Measure[]; pattern?: Pattern; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
+  measures?: Measure[]; pattern?: Pattern; sources?: string[]; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
 }
+interface Source { package: string; id: string; sourceId: string; packageId: string; title: string; url: string; kind: string; publicationDate?: string; lastReviewedAt: string; note?: string }
+interface Answer { key?: string; value?: string; label: string }
+interface Point { when: string[]; to: string[]; why: string }
+interface Question { package: string; set: string; id: string; questionId: string; prompt: string; kind: string; options?: Answer[]; points?: Point[] }
+interface QuestionSet { package: string; id: string; assessmentId: string; packageId: string; title: string; description?: string; questions: Question[] }
 interface Target { id: string; title: string; type: string; typeLabel: string; packageTitle: string; folder: string; own: boolean; ways: { id: string; title: string }[] }
 interface Choice { id: string; label: string; hint?: string }
 interface State {
@@ -25,6 +31,8 @@ interface State {
   statuses: Choice[];
   sections: Record<string, string>;
   elements: Item[];
+  sources: Source[];
+  discovery: QuestionSet[];
   targets: Target[];
 }
 /** What a new element starts with, when it's added from somewhere in particular. */
@@ -34,6 +42,8 @@ interface Start {
   incoming?: Record<string, string[]>;
   /** What to offer first in the outcomes it could contribute to. */
   suggest?: string[];
+  /** Go to its page once it's saved, as something new from the bar does. */
+  thenGo?: boolean;
 }
 
 type Props = Record<string, string | boolean | ((e: Event) => void)>;
@@ -81,7 +91,8 @@ function restoreSelection() {
   if (selected) document.querySelector<HTMLElement>(`.ex-card[data-node="${CSS.escape(selected)}"]`)?.click();
 }
 
-const pageOf = (state: State, type: string, id: string) => `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${state.sections[type]}/${id}/`;
+const onSite = (path: string) => `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${path}`;
+const pageOf = (state: State, type: string, id: string) => onSite(`${state.sections[type]}/${id}/`);
 
 function problemList(box: HTMLElement, message: string) {
   box.replaceChildren(...message.split('\n').map((line) => h('p', {}, line)));
@@ -111,11 +122,16 @@ interface PickerOptions {
   not?: string;
   /** Items to offer before any search. */
   suggest?: string[];
+  /** What to search, when it isn't everything an element can link to. */
+  pool?: () => Target[];
+  /** Offers making a new item, which it's then given to add. */
+  create?: { label: string; open: (add: (target: Target) => void) => void };
 }
 
 /** The list of what an item links to, and the search that adds to it. */
 function linkPicker(state: State, links: Link[], options: PickerOptions) {
-  const byId = new Map(state.targets.map((t) => [t.id, t]));
+  const pool = () => options.pool?.() ?? state.targets;
+  const find = (id: string) => pool().find((t) => t.id === id);
   const chosen = h('ul', { className: 'kit-editor-links' });
   const results = h('ul', { className: 'kit-editor-results', hidden: true });
   const suggestions = h('div', { className: 'kit-editor-suggest' });
@@ -140,7 +156,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   const drawChosen = () => {
     chosen.replaceChildren(
       ...links.map((link, i) => {
-        const target = byId.get(link.to);
+        const target = find(link.to);
         const note = (options.ways || options.coverage || options.note) && h('input', { className: 'kit-editor-links__note', value: link.note ?? '', placeholder: 'A note about this link, if it needs one', 'aria-label': 'A note about this link', oninput: (e: Event) => (link.note = (e.target as HTMLInputElement).value.trim() || undefined) });
         return h('li', {},
           h('span', { className: 'kit-editor-links__name' }, h('strong', {}, target?.title ?? link.to), h('small', {}, target ? ` ${target.typeLabel} · ${target.packageTitle}` : '')),
@@ -152,7 +168,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   };
 
   const drawSuggestions = () => {
-    const open = (options.suggest ?? []).flatMap((id) => (byId.has(id) && !links.some((l) => l.to === id) ? [byId.get(id)!] : []));
+    const open = (options.suggest ?? []).flatMap((id) => (find(id) && !links.some((l) => l.to === id) ? [find(id)!] : []));
     suggestions.replaceChildren(...open.map((t) => h('button', { type: 'button', onclick: () => add(t) }, `+ ${t.title}`)));
   };
 
@@ -173,7 +189,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   const matches = () => {
     const words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
     if (!words.length) return [];
-    return state.targets
+    return pool()
       .filter((t) => options.types.includes(t.type) && (!options.ownOnly || t.own) && (!options.inPackage || t.folder === options.inPackage) && t.id !== options.not && !links.some((l) => l.to === t.id))
       .filter((t) => words.every((w) => `${t.title} ${t.typeLabel} ${t.packageTitle}`.toLowerCase().includes(w)))
       .slice(0, 12);
@@ -196,7 +212,9 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   });
 
   redraw();
-  return h('div', {}, chosen, suggestions, search, results);
+  const create = options.create;
+  return h('div', {}, chosen, suggestions, search, results,
+    create && h('button', { type: 'button', className: 'kit-editor-link', onclick: () => create.open(add) }, create.label));
 }
 
 /** Rows of free details, such as an edition or a contract vehicle. */
@@ -273,6 +291,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   const incoming: Record<string, Link[]> = Object.fromEntries(['seeks', 'contributes_to', 'satisfies', 'candidate_pattern'].map((p) => [p, asLinks(existing?.incoming?.[p] ?? start.incoming?.[p])]));
   const details = Object.entries(existing?.details ?? {});
   const measures: Measure[] = copy(existing?.measures ?? []);
+  const cited = asLinks(existing?.sources);
 
   const title = h('input', { value: existing?.title ?? '', required: true });
   const description = h('textarea', { rows: '4', required: true, value: existing?.description ?? '' });
@@ -282,6 +301,8 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   const save = h('button', { type: 'submit', className: 'kit-editor-primary' }, existing ? 'Save' : 'Add it');
   const close = () => dialog.close();
   const packageName = () => existing?.package ?? inPackage.value;
+  // The package it will be in, which is what its sources have to come from.
+  let home = packageName;
 
   // What's particular to each type, and how to read it back.
   const parts: (HTMLElement | false)[] = [];
@@ -351,8 +372,8 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
       group('Capability it belongs to', linkPicker(state, incoming.satisfies, { types: ['capability'], ownOnly: true, one: true, inPackage: existing?.package ?? start.package, placeholder: 'Search your capabilities' })),
     );
     // A requirement goes in its capability's package, so that's what says where.
-    const home = () => (existing ? undefined : state.targets.find((t) => t.id === incoming.satisfies[0]?.to)?.folder);
-    read = () => ({ values: { kind: kind.value }, incoming: { satisfies: incoming.satisfies.map((l) => l.to) }, ...(home() && { package: home() }) });
+    home = () => (existing ? existing.package : (state.targets.find((t) => t.id === incoming.satisfies[0]?.to)?.folder ?? inPackage.value));
+    read = () => ({ values: { kind: kind.value }, incoming: { satisfies: incoming.satisfies.map((l) => l.to) }, package: home() });
   }
 
   if (type === 'implementationPattern') {
@@ -378,6 +399,15 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
       pattern: { ...pattern, layer: layer.value, ...Object.fromEntries(state.patternFields.map((f) => [f.id, statements(areas.get(f.id)!.value)])) },
       incoming: { candidate_pattern: incoming.candidate_pattern.map((l) => l.to) },
     });
+  }
+
+  if (type !== 'resource') {
+    parts.push(group('Sources', linkPicker(state, cited, {
+      types: ['source'],
+      placeholder: 'Search this package’s sources',
+      pool: () => sourcesAsTargets(state, home()),
+      create: { label: '+ Add a new source', open: (add) => openSource(state, undefined, { package: home(), then: (s) => add(sourcesAsTargets(state, s.package).find((t) => t.id === s.id)!) }) },
+    }), 'What it’s based on, such as a law or a standard.'));
   }
 
   const failed = (e: unknown) => {
@@ -418,10 +448,11 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
           description: description.value,
           status: status.value,
           links,
+          ...(type !== 'resource' && { sources: cited.map((l) => l.to) }),
           ...read(),
         });
         // Something new from the bar has nowhere to show on this page, so go to its own.
-        const fromTheBar = !existing && !start.package;
+        const fromTheBar = !existing && (!start.package || start.thenGo);
         if (fromTheBar && type !== 'resource') location.assign(pageOf(state, type, String(saved.id)));
         else reloadHere();
       } catch (err) {
@@ -447,9 +478,244 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   title.focus();
 }
 
+/** A package's sources, as something a picker can search. */
+const sourcesAsTargets = (state: State, packageName: string): Target[] =>
+  state.sources
+    .filter((s) => s.package === packageName)
+    .map((s) => ({ id: s.id, title: s.title, type: 'source', typeLabel: state.groups.source.find((k) => k.id === s.kind)?.label ?? 'Source', packageTitle: state.packages.find((p) => p.name === s.package)?.title ?? '', folder: s.package, own: true, ways: [] }));
+
+interface PlainForm {
+  heading: string;
+  fields: (HTMLElement | false | undefined)[];
+  submit: string;
+  /** Sends the form. A problem it throws shows in the form. */
+  send: () => Promise<void>;
+  /** Deletes what it's about, after asking, with the words to ask in. */
+  remove?: { confirm: string; send: () => Promise<void> };
+}
+
+/** A form for something that isn't an element, which has less to it. */
+function plainForm({ heading, fields, submit, send, remove }: PlainForm) {
+  const problems = h('div', { className: 'kit-editor-problems', role: 'alert', hidden: true });
+  const save = h('button', { type: 'submit', className: 'kit-editor-primary' }, submit);
+  const attempt = async (work: () => Promise<void>, button: HTMLButtonElement) => {
+    problems.hidden = true;
+    button.disabled = true;
+    try {
+      await work();
+    } catch (e) {
+      button.disabled = false;
+      problemList(problems, e instanceof Error ? e.message : String(e));
+    }
+  };
+  const form = h('form', { method: 'dialog', onsubmit: (e: Event) => { e.preventDefault(); void attempt(send, save); } },
+    h('header', {}, h('h2', {}, heading), h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Close', onclick: () => dialog.close() }, '✕')),
+    problems,
+    ...fields.filter((x): x is HTMLElement => Boolean(x)),
+    h('footer', {},
+      remove && h('button', { type: 'button', className: 'kit-editor-danger', onclick: (e: Event) => {
+        const button = e.currentTarget as HTMLButtonElement;
+        if (button.dataset.sure === 'yes') return void attempt(remove.send, button);
+        button.dataset.sure = 'yes';
+        button.textContent = remove.confirm;
+      } }, 'Delete'),
+      h('span', { className: 'kit-editor-spacer' }),
+      h('button', { type: 'button', onclick: () => dialog.close() }, 'Cancel'),
+      save));
+  const dialog = h('dialog', { className: 'kit-editor-dialog', onclose: () => dialog.remove() }, form);
+  document.body.append(dialog);
+  dialog.showModal();
+  dialog.querySelector<HTMLElement>('input, textarea')?.focus();
+  return dialog;
+}
+
+const packageSelect = (state: State, current?: string) => h('select', {}, ...state.packages.map((p) => h('option', { value: p.name, selected: p.name === current }, p.title)));
+
+/** The form for a source. Given `then`, it hands the new source back, for citing, and the page stays as it is. */
+function openSource(state: State, existing?: Source, start: { package?: string; then?: (source: Source) => void } = {}) {
+  const title = h('input', { value: existing?.title ?? '', required: true });
+  const url = h('input', { type: 'url', value: existing?.url ?? '', required: true, placeholder: 'https://' });
+  const kind = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.source, existing?.kind));
+  const published = h('input', { type: 'date', value: existing?.publicationDate ?? '' });
+  const checked = h('input', { type: 'date', value: existing?.lastReviewedAt ?? state.today, required: true });
+  const note = h('textarea', { rows: '3', value: existing?.note ?? '' });
+  const inPackage = packageSelect(state, start.package ?? defaultPackage(state, 'source', {}));
+  const packageName = () => existing?.package ?? start.package ?? inPackage.value;
+  const dialog = plainForm({
+    heading: existing ? 'Change this source' : 'Add a source',
+    submit: existing ? 'Save' : 'Add it',
+    fields: [
+      field('Title', title),
+      field('Link', url),
+      h('div', { className: 'kit-editor-pair' }, field('Kind', kind), field('Last checked', checked), field('Published', published, 'If it has a date.')),
+      field('Note', note, 'What it’s cited for.'),
+      !existing && !start.package && state.packages.length > 1 && field('Package', inPackage, 'A package’s items can cite only its own sources.'),
+    ],
+    send: async () => {
+      const fields = { package: packageName(), title: title.value, url: url.value, kind: kind.value, lastReviewedAt: checked.value, ...(published.value && { publicationDate: published.value }), note: note.value };
+      const saved = await post('source', { ...fields, ...(existing && { id: existing.id }) });
+      if (start.then) {
+        const source = { ...fields, id: String(saved.id), sourceId: `src:${saved.id}`, packageId: '' };
+        state.sources.push(source);
+        dialog.close();
+        start.then(source);
+      } else if (existing) reloadHere();
+      else location.assign(onSite('sources/'));
+    },
+    remove: existing && { confirm: 'Yes, delete it and its citations', send: async () => { await post('delete-source', { package: existing.package, id: existing.id }); reloadHere(); } },
+  });
+}
+
+/** The form for a set's title and description. A new set starts from openQuestion. */
+function openSet(state: State, set: QuestionSet) {
+  const title = h('input', { value: set.title, required: true });
+  const description = h('textarea', { rows: '3', value: set.description ?? '' });
+  plainForm({
+    heading: 'Change this question set',
+    submit: 'Save',
+    fields: [field('Title', title), field('Description', description, 'When it’s for, and what it covers.')],
+    send: async () => { await post('set', { package: set.package, id: set.id, title: title.value, description: description.value }); reloadHere(); },
+    remove: { confirm: 'Yes, delete it and its questions', send: async () => { await post('delete-set', { package: set.package, id: set.id }); location.assign(onSite('discovery/')); } },
+  });
+}
+
+const CHOICE = ['single-choice', 'multiple-choice'];
+const BOOLEAN_ANSWERS: Answer[] = [{ key: 'true', label: 'Yes' }, { key: 'false', label: 'No' }];
+
+interface Pointer { when: string[]; to: Link[]; why: string }
+
+/** The form for a question, and for a set too when it starts a new one. */
+function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
+  const prompt = h('textarea', { rows: '2', required: true, value: existing?.prompt ?? '' });
+  const kind = h('select', { required: true }, ...options(state.groups.question, existing?.kind ?? 'single-choice'));
+  const setTitle = h('input', { required: true });
+  const setDescription = h('textarea', { rows: '2' });
+  const inPackage = packageSelect(state, defaultPackage(state, 'discovery', {}));
+
+  let keys = 0;
+  const answers: Answer[] = (existing?.options ?? []).map((o) => ({ ...o, key: o.value }));
+  if (!existing) answers.push({ key: `new-${++keys}`, label: '' }, { key: `new-${++keys}`, label: '' });
+  const pointers: Pointer[] = (existing?.points ?? []).map((p) => ({ when: [...p.when], to: asLinks(p.to), why: p.why }));
+
+  const choice = () => CHOICE.includes(kind.value);
+  const answerable = () => choice() || kind.value === 'boolean';
+  const choices = () => (kind.value === 'boolean' ? BOOLEAN_ANSWERS : answers);
+
+  const answerRows = h('div', { className: 'kit-editor-details' });
+  const pointerRows = h('div', { className: 'kit-editor-ways' });
+  const answersGroup = group('Answers', answerRows);
+  const pointersGroup = group('What the answers point to', pointerRows, 'Something worth exploring next, such as a capability or a pattern, and why.');
+
+  const drawAnswers = () => {
+    answerRows.replaceChildren(
+      ...answers.map((answer, i) =>
+        h('div', { className: 'kit-editor-answer' },
+          h('input', { value: answer.label, required: true, 'aria-label': `Answer ${i + 1}`, oninput: (e: Event) => (answer.label = (e.target as HTMLInputElement).value), onchange: () => drawPointers() }),
+          h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this answer', onclick: () => {
+            answers.splice(i, 1);
+            for (const pointer of pointers) pointer.when = pointer.when.filter((w) => w !== answer.key);
+            drawAnswers();
+            drawPointers();
+          } }, '✕'))),
+      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { answers.push({ key: `new-${++keys}`, label: '' }); drawAnswers(); drawPointers(); } }, '+ Add an answer'),
+    );
+  };
+
+  const drawPointers = () => {
+    pointerRows.replaceChildren(
+      ...pointers.map((pointer, i) =>
+        h('div', { className: 'kit-editor-way' },
+          h('div', { className: 'kit-editor-way__top' },
+            h('div', { className: 'kit-editor-answers', role: 'group', 'aria-label': 'Which answers' },
+              ...choices().map((answer) =>
+                h('label', { className: 'kit-editor-check' },
+                  h('input', { type: 'checkbox', checked: pointer.when.includes(answer.key!), onchange: (e: Event) => {
+                    pointer.when = (e.target as HTMLInputElement).checked ? [...pointer.when, answer.key!] : pointer.when.filter((w) => w !== answer.key);
+                  } }),
+                  ` ${answer.label || 'An answer'}`))),
+            h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this pointer', onclick: () => { pointers.splice(i, 1); drawPointers(); } }, '✕')),
+          linkPicker(state, pointer.to, { types: ['outcome', 'measure', 'capability', 'requirement', 'implementationPattern'], placeholder: 'Search outcomes, measures, capabilities, requirements, and patterns' }),
+          h('input', { value: pointer.why, required: true, placeholder: 'Why, such as “The office may not have this yet”', 'aria-label': 'Why it points there', oninput: (e: Event) => (pointer.why = (e.target as HTMLInputElement).value) }))),
+      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { pointers.push({ when: [], to: [], why: '' }); drawPointers(); } }, '+ Add a pointer'),
+    );
+  };
+
+  const drawKind = () => {
+    answersGroup.hidden = !choice();
+    for (const input of answerRows.querySelectorAll('input')) input.required = choice();
+    pointersGroup.hidden = !answerable();
+    for (const input of pointerRows.querySelectorAll<HTMLInputElement>('input:not([type=search]):not([type=checkbox])')) input.required = answerable();
+  };
+  kind.addEventListener('change', () => {
+    // Yes and no aren't the choices a pointer may have named.
+    for (const pointer of pointers) pointer.when = pointer.when.filter((w) => choices().some((c) => c.key === w));
+    drawPointers();
+    drawKind();
+  });
+  drawAnswers();
+  drawPointers();
+  drawKind();
+
+  const packageName = () => set?.package ?? inPackage.value;
+  plainForm({
+    heading: existing ? 'Change this question' : set ? 'Add a question' : 'Add a question set',
+    submit: existing ? 'Save' : 'Add it',
+    fields: [
+      !set && field('Set title', setTitle),
+      !set && field('Description', setDescription, 'When it’s for, and what it covers.'),
+      !set && state.packages.length > 1 && field('Package', inPackage),
+      field(set ? 'Question' : 'First question', prompt, 'Ask how the office works today, never about a particular case or person.'),
+      field('How it’s answered', kind),
+      answersGroup,
+      pointersGroup,
+    ],
+    send: async () => {
+      const saved = await post('question', {
+        package: packageName(),
+        ...(set ? { set: set.id } : { newSet: { title: setTitle.value, description: setDescription.value } }),
+        ...(existing && { id: existing.id }),
+        prompt: prompt.value,
+        kind: kind.value,
+        options: choice() ? answers : [],
+        points: answerable() ? pointers.filter((p) => p.when.length || p.to.length || p.why.trim()).map((p) => ({ when: p.when, to: p.to.map((l) => l.to), why: p.why })) : [],
+      });
+      if (set) reloadHere();
+      else location.assign(onSite(`discovery/${String(saved.set)}/`));
+    },
+    remove: existing && set && { confirm: 'Yes, delete it', send: async () => { await post('delete-question', { package: set.package, set: set.id, id: existing.id }); reloadHere(); } },
+  });
+}
+
+/** The form for starting a package, whose publisher's details come from your other packages. */
+function openPackage(state: State) {
+  const title = h('input', { required: true });
+  const description = h('textarea', { rows: '3', required: true });
+  const dialog = plainForm({
+    heading: 'Add a package',
+    submit: 'Add it',
+    fields: [
+      field('Title', title, 'What it holds, such as “Our Services” or a mission’s name.'),
+      field('Description', description),
+    ],
+    send: async () => {
+      const saved = await post('package', { title: title.value, description: description.value });
+      const name = String(saved.name);
+      state.packages.push({ name, title: title.value.trim() });
+      dialog.querySelector('form')!.replaceChildren(
+        h('header', {}, h('h2', {}, 'Your package is ready')),
+        h('p', {}, `“${title.value.trim()}” is in source/${name}/. It builds on nothing yet; the editor adds what it needs as you link to things.`),
+        h('footer', {},
+          h('span', { className: 'kit-editor-spacer' }),
+          h('button', { type: 'button', onclick: () => location.reload() }, 'Done'),
+          h('button', { type: 'button', className: 'kit-editor-primary', onclick: () => { dialog.close(); openForm(state, 'mission', undefined, { package: name, thenGo: true }); } }, 'Add a mission')));
+    },
+  });
+}
+
 /** Where something new goes: where it's being added from, or a package that already has that type. */
 function defaultPackage(state: State, type: string, start: Start) {
-  return start.package ?? state.elements.find((e) => e.type === type)?.package ?? state.packages[0]?.name;
+  const having = type === 'source' ? state.sources[0]?.package : type === 'discovery' ? state.discovery[0]?.package : state.elements.find((e) => e.type === type)?.package;
+  return start.package ?? having ?? state.packages[0]?.name;
 }
 
 function openPublish(state: State) {
@@ -481,14 +747,23 @@ function openPublish(state: State) {
   dialog.showModal();
 }
 
+/** What the bar can add. */
+function additions(state: State): [string, () => void][] {
+  return [
+    ...['resource', 'mission', 'outcome', 'capability', 'requirement', 'implementationPattern'].map((type): [string, () => void] => [`+ Add ${names[type].a}`, () => openForm(state, type)]),
+    ['+ Add a source', () => openSource(state)],
+    ['+ Add a question set', () => openQuestion(state)],
+    ['+ Add a package', () => openPackage(state)],
+  ];
+}
+
 function drawBar(state: State) {
   const status = state.problems
     ? h('span', { className: 'kit-editor-bar__problem', title: state.problems.join('\n') }, 'source/ has a problem. See the terminal.')
     : h('span', {}, `Release ${state.release}`, h('span', { className: state.draft ? 'kit-editor-pill kit-editor-pill--draft' : 'kit-editor-pill' }, state.draft ? 'Draft' : 'Published'));
   const menu = h('details', { className: 'kit-editor-menu' },
     h('summary', {}, '+ Add'),
-    h('div', {}, ...['resource', 'mission', 'outcome', 'capability', 'requirement', 'implementationPattern'].map((type) =>
-      h('button', { type: 'button', onclick: () => { menu.open = false; openForm(state, type); } }, `+ Add ${names[type].a}`))));
+    h('div', {}, ...additions(state).map(([label, open]) => h('button', { type: 'button', onclick: () => { menu.open = false; open(); } }, label))));
   document.addEventListener('click', (e) => {
     if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
   });
@@ -521,6 +796,31 @@ function actions(state: State, item: Item) {
     item.type === 'capability' && button('+ Add a pattern', add.pattern));
 }
 
+/** Finds what a page's place means among your own, by its package as well as its ID, since the library's could have the same ID. */
+const ownBy = <T extends { packageId: string }>(items: T[], id: (item: T) => string) => {
+  const byKey = new Map(items.map((item) => [`${item.packageId} ${id(item)}`, item]));
+  return (spot: HTMLElement, value: string) => byKey.get(`${spot.dataset.package} ${value}`);
+};
+
+function drawReferenceButtons(state: State) {
+  const button = (label: string, onclick: () => void) => h('button', { type: 'button', className: 'kit-editor-edit', onclick }, label);
+  const source = ownBy(state.sources, (s) => s.sourceId);
+  for (const row of document.querySelectorAll<HTMLElement>('[data-source]')) {
+    const found = source(row, row.dataset.source!);
+    if (found) row.querySelector('th')?.append(button('Edit', () => openSource(state, found)));
+  }
+  const assessment = ownBy(state.discovery, (a) => a.assessmentId);
+  for (const header of document.querySelectorAll<HTMLElement>('[data-assessment]')) {
+    const set = assessment(header, header.dataset.assessment!);
+    if (!set) continue;
+    header.append(h('div', { className: 'kit-editor-actions' }, button('Edit this set', () => openSet(state, set)), button('+ Add a question', () => openQuestion(state, set))));
+    for (const spot of document.querySelectorAll<HTMLElement>('[data-question]')) {
+      const question = set.questions.find((q) => q.questionId === spot.dataset.question);
+      if (question) spot.append(button('Edit', () => openQuestion(state, set, question)));
+    }
+  }
+}
+
 function drawButtons(state: State) {
   const known = new Set(state.targets.map((t) => t.id));
   const own = new Map(state.elements.map((e) => [e.elementId, e]));
@@ -544,6 +844,7 @@ async function start() {
   const state = (await res.json()) as State;
   drawBar(state);
   drawButtons(state);
+  drawReferenceButtons(state);
   restoreSelection();
 }
 

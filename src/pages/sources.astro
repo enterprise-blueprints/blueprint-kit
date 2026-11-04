@@ -24,7 +24,7 @@ import { formatDate } from '../lib/format';
         </thead>
         <tbody>
           {sources.map((s) => (
-            <tr class:list={{ 'only-whole': !inUse(s.package) }}>
+            <tr class:list={{ 'only-whole': !inUse(s.package) }} data-source={s.id} data-package={s.package.packageId}>
               <th scope="row">
                 <a href={s.url} target="_blank" rel="noopener">{s.title}<span class="sr-only"> (opens in a new tab)</span></a>
                 {s.note && <p class="source-list__meta">{s.note}</p>}

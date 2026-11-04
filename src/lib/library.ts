@@ -362,7 +362,7 @@ export interface ElementResource {
   note?: string;
 }
 
-/** The resources that help with an element, in the order their packages list them, kind by kind. */
+/** The resources that help with an element, a publisher's own first, then in the order their packages list them, kind by kind. */
 export function resourcesFor(element: LibraryElement): ElementResource[] {
   const ways = Array.isArray(element.attributes?.ways) ? (element.attributes.ways as { id: string; title: string }[]) : [];
   const kinds = Object.keys(resourceKinds.groups);
@@ -372,7 +372,7 @@ export function resourcesFor(element: LibraryElement): ElementResource[] {
       const way = r.way ? ways.find((w) => w.id === r.way) : undefined;
       return { resource, details: resourceDetails(resource), ...(way && { way: { id: way.id, title: way.title } }), ...(r.description && { note: r.description }) };
     })
-    .sort((a, b) => kinds.indexOf(String(a.resource.attributes?.kind)) - kinds.indexOf(String(b.resource.attributes?.kind)));
+    .sort((a, b) => Number(isOwn(b.resource.package)) - Number(isOwn(a.resource.package)) || kinds.indexOf(String(a.resource.attributes?.kind)) - kinds.indexOf(String(b.resource.attributes?.kind)));
 }
 
 /** What a resource helps with, in the order it lists them, with the pattern's way when a link names one. */

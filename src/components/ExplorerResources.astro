@@ -1,0 +1,25 @@
+---
+// The resources that help with the item in the explorer's panel, right after
+// its description, in a box of their own so they're easy to find. With none it
+// stays empty and takes no room, and the editor can still add one here.
+import { resourcesFor, type LibraryElement } from '../lib/library';
+import type { BlueprintPackage } from '../lib/package';
+import ResourceList from './ResourceList.astro';
+
+interface Props {
+  element: LibraryElement;
+  /** The mission's package, so the library's own resources go unmarked on its pages. */
+  within?: BlueprintPackage;
+}
+
+const { element, within } = Astro.props;
+const resources = resourcesFor(element);
+---
+<section class="ex__resources type-resource" data-resources-for={element.id}>{resources.length > 0 && <><h4>Resources <span>{resources.length}</span></h4><ResourceList resources={resources} within={within} compact /></>}</section>
+
+<style>
+  .ex__resources { margin: .25rem 0 .9rem; padding: .6rem .65rem .7rem; border-radius: var(--radius-sm); background: var(--tc-bg); }
+  .ex__resources:empty { display: none; }
+  .ex__resources h4 { margin: 0 0 .45rem; color: var(--tc); font-size: .8125rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .ex__resources h4 span { font-weight: 500; opacity: .8; }
+</style>

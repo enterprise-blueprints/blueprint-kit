@@ -65,6 +65,7 @@ const stacked = Boolean(blueprint?.capabilities.length);
 // A resource links out; the resources that help with anything else are listed as cards.
 const resource = element.type === 'resource' ? resourceDetails(element) : null;
 const resources = resourcesFor(element);
+const canHaveResources = predicates.helps_with.to.includes(element.type);
 const replacement = element.replacedBy ? elements.find((e) => e.id === element.replacedBy) : undefined;
 // The stack already shows the mission's outcomes and capabilities, and a capability compares its patterns.
 const covered = [predicates.helps_with.incoming, ...(stacked ? [predicates.seeks.outgoing, predicates.supports_mission.incoming] : [])];
@@ -82,7 +83,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
       </ol>
     </nav>
 
-    <header class="record-header">
+    <header class="record-header" data-element={element.id}>
       <div class="record-header__meta">
         <TypeBadge type={element.type} />
         <StatusBadge status={element.status} />
@@ -116,6 +117,10 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           <div class="notice">
             <p>This pattern has been replaced by <a href={replacement.url}>{replacement.title}</a>, which describes it as one of its ways.</p>
           </div>
+        )}
+
+        {canHaveResources && (
+          <section class="section section--resources" data-resources-for={element.id}>{resources.length > 0 && <><h2>Resources</h2><p class="section-note">To learn more, or to get started.</p><ResourceList resources={resources} within={pkg} /></>}</section>
         )}
 
         {measures.length > 0 && (
@@ -216,14 +221,6 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           </section>
         )}
 
-        {resources.length > 0 && (
-          <section class="section">
-            <h2>Resources</h2>
-            <p class="section-note">To learn more, or to get started.</p>
-            <ResourceList resources={resources} within={pkg} />
-          </section>
-        )}
-
         {questions.length > 0 && (
           <section class="section">
             <h2>Discovery questions</h2>
@@ -296,6 +293,8 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
   .pattern-field h2 { margin: 0 0 .5rem; font-size: 1rem; }
   .pattern-field ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
   .record-from { margin: 0 0 .75rem; color: var(--text-muted); font-size: .9375rem; }
+  .section--resources { margin-bottom: 2rem; }
+  .section--resources:empty { display: none; }
   .record-resource { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin: 0; }
   .measures { display: grid; gap: .9rem; margin: 0; max-width: 54rem; }
   .measures dt { font-weight: 650; }

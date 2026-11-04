@@ -5,11 +5,12 @@
 // Selecting anything lights up its trace, from outcomes through capabilities
 // to patterns, and shows it in the panel beside them, with its measures,
 // requirements, or ways to source it. Requirements stay in the panel, since
-// they're the detail under a capability, and so do the resources that help
-// with each item. Search dims what doesn't match.
+// they're the detail under a capability. Each card says how many resources
+// help with it, and the panel shows them first. Search dims what doesn't match.
 import { byLayer, coversPartly, groupOf, patternDetails, resourcesFor, shortTitle, type LibraryElement, type MissionBlueprint } from '../lib/library';
 import { plural } from '../lib/format';
 import { capabilityStages, patternLayers } from '../lib/vocabulary';
+import ExplorerResources from './ExplorerResources.astro';
 import LibraryMark from './LibraryMark.astro';
 
 interface Props {
@@ -42,6 +43,7 @@ const outcomesFor = (c: LibraryElement) => outcomes.filter((o) => o.capabilities
 const capabilitiesFor = (p: LibraryElement) => capabilities.filter((c) => c.patterns.includes(p)).map((c) => c.capability);
 const sharedLabel = (e: LibraryElement) => (e.package !== mission ? shortTitle(e.package).replace(/ Capabilities$/, '') : undefined);
 const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).join(' ') });
+const helpCount = (e: LibraryElement) => resourcesFor(e).length;
 ---
 <section class="ex" aria-labelledby="ex-heading" data-explorer>
   <div class="ex__bar">
@@ -71,6 +73,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
               <button type="button" class="ex-card" aria-pressed="false" {...node(o.outcome.id)}>
                 <span class="ex-card__title">{o.outcome.title}<LibraryMark element={o.outcome} within={mission} /></span>
                 <span class="ex-card__meta">{[groupOf(o.outcome)?.label, o.measures.length && countOf(o.measures.length, 'measure', 'measures')].filter(Boolean).join(' · ')}</span>
+                {helpCount(o.outcome) > 0 && <span class="ex-card__help type-resource">{countOf(helpCount(o.outcome), 'resource', 'resources')}</span>}
               </button>
             </li>
           ))}
@@ -88,6 +91,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
                   <button type="button" class="ex-card" aria-pressed="false" {...node(c.capability.id)}>
                     <span class="ex-card__title">{c.capability.title}<LibraryMark element={c.capability} within={mission} /></span>
                     <span class="ex-card__meta">{[sharedLabel(c.capability), c.requirements.length && countOf(c.requirements.length, 'requirement', 'requirements')].filter(Boolean).join(' · ')}</span>
+                    {helpCount(c.capability) > 0 && <span class="ex-card__help type-resource">{countOf(helpCount(c.capability), 'resource', 'resources')}</span>}
                   </button>
                 </li>
               ))}
@@ -107,6 +111,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
                   <button type="button" class="ex-card" aria-pressed="false" {...node(p.id)}>
                     <span class="ex-card__title">{p.title}<LibraryMark element={p} within={mission} /></span>
                     <span class="ex-card__meta">{[sharedLabel(p), patternDetails(p).sourcing].filter(Boolean).join(' · ')}</span>
+                    {helpCount(p) > 0 && <span class="ex-card__help type-resource">{countOf(helpCount(p), 'resource', 'resources')}</span>}
                   </button>
                 </li>
               ))}
@@ -131,6 +136,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
           <p class="ex__kicker">Outcome{groupOf(o.outcome) && <> · {groupOf(o.outcome)!.label}</>}</p>
           <h3 class="ex__title">{o.outcome.title}<LibraryMark element={o.outcome} always /></h3>
           <p>{o.outcome.description}</p>
+          <ExplorerResources element={o.outcome} within={mission} />
           {o.measures.length > 0 && (
             <>
               <h4>Measures</h4>
@@ -139,12 +145,6 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
           )}
           <h4>Capabilities that contribute</h4>
           <div class="ex__chips type-capability">{o.capabilities.map((c) => <button type="button" class="ex-chip" data-select={c.id}><span>{c.title}<LibraryMark element={c} within={mission} /></span></button>)}</div>
-          {resourcesFor(o.outcome).length > 0 && (
-            <>
-              <h4>Resources</h4>
-              <div class="ex__chips type-resource">{resourcesFor(o.outcome).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
-            </>
-          )}
           <p class="ex__open"><a href={o.outcome.url}>Open the outcome’s page →</a></p>
         </div>
       ))}
@@ -154,6 +154,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
           <p class="ex__kicker">Capability{groupOf(c.capability) && <> · {groupOf(c.capability)!.label}</>}{c.sharedFrom && <> · from {shortTitle(c.sharedFrom)}</>}</p>
           <h3 class="ex__title">{c.capability.title}<LibraryMark element={c.capability} always /></h3>
           <p>{c.capability.description}</p>
+          <ExplorerResources element={c.capability} within={mission} />
           <h4>Outcomes it serves</h4>
           <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}><span>{o.title}<LibraryMark element={o} within={mission} /></span></button>)}</div>
           {c.patterns.length > 0 && (
@@ -175,12 +176,6 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
               <div class="ex__chips type-requirement">{c.requirements.map((r) => <a class="ex-chip" href={r.url}><span>{r.title}<LibraryMark element={r} within={mission} /></span></a>)}</div>
             </>
           )}
-          {resourcesFor(c.capability).length > 0 && (
-            <>
-              <h4>Resources</h4>
-              <div class="ex__chips type-resource">{resourcesFor(c.capability).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
-            </>
-          )}
           <p class="ex__open"><a href={c.capability.url}>Open the capability’s page →</a></p>
         </div>
       ))}
@@ -192,6 +187,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
             <p class="ex__kicker">Pattern{details.layer && <> · {patternLayers[details.layer].label}</>}{sharedLabel(p) && <> · from {shortTitle(p.package)}</>}</p>
             <h3 class="ex__title">{p.title}<LibraryMark element={p} always /></h3>
             <p>{p.description}</p>
+            <ExplorerResources element={p} within={mission} />
             {details.ways.length > 0 && (
               <>
                 <h4>{details.ways.length === 1 ? 'How to source it' : 'Ways to source it'}</h4>
@@ -207,12 +203,6 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
                 </button>
               ))}
             </div>
-            {resourcesFor(p).length > 0 && (
-              <>
-                <h4>Resources</h4>
-                <div class="ex__chips type-resource">{resourcesFor(p).map((r) => <a class="ex-chip" href={r.details.url} target="_blank" rel="noopener"><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span><span class="sr-only"> (opens in a new tab)</span></a>)}</div>
-              </>
-            )}
             <p class="ex__open"><a href={p.url}>Open the pattern’s page →</a></p>
           </div>
         );
@@ -360,6 +350,7 @@ const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).joi
   .ex-card__title { font-weight: 600; font-size: .9375rem; line-height: 1.3; }
   .ex-card__meta { font-size: .8125rem; color: var(--text-muted); }
   .ex-card__meta:empty { display: none; }
+  .ex-card__help { justify-self: start; margin-top: .15rem; padding: .05rem .45rem; border-radius: 999px; background: var(--tc-bg); color: var(--tc); font-size: .75rem; font-weight: 650; }
   .has-selection .ex-card:not(.is-lit) { opacity: .35; }
   .ex-card.is-lit { background: var(--tc-bg); }
   .ex-card[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--accent); }

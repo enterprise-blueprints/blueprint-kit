@@ -1,4 +1,5 @@
-// The editor on the pages, with `pnpm editor`: a bar across the top, a button
+// The editor on the pages, with `pnpm editor`, on the library's site and on
+// publishers': a bar across the top, a button
 // wherever something can be added or changed, and a form. The pages mark those
 // places with data-resources-for, data-resource-id, data-element, data-detail,
 // data-source, data-assessment, data-question, and data-package, and otherwise
@@ -25,6 +26,8 @@ interface Target { id: string; title: string; type: string; typeLabel: string; p
 interface Choice { id: string; label: string; hint?: string }
 interface State {
   release?: string; draft?: boolean; problems?: string[]; today: string;
+  /** A publisher's site, rather than the library, which publishes by pushing to main. */
+  publisher: boolean;
   packages: { name: string; title: string }[];
   groups: Record<string, Choice[]>;
   patternFields: Choice[];
@@ -76,7 +79,7 @@ async function post(path: string, body: unknown): Promise<Record<string, unknown
   return data;
 }
 
-const SELECTED = 'kit-editor-selected';
+const SELECTED = 'site-editor-selected';
 
 /** Reloads the page, coming back to what was selected in the explorer. */
 function reloadHere() {
@@ -132,9 +135,9 @@ interface PickerOptions {
 function linkPicker(state: State, links: Link[], options: PickerOptions) {
   const pool = () => options.pool?.() ?? state.targets;
   const find = (id: string) => pool().find((t) => t.id === id);
-  const chosen = h('ul', { className: 'kit-editor-links' });
-  const results = h('ul', { className: 'kit-editor-results', hidden: true });
-  const suggestions = h('div', { className: 'kit-editor-suggest' });
+  const chosen = h('ul', { className: 'site-editor-links' });
+  const results = h('ul', { className: 'site-editor-results', hidden: true });
+  const suggestions = h('div', { className: 'site-editor-suggest' });
   const search = h('input', { type: 'search', placeholder: options.placeholder, autocomplete: 'off', 'aria-label': options.placeholder });
 
   const extras = (link: Link, target?: Target) => {
@@ -146,7 +149,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
         ...ways.map((w) => h('option', { value: w.id ?? '', selected: w.id === link.way }, w.title))));
     }
     if (options.coverage) {
-      parts.push(h('label', { className: 'kit-editor-check' },
+      parts.push(h('label', { className: 'site-editor-check' },
         h('input', { type: 'checkbox', checked: link.coverage === 'partial', onchange: (e: Event) => (link.coverage = (e.target as HTMLInputElement).checked ? 'partial' : undefined) }),
         ' Covers part of it'));
     }
@@ -157,11 +160,11 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
     chosen.replaceChildren(
       ...links.map((link, i) => {
         const target = find(link.to);
-        const note = (options.ways || options.coverage || options.note) && h('input', { className: 'kit-editor-links__note', value: link.note ?? '', placeholder: 'A note about this link, if it needs one', 'aria-label': 'A note about this link', oninput: (e: Event) => (link.note = (e.target as HTMLInputElement).value.trim() || undefined) });
+        const note = (options.ways || options.coverage || options.note) && h('input', { className: 'site-editor-links__note', value: link.note ?? '', placeholder: 'A note about this link, if it needs one', 'aria-label': 'A note about this link', oninput: (e: Event) => (link.note = (e.target as HTMLInputElement).value.trim() || undefined) });
         return h('li', {},
-          h('span', { className: 'kit-editor-links__name' }, h('strong', {}, target?.title ?? link.to), h('small', {}, target ? ` ${target.typeLabel} · ${target.packageTitle}` : '')),
+          h('span', { className: 'site-editor-links__name' }, h('strong', {}, target?.title ?? link.to), h('small', {}, target ? ` ${target.typeLabel} · ${target.packageTitle}` : '')),
           ...extras(link, target),
-          h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': `Remove ${target?.title ?? link.to}`, onclick: () => { links.splice(i, 1); redraw(); } }, '✕'),
+          h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': `Remove ${target?.title ?? link.to}`, onclick: () => { links.splice(i, 1); redraw(); } }, '✕'),
           note);
       }),
     );
@@ -201,7 +204,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
       ...found.map((t) => h('li', {}, h('button', { type: 'button', onclick: () => add(t) }, h('strong', {}, t.title), h('small', {}, ` ${t.typeLabel} · ${t.packageTitle}`)))),
     );
     results.hidden = !search.value.trim();
-    if (!found.length && search.value.trim()) results.append(h('li', { className: 'kit-editor-results__none' }, 'Nothing matches that.'));
+    if (!found.length && search.value.trim()) results.append(h('li', { className: 'site-editor-results__none' }, 'Nothing matches that.'));
   });
   // Enter takes the first match, rather than sending the form.
   search.addEventListener('keydown', (e) => {
@@ -214,20 +217,20 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
   redraw();
   const create = options.create;
   return h('div', {}, chosen, suggestions, search, results,
-    create && h('button', { type: 'button', className: 'kit-editor-link', onclick: () => create.open(add) }, create.label));
+    create && h('button', { type: 'button', className: 'site-editor-link', onclick: () => create.open(add) }, create.label));
 }
 
 /** Rows of free details, such as an edition or a contract vehicle. */
 function detailRows(attributes: [string, string][]) {
-  const rows = h('div', { className: 'kit-editor-details' });
+  const rows = h('div', { className: 'site-editor-details' });
   const draw = () => {
     rows.replaceChildren(
       ...attributes.map((row, i) =>
-        h('div', { className: 'kit-editor-details__row' },
+        h('div', { className: 'site-editor-details__row' },
           h('input', { value: row[0], placeholder: 'Name, such as editions', 'aria-label': 'Detail name', oninput: (e: Event) => (row[0] = (e.target as HTMLInputElement).value) }),
           h('input', { value: row[1], placeholder: 'What it says', 'aria-label': 'Detail value', oninput: (e: Event) => (row[1] = (e.target as HTMLInputElement).value) }),
-          h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this detail', onclick: () => { attributes.splice(i, 1); draw(); } }, '✕'))),
-      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { attributes.push(['', '']); draw(); } }, '+ Add a detail'),
+          h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Remove this detail', onclick: () => { attributes.splice(i, 1); draw(); } }, '✕'))),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { attributes.push(['', '']); draw(); } }, '+ Add a detail'),
     );
   };
   draw();
@@ -236,15 +239,15 @@ function detailRows(attributes: [string, string][]) {
 
 /** Rows of an outcome's measures. */
 function measureRows(measures: Measure[]) {
-  const rows = h('div', { className: 'kit-editor-measures' });
+  const rows = h('div', { className: 'site-editor-measures' });
   const draw = () => {
     rows.replaceChildren(
       ...measures.map((m, i) =>
-        h('div', { className: 'kit-editor-measures__row' },
+        h('div', { className: 'site-editor-measures__row' },
           h('input', { value: m.title, placeholder: 'What’s measured, such as share of the plan completed', 'aria-label': 'Measure title', oninput: (e: Event) => (m.title = (e.target as HTMLInputElement).value) }),
-          h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this measure', onclick: () => { measures.splice(i, 1); draw(); } }, '✕'),
+          h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Remove this measure', onclick: () => { measures.splice(i, 1); draw(); } }, '✕'),
           h('input', { value: m.description, placeholder: 'How it’s worked out', 'aria-label': 'Measure description', oninput: (e: Event) => (m.description = (e.target as HTMLInputElement).value) }))),
-      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { measures.push({ title: '', description: '' }); draw(); } }, '+ Add a measure'),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { measures.push({ title: '', description: '' }); draw(); } }, '+ Add a measure'),
     );
   };
   draw();
@@ -256,28 +259,28 @@ const statements = (text: string) => text.split('\n').map((s) => s.trim()).filte
 
 /** Rows of a pattern's ways to source it, each with its fit tucked away until it's wanted. */
 function wayRows(state: State, ways: Way[]) {
-  const rows = h('div', { className: 'kit-editor-ways' });
+  const rows = h('div', { className: 'site-editor-ways' });
   const said = state.patternFields.filter((f) => f.id !== 'parts');
   const draw = () => {
     rows.replaceChildren(
       ...ways.map((way, i) =>
-        h('div', { className: 'kit-editor-way' },
-          h('div', { className: 'kit-editor-way__top' },
+        h('div', { className: 'site-editor-way' },
+          h('div', { className: 'site-editor-way__top' },
             h('select', { required: true, 'aria-label': 'Approach', onchange: (e: Event) => (way.approach = (e.target as HTMLSelectElement).value) }, h('option', { value: '' }, 'Choose an approach'), ...options(state.groups.approach, way.approach)),
-            ways.length > 1 && h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this way', onclick: () => { ways.splice(i, 1); draw(); } }, '✕'),
+            ways.length > 1 && h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Remove this way', onclick: () => { ways.splice(i, 1); draw(); } }, '✕'),
             h('input', { value: way.title, required: true, placeholder: 'What it is, such as “The agency’s case platform”', 'aria-label': 'Way title', oninput: (e: Event) => (way.title = (e.target as HTMLInputElement).value) })),
           h('textarea', { rows: '2', value: way.description ?? '', placeholder: 'How this way works, if that needs saying', 'aria-label': 'Way description', oninput: (e: Event) => (way.description = (e.target as HTMLTextAreaElement).value) }),
           h('details', { open: said.some((f) => way[f.id as 'strengths']?.length) },
             h('summary', {}, 'What’s particular to this way'),
             ...said.map((f) => field(f.label, h('textarea', { rows: '2', value: lines(way[f.id as 'strengths']), oninput: (e: Event) => (way[f.id as 'strengths'] = statements((e.target as HTMLTextAreaElement).value)) }), 'One to a line.'))))),
-      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { ways.push({ approach: '', title: '' }); draw(); } }, '+ Add a way'),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { ways.push({ approach: '', title: '' }); draw(); } }, '+ Add a way'),
     );
   };
   draw();
   return rows;
 }
 
-const field = (label: string, control: HTMLElement, hint?: string) => h('label', { className: 'kit-editor-field' }, h('span', {}, label), control, hint && h('small', {}, hint));
+const field = (label: string, control: HTMLElement, hint?: string) => h('label', { className: 'site-editor-field' }, h('span', {}, label), control, hint && h('small', {}, hint));
 const group = (label: string, body: HTMLElement, hint?: string) => h('fieldset', {}, h('legend', {}, label), hint && h('small', {}, hint), body);
 const options = (choices: Choice[], current?: string) => choices.map((c) => h('option', { value: c.id, selected: c.id === current }, c.label));
 const asLinks = (ids: string[] = []): Link[] => ids.map((to) => ({ to }));
@@ -295,10 +298,10 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
 
   const title = h('input', { value: existing?.title ?? '', required: true });
   const description = h('textarea', { rows: '4', required: true, value: existing?.description ?? '' });
-  const status = h('select', {}, ...options(state.statuses, existing?.status ?? 'draft'));
+  const status = h('select', {}, ...options(state.statuses, existing?.status ?? (state.publisher ? 'draft' : 'reference')));
   const inPackage = h('select', {}, ...state.packages.map((p) => h('option', { value: p.name, selected: p.name === defaultPackage(state, type, start) }, p.title)));
-  const problems = h('div', { className: 'kit-editor-problems', role: 'alert', hidden: true });
-  const save = h('button', { type: 'submit', className: 'kit-editor-primary' }, existing ? 'Save' : 'Add it');
+  const problems = h('div', { className: 'site-editor-problems', role: 'alert', hidden: true });
+  const save = h('button', { type: 'submit', className: 'site-editor-primary' }, existing ? 'Save' : 'Add it');
   const close = () => dialog.close();
   const packageName = () => existing?.package ?? inPackage.value;
   // The package it will be in, which is what its sources have to come from.
@@ -314,7 +317,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
     const url = h('input', { type: 'url', value: existing?.values?.url ?? '', required: true, placeholder: 'https://' });
     const by = h('input', { value: existing?.values?.by ?? '' });
     parts.push(
-      h('div', { className: 'kit-editor-pair' }, field('Kind', kind), field('Last checked', checked)),
+      h('div', { className: 'site-editor-pair' }, field('Kind', kind), field('Last checked', checked)),
       field('Link', url),
       field('Description', description, 'What it is and who it’s for, in a sentence or two.'),
       group('Helps with', linkPicker(state, linksFor('helps_with'), { types: ['mission', 'outcome', 'capability', 'requirement', 'implementationPattern'], placeholder: 'Search missions, outcomes, capabilities, requirements, and patterns', ways: true })),
@@ -343,11 +346,11 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   if (type === 'outcome') {
     const theme = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.outcome, existing?.values?.theme));
     parts.push(
-      h('div', { className: 'kit-editor-pair' }, field('What the public gets', theme), field('Status', status)),
+      h('div', { className: 'site-editor-pair' }, field('What the public gets', theme), field('Status', status)),
       field('Description', description, 'The result, as someone outside the office would see it.'),
       group('Measures', measureRows(measures), 'Ways to tell how it’s going, such as a figure the office already reports.'),
       group('Missions that seek it', linkPicker(state, incoming.seeks, { types: ['mission'], ownOnly: true, placeholder: 'Search your missions' })),
-      group('Capabilities that contribute', linkPicker(state, incoming.contributes_to, { types: ['capability'], placeholder: 'Search capabilities, yours and the library’s' }), 'Choosing one of the library’s reuses it for this mission, without changing it.'),
+      group('Capabilities that contribute', linkPicker(state, incoming.contributes_to, { types: ['capability'], placeholder: 'Search capabilities in any package' }), 'Choosing one from another package reuses it for this mission, without changing it.'),
     );
     read = () => ({ values: { theme: theme.value }, measures, incoming: { seeks: incoming.seeks.map((l) => l.to), contributes_to: incoming.contributes_to.map((l) => l.to) } });
   }
@@ -355,7 +358,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   if (type === 'capability') {
     const stage = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.capability, existing?.values?.stage));
     parts.push(
-      h('div', { className: 'kit-editor-pair' }, field('Stage of the work', stage), field('Status', status)),
+      h('div', { className: 'site-editor-pair' }, field('Stage of the work', stage), field('Status', status)),
       field('Description', description, 'What must be possible. It usually starts “Ability to”.'),
       group('Outcomes it contributes to', linkPicker(state, linksFor('contributes_to'), { types: ['outcome'], placeholder: 'Search outcomes', suggest: start.suggest })),
       group('Patterns that could provide it', linkPicker(state, linksFor('candidate_pattern'), { types: ['implementationPattern'], placeholder: 'Search patterns', coverage: true })),
@@ -367,7 +370,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   if (type === 'requirement') {
     const kind = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.requirement, existing?.values?.kind));
     parts.push(
-      h('div', { className: 'kit-editor-pair' }, field('Kind', kind), field('Status', status)),
+      h('div', { className: 'site-editor-pair' }, field('Kind', kind), field('Status', status)),
       field('Description', description, 'What it asks for, with any figure from the law or policy, such as 20 working days.'),
       group('Capability it belongs to', linkPicker(state, incoming.satisfies, { types: ['capability'], ownOnly: true, one: true, inPackage: existing?.package ?? start.package, placeholder: 'Search your capabilities' })),
     );
@@ -387,11 +390,11 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
     // A need can name one of the ways, so it needs ways that are saved, and more than one to choose from.
     const saved = existing?.pattern?.ways ?? [];
     parts.push(
-      h('div', { className: 'kit-editor-pair' }, layerField, field('Status', status)),
-      field('Description', description, 'What it is, in a sentence or two. The library’s start “An example architecture:”.'),
+      h('div', { className: 'site-editor-pair' }, layerField, field('Status', status)),
+      field('Description', description, 'What it is, in a sentence or two. Patterns usually start “An example architecture:”.'),
       group('Ways to source it', wayRows(state, pattern.ways), 'One is enough. Add more if it could also be bought, built, or run on a platform the agency has.'),
       ...state.patternFields.map((f) => field(f.label, areas.get(f.id)!, `${f.hint} One to a line.`)),
-      group('Capabilities it could provide', linkPicker(state, incoming.candidate_pattern, { types: ['capability'], placeholder: 'Search capabilities, yours and the library’s' }), 'Choosing one of the library’s offers this pattern there, without changing it.'),
+      group('Capabilities it could provide', linkPicker(state, incoming.candidate_pattern, { types: ['capability'], placeholder: 'Search capabilities in any package' }), 'Choosing one from another package offers this pattern there, without changing it.'),
       group('Needs', linkPicker(state, linksFor('depends_on'), { types: ['implementationPattern'], placeholder: 'Search patterns', not: existing?.elementId, note: true, ownWays: saved.length > 1 ? saved : undefined }), 'Patterns it can’t work without. A mission with this pattern has to have them too.'),
       group('Works with', linkPicker(state, linksFor('works_with'), { types: ['implementationPattern'], placeholder: 'Search patterns', not: existing?.elementId, note: true })),
     );
@@ -460,19 +463,19 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
       }
     },
   },
-    h('header', {}, h('h2', {}, existing ? `Change this ${name.word}` : `Add ${name.a}`), h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Close', onclick: close }, '✕')),
+    h('header', {}, h('h2', {}, existing ? `Change this ${name.word}` : `Add ${name.a}`), h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Close', onclick: close }, '✕')),
     problems,
     field('Title', title, type === 'requirement' ? 'An instruction, such as “Publish the approved audit plan”.' : undefined),
     ...parts.filter((p): p is HTMLElement => Boolean(p)),
     !existing && !start.package && type !== 'requirement' && state.packages.length > 1 && field('Package', inPackage),
     h('footer', {},
-      existing && h('button', { type: 'button', className: 'kit-editor-danger', onclick: (e: Event) => void remove(e.currentTarget as HTMLButtonElement) }, 'Delete'),
-      h('span', { className: 'kit-editor-spacer' }),
+      existing && h('button', { type: 'button', className: 'site-editor-danger', onclick: (e: Event) => void remove(e.currentTarget as HTMLButtonElement) }, 'Delete'),
+      h('span', { className: 'site-editor-spacer' }),
       h('button', { type: 'button', onclick: close }, 'Cancel'),
       save),
   );
 
-  const dialog = h('dialog', { className: 'kit-editor-dialog', onclose: () => dialog.remove() }, form);
+  const dialog = h('dialog', { className: 'site-editor-dialog', onclose: () => dialog.remove() }, form);
   document.body.append(dialog);
   dialog.showModal();
   title.focus();
@@ -496,8 +499,8 @@ interface PlainForm {
 
 /** A form for something that isn't an element, which has less to it. */
 function plainForm({ heading, fields, submit, send, remove }: PlainForm) {
-  const problems = h('div', { className: 'kit-editor-problems', role: 'alert', hidden: true });
-  const save = h('button', { type: 'submit', className: 'kit-editor-primary' }, submit);
+  const problems = h('div', { className: 'site-editor-problems', role: 'alert', hidden: true });
+  const save = h('button', { type: 'submit', className: 'site-editor-primary' }, submit);
   const attempt = async (work: () => Promise<void>, button: HTMLButtonElement) => {
     problems.hidden = true;
     button.disabled = true;
@@ -509,20 +512,20 @@ function plainForm({ heading, fields, submit, send, remove }: PlainForm) {
     }
   };
   const form = h('form', { method: 'dialog', onsubmit: (e: Event) => { e.preventDefault(); void attempt(send, save); } },
-    h('header', {}, h('h2', {}, heading), h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Close', onclick: () => dialog.close() }, '✕')),
+    h('header', {}, h('h2', {}, heading), h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Close', onclick: () => dialog.close() }, '✕')),
     problems,
     ...fields.filter((x): x is HTMLElement => Boolean(x)),
     h('footer', {},
-      remove && h('button', { type: 'button', className: 'kit-editor-danger', onclick: (e: Event) => {
+      remove && h('button', { type: 'button', className: 'site-editor-danger', onclick: (e: Event) => {
         const button = e.currentTarget as HTMLButtonElement;
         if (button.dataset.sure === 'yes') return void attempt(remove.send, button);
         button.dataset.sure = 'yes';
         button.textContent = remove.confirm;
       } }, 'Delete'),
-      h('span', { className: 'kit-editor-spacer' }),
+      h('span', { className: 'site-editor-spacer' }),
       h('button', { type: 'button', onclick: () => dialog.close() }, 'Cancel'),
       save));
-  const dialog = h('dialog', { className: 'kit-editor-dialog', onclose: () => dialog.remove() }, form);
+  const dialog = h('dialog', { className: 'site-editor-dialog', onclose: () => dialog.remove() }, form);
   document.body.append(dialog);
   dialog.showModal();
   dialog.querySelector<HTMLElement>('input, textarea')?.focus();
@@ -547,7 +550,7 @@ function openSource(state: State, existing?: Source, start: { package?: string; 
     fields: [
       field('Title', title),
       field('Link', url),
-      h('div', { className: 'kit-editor-pair' }, field('Kind', kind), field('Last checked', checked), field('Published', published, 'If it has a date.')),
+      h('div', { className: 'site-editor-pair' }, field('Kind', kind), field('Last checked', checked), field('Published', published, 'If it has a date.')),
       field('Note', note, 'What it’s cited for.'),
       !existing && !start.package && state.packages.length > 1 && field('Package', inPackage, 'A package’s items can cite only its own sources.'),
     ],
@@ -601,42 +604,42 @@ function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
   const answerable = () => choice() || kind.value === 'boolean';
   const choices = () => (kind.value === 'boolean' ? BOOLEAN_ANSWERS : answers);
 
-  const answerRows = h('div', { className: 'kit-editor-details' });
-  const pointerRows = h('div', { className: 'kit-editor-ways' });
+  const answerRows = h('div', { className: 'site-editor-details' });
+  const pointerRows = h('div', { className: 'site-editor-ways' });
   const answersGroup = group('Answers', answerRows);
   const pointersGroup = group('What the answers point to', pointerRows, 'Something worth exploring next, such as a capability or a pattern, and why.');
 
   const drawAnswers = () => {
     answerRows.replaceChildren(
       ...answers.map((answer, i) =>
-        h('div', { className: 'kit-editor-answer' },
+        h('div', { className: 'site-editor-answer' },
           h('input', { value: answer.label, required: true, 'aria-label': `Answer ${i + 1}`, oninput: (e: Event) => (answer.label = (e.target as HTMLInputElement).value), onchange: () => drawPointers() }),
-          h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this answer', onclick: () => {
+          h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Remove this answer', onclick: () => {
             answers.splice(i, 1);
             for (const pointer of pointers) pointer.when = pointer.when.filter((w) => w !== answer.key);
             drawAnswers();
             drawPointers();
           } }, '✕'))),
-      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { answers.push({ key: `new-${++keys}`, label: '' }); drawAnswers(); drawPointers(); } }, '+ Add an answer'),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { answers.push({ key: `new-${++keys}`, label: '' }); drawAnswers(); drawPointers(); } }, '+ Add an answer'),
     );
   };
 
   const drawPointers = () => {
     pointerRows.replaceChildren(
       ...pointers.map((pointer, i) =>
-        h('div', { className: 'kit-editor-way' },
-          h('div', { className: 'kit-editor-way__top' },
-            h('div', { className: 'kit-editor-answers', role: 'group', 'aria-label': 'Which answers' },
+        h('div', { className: 'site-editor-way' },
+          h('div', { className: 'site-editor-way__top' },
+            h('div', { className: 'site-editor-answers', role: 'group', 'aria-label': 'Which answers' },
               ...choices().map((answer) =>
-                h('label', { className: 'kit-editor-check' },
+                h('label', { className: 'site-editor-check' },
                   h('input', { type: 'checkbox', checked: pointer.when.includes(answer.key!), onchange: (e: Event) => {
                     pointer.when = (e.target as HTMLInputElement).checked ? [...pointer.when, answer.key!] : pointer.when.filter((w) => w !== answer.key);
                   } }),
                   ` ${answer.label || 'An answer'}`))),
-            h('button', { type: 'button', className: 'kit-editor-remove', 'aria-label': 'Remove this pointer', onclick: () => { pointers.splice(i, 1); drawPointers(); } }, '✕')),
+            h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Remove this pointer', onclick: () => { pointers.splice(i, 1); drawPointers(); } }, '✕')),
           linkPicker(state, pointer.to, { types: ['outcome', 'measure', 'capability', 'requirement', 'implementationPattern'], placeholder: 'Search outcomes, measures, capabilities, requirements, and patterns' }),
           h('input', { value: pointer.why, required: true, placeholder: 'Why, such as “The office may not have this yet”', 'aria-label': 'Why it points there', oninput: (e: Event) => (pointer.why = (e.target as HTMLInputElement).value) }))),
-      h('button', { type: 'button', className: 'kit-editor-link', onclick: () => { pointers.push({ when: [], to: [], why: '' }); drawPointers(); } }, '+ Add a pointer'),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { pointers.push({ when: [], to: [], why: '' }); drawPointers(); } }, '+ Add a pointer'),
     );
   };
 
@@ -705,9 +708,9 @@ function openPackage(state: State) {
         h('header', {}, h('h2', {}, 'Your package is ready')),
         h('p', {}, `“${title.value.trim()}” is in source/${name}/. It builds on nothing yet; the editor adds what it needs as you link to things.`),
         h('footer', {},
-          h('span', { className: 'kit-editor-spacer' }),
+          h('span', { className: 'site-editor-spacer' }),
           h('button', { type: 'button', onclick: () => location.reload() }, 'Done'),
-          h('button', { type: 'button', className: 'kit-editor-primary', onclick: () => { dialog.close(); openForm(state, 'mission', undefined, { package: name, thenGo: true }); } }, 'Add a mission')));
+          h('button', { type: 'button', className: 'site-editor-primary', onclick: () => { dialog.close(); openForm(state, 'mission', undefined, { package: name, thenGo: true }); } }, 'Add a mission')));
     },
   });
 }
@@ -719,8 +722,8 @@ function defaultPackage(state: State, type: string, start: Start) {
 }
 
 function openPublish(state: State) {
-  const problems = h('div', { className: 'kit-editor-problems', role: 'alert', hidden: true });
-  const go = h('button', { type: 'button', className: 'kit-editor-primary' }, `Publish release ${state.release}`);
+  const problems = h('div', { className: 'site-editor-problems', role: 'alert', hidden: true });
+  const go = h('button', { type: 'button', className: 'site-editor-primary' }, `Publish release ${state.release}`);
   go.addEventListener('click', async () => {
     go.disabled = true;
     go.textContent = 'Publishing…';
@@ -729,20 +732,20 @@ function openPublish(state: State) {
       dialog.querySelector('form')!.replaceChildren(
         h('header', {}, h('h2', {}, `Release ${state.release} is published`)),
         h('p', {}, String(message)),
-        h('footer', {}, h('span', { className: 'kit-editor-spacer' }), h('button', { type: 'button', className: 'kit-editor-primary', onclick: () => location.reload() }, 'Done')));
+        h('footer', {}, h('span', { className: 'site-editor-spacer' }), h('button', { type: 'button', className: 'site-editor-primary', onclick: () => location.reload() }, 'Done')));
     } catch (e) {
       go.disabled = false;
       go.textContent = `Publish release ${state.release}`;
       problemList(problems, e instanceof Error ? e.message : String(e));
     }
   });
-  const dialog = h('dialog', { className: 'kit-editor-dialog kit-editor-dialog--small', onclose: () => dialog.remove() },
+  const dialog = h('dialog', { className: 'site-editor-dialog site-editor-dialog--small', onclose: () => dialog.remove() },
     h('form', { method: 'dialog' },
       h('header', {}, h('h2', {}, `Publish release ${state.release}?`)),
       problems,
       h('p', {}, 'Tools and people may keep what you share, so this version won’t change after this. Your next changes go in the release after it.'),
       h('p', {}, 'This also builds the site into dist/, ready to copy to where you host it.'),
-      h('footer', {}, h('span', { className: 'kit-editor-spacer' }), h('button', { type: 'button', onclick: () => dialog.close() }, 'Not yet'), go)));
+      h('footer', {}, h('span', { className: 'site-editor-spacer' }), h('button', { type: 'button', onclick: () => dialog.close() }, 'Not yet'), go)));
   document.body.append(dialog);
   dialog.showModal();
 }
@@ -759,26 +762,27 @@ function additions(state: State): [string, () => void][] {
 
 function drawBar(state: State) {
   const status = state.problems
-    ? h('span', { className: 'kit-editor-bar__problem', title: state.problems.join('\n') }, 'source/ has a problem. See the terminal.')
-    : h('span', {}, `Release ${state.release}`, h('span', { className: state.draft ? 'kit-editor-pill kit-editor-pill--draft' : 'kit-editor-pill' }, state.draft ? 'Draft' : 'Published'));
-  const menu = h('details', { className: 'kit-editor-menu' },
+    ? h('span', { className: 'site-editor-bar__problem', title: state.problems.join('\n') }, 'source/ has a problem. See the terminal.')
+    : h('span', {}, `Release ${state.release}`, h('span', { className: state.draft ? 'site-editor-pill site-editor-pill--draft' : 'site-editor-pill' }, state.draft ? 'Draft' : 'Published'));
+  const menu = h('details', { className: 'site-editor-menu' },
     h('summary', {}, '+ Add'),
     h('div', {}, ...additions(state).map(([label, open]) => h('button', { type: 'button', onclick: () => { menu.open = false; open(); } }, label))));
   document.addEventListener('click', (e) => {
     if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
   });
-  const bar = h('div', { className: 'kit-editor-bar', role: 'region', 'aria-label': 'Editor' },
+  const bar = h('div', { className: 'site-editor-bar', role: 'region', 'aria-label': 'Editor' },
     h('strong', {}, 'Editing'),
     status,
-    h('span', { className: 'kit-editor-spacer' }),
+    h('span', { className: 'site-editor-spacer' }),
     menu,
-    state.draft && h('button', { type: 'button', className: 'kit-editor-primary', onclick: () => openPublish(state) }, 'Publish'));
+    state.draft && state.publisher && h('button', { type: 'button', className: 'site-editor-primary', onclick: () => openPublish(state) }, 'Publish'),
+    state.draft && !state.publisher && h('span', {}, 'Commit and push to publish'));
   document.body.prepend(bar);
 }
 
 /** What you can do from one of your own items, on its page or in the explorer's panel. */
 function actions(state: State, item: Item) {
-  const button = (label: string, onclick: () => void) => h('button', { type: 'button', className: 'kit-editor-edit', onclick }, label);
+  const button = (label: string, onclick: () => void) => h('button', { type: 'button', className: 'site-editor-edit', onclick }, label);
   const outcomes = item.type === 'mission' ? (item.links?.seeks ?? []).map((l) => l.to) : [item.elementId];
   const add = {
     outcome: () => openForm(state, 'outcome', undefined, { package: item.package, incoming: { seeks: [item.elementId] } }),
@@ -788,7 +792,7 @@ function actions(state: State, item: Item) {
     requirement: () => openForm(state, 'requirement', undefined, { package: item.package, incoming: { satisfies: [item.elementId] } }),
     pattern: () => openForm(state, 'implementationPattern', undefined, { package: item.package, incoming: { candidate_pattern: [item.elementId] } }),
   };
-  return h('div', { className: 'kit-editor-actions' },
+  return h('div', { className: 'site-editor-actions' },
     button(`Edit this ${names[item.type].word}`, () => openForm(state, item.type, item)),
     item.type === 'mission' && button('+ Add an outcome', add.outcome),
     (item.type === 'mission' || item.type === 'outcome') && button('+ Add a capability', add.capability),
@@ -796,14 +800,14 @@ function actions(state: State, item: Item) {
     item.type === 'capability' && button('+ Add a pattern', add.pattern));
 }
 
-/** Finds what a page's place means among your own, by its package as well as its ID, since the library's could have the same ID. */
+/** Finds what a page's place means among your own, by its package as well as its ID, since another publisher's could have the same ID. */
 const ownBy = <T extends { packageId: string }>(items: T[], id: (item: T) => string) => {
   const byKey = new Map(items.map((item) => [`${item.packageId} ${id(item)}`, item]));
   return (spot: HTMLElement, value: string) => byKey.get(`${spot.dataset.package} ${value}`);
 };
 
 function drawReferenceButtons(state: State) {
-  const button = (label: string, onclick: () => void) => h('button', { type: 'button', className: 'kit-editor-edit', onclick }, label);
+  const button = (label: string, onclick: () => void) => h('button', { type: 'button', className: 'site-editor-edit', onclick }, label);
   const source = ownBy(state.sources, (s) => s.sourceId);
   for (const row of document.querySelectorAll<HTMLElement>('[data-source]')) {
     const found = source(row, row.dataset.source!);
@@ -813,7 +817,7 @@ function drawReferenceButtons(state: State) {
   for (const header of document.querySelectorAll<HTMLElement>('[data-assessment]')) {
     const set = assessment(header, header.dataset.assessment!);
     if (!set) continue;
-    header.append(h('div', { className: 'kit-editor-actions' }, button('Edit this set', () => openSet(state, set)), button('+ Add a question', () => openQuestion(state, set))));
+    header.append(h('div', { className: 'site-editor-actions' }, button('Edit this set', () => openSet(state, set)), button('+ Add a question', () => openQuestion(state, set))));
     for (const spot of document.querySelectorAll<HTMLElement>('[data-question]')) {
       const question = set.questions.find((q) => q.questionId === spot.dataset.question);
       if (question) spot.append(button('Edit', () => openQuestion(state, set, question)));
@@ -827,11 +831,11 @@ function drawButtons(state: State) {
 
   for (const spot of document.querySelectorAll<HTMLElement>('[data-resources-for]')) {
     const id = spot.dataset.resourcesFor!;
-    if (known.has(id)) spot.append(h('button', { type: 'button', className: 'kit-editor-add', onclick: () => openForm(state, 'resource', undefined, { links: { helps_with: [{ to: id }] } }) }, '+ Add a resource here'));
+    if (known.has(id)) spot.append(h('button', { type: 'button', className: 'site-editor-add', onclick: () => openForm(state, 'resource', undefined, { links: { helps_with: [{ to: id }] } }) }, '+ Add a resource here'));
   }
   for (const card of document.querySelectorAll<HTMLElement>('[data-resource-id]')) {
     const resource = own.get(card.dataset.resourceId!);
-    if (resource) card.append(h('button', { type: 'button', className: 'kit-editor-edit', onclick: () => openForm(state, 'resource', resource) }, 'Edit'));
+    if (resource) card.append(h('button', { type: 'button', className: 'site-editor-edit', onclick: () => openForm(state, 'resource', resource) }, 'Edit'));
   }
   for (const spot of document.querySelectorAll<HTMLElement>('[data-element], [data-detail]')) {
     const item = own.get(spot.dataset.element ?? spot.dataset.detail ?? '');

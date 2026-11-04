@@ -363,8 +363,9 @@ function check(input: ElementFields & { id?: string }, targets: Target[], before
   if (type === 'outcome' && !groupings.outcome.groups[values.theme]) problems.push('Choose what the public gets from it.');
   if (type === 'capability') {
     if (!groupings.capability.groups[values.stage]) problems.push('Choose its stage of the work.');
-    // Only a new one: a shared capability can get its outcomes from other packages' links.yaml.
-    if (!before && !input.links?.contributes_to?.length) problems.push('Choose at least one outcome it contributes to.');
+    // Only a new one, in a package with outcomes: a shared capability gets its outcomes from other packages' links.yaml.
+    const hasOutcomes = targets.some((t) => t.type === 'outcome' && t.folder === input.package);
+    if (!before && hasOutcomes && !input.links?.contributes_to?.length) problems.push('Choose at least one outcome it contributes to.');
   }
   if (type === 'requirement') {
     if (!groupings.requirement.groups[values.kind]) problems.push('Choose what kind of requirement it is.');
@@ -731,8 +732,9 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
 /**
  * Takes an element out of source/, with every link to it there. Published
  * versions keep it; the next release won't have it. A resource has to help with
- * something, so one that helps only with this is left for you to decide about.
- * The validator still gets the last word, on anything else that names it.
+ * something and a requirement has to belong to a capability, so one that has
+ * only this is left for you to decide about. The validator still gets the last
+ * word, on anything else that names it.
  */
 export function deleteElement(root: string, packageName: string, type: string, id: string, targets: Target[]): { undo: () => void } {
   if (!forms[type]) throw new EditError(`The editor doesn't handle ${type}.`);
@@ -745,8 +747,12 @@ export function deleteElement(root: string, packageName: string, type: string, i
   seq.items.splice(at, 1);
 
   const elementId = fullIdOf(root, packageName, type, id);
-  const stranded = readElements(root, targets).filter((e) => e.type === 'resource' && e.links?.helps_with?.length && e.links.helps_with.every((l) => l.to === elementId));
-  if (stranded.length) throw new EditError(stranded.map((e) => `“${e.title}” helps only with this, so change or delete that resource first.`).join('\n'));
+  const all = readElements(root, targets);
+  const stranded = [
+    ...all.filter((e) => e.type === 'resource' && e.links?.helps_with?.length && e.links.helps_with.every((l) => l.to === elementId)).map((e) => `“${e.title}” helps only with this, so change or delete that resource first.`),
+    ...all.filter((e) => e.type === 'requirement' && e.incoming?.satisfies?.length && e.incoming.satisfies.every((c) => c === elementId)).map((e) => `“${e.title}” belongs only to this, so move or delete that requirement first.`),
+  ];
+  if (stranded.length) throw new EditError(stranded.join('\n'));
   const linksTo = Object.entries(predicates).filter(([, info]) => info.to.includes(type));
   for (const name of sourcePackages(root)) {
     for (const [predicate, info] of linksTo) {
@@ -1045,7 +1051,7 @@ export function addPackage(root: string, input: PackageFields): { name: string; 
   if (!input.title?.trim()) problems.push('Give it a title.');
   if (!input.description?.trim()) problems.push('Give it a description.');
   if (!/^[a-z][a-z0-9]*$/.test(prefix)) problems.push('Give it an ID prefix of lowercase letters and numbers, such as acme.');
-  else if (prefix === 'eb') problems.push('The prefix eb is the library’s, so pick one of your own.');
+  else if (!template && prefix === 'eb') problems.push('The prefix eb is the library’s, so pick one of your own.');
   if (!(publisher as Raw).name) problems.push('Say who publishes it.');
   if (problems.length) throw new EditError(problems.join('\n'));
 

@@ -216,7 +216,8 @@ It's your site with an editing bar across the top, and it edits everything in yo
 The forms search everything a link can reach, and add the package to `dependencies` when a link needs a new
 one. When that's one of your own packages, the package's references to the library are written out in full,
 as in `eb:capability:records-management`, since the short form could then mean either. Deleting something
-takes the links to it along too, unless a resource helps with nothing else, and then the form says so.
+takes the links to it along too. If that would leave a resource with nothing to help with, or a requirement
+with no capability, the form says so first.
 
 Saving writes to your files under `source/<package>/`, keeping your comments and any fields the forms don't
 show, and rebuilds your draft release with the same checks as `pnpm content:build`. If those checks refuse a

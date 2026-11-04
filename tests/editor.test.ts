@@ -287,7 +287,7 @@ describe('the editor’s files', () => {
   const askedIn = (id: string) => readDiscovery(root, targets).flatMap((s) => s.questions).find((q) => q.id === id)!;
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'kit-editor-'));
+    root = mkdtempSync(join(tmpdir(), 'site-editor-'));
     for (const [path, content] of Object.entries(FILES)) {
       mkdirSync(dirname(join(root, path)), { recursive: true });
       writeFileSync(join(root, path), content);
@@ -532,6 +532,11 @@ describe('the editor’s files', () => {
       writeFileSync(path, CAPABILITIES.replace('satisfies: [ publish-the-plan ]', 'satisfies:\n    - to: publish-the-plan'));
       saveElement(root, element('capability', 'audit-planning'), targets);
       expect(text('audit/capabilities.yaml')).toContain('- to: publish-the-plan');
+    });
+
+    it('adds a capability to a shared package, which has no outcomes of its own to choose', () => {
+      saveElement(root, capability({ package: 'offerings', links: {} }), targets);
+      expect(list('offerings/capabilities.yaml').at(-1)).toMatchObject({ id: 'report-publishing' });
     });
 
     it('saves a shared capability whose outcomes are in other packages', () => {
@@ -797,6 +802,7 @@ describe('the editor’s files', () => {
     });
 
     it('takes what answers say about a deleted element with it, and a pointer left with nothing', () => {
+      deleteElement(root, 'audit', 'requirement', 'publish-the-plan', targets);
       deleteElement(root, 'audit', 'capability', 'audit-planning', targets);
       const [, second] = list('audit/discovery.yaml')[0].questions as Record<string, unknown>[];
       expect(second).not.toHaveProperty('points');
@@ -835,6 +841,12 @@ describe('the editor’s files', () => {
       expect(text('our-services/package.yaml').startsWith('# The package itself.')).toBe(true);
       undo();
       expect(existsSync(join(root, 'source', 'our-services'))).toBe(false);
+    });
+
+    it('takes the library’s own prefix on the library, where it’s the one its packages have', () => {
+      writeFileSync(join(root, 'source', 'audit', 'package.yaml'), `schemaVersion: 0.6.0\npackageId: org.enterprise-blueprints.audit\nidPrefix: eb\ntitle: Audit\npublisher:\n  name: Enterprise Blueprints\nlicense: MIT\ndomain: public-sector\n`);
+      expect(addPackage(root, { title: 'Benefits', description: 'x' }).name).toBe('benefits');
+      expect(parse(text('benefits/package.yaml'))).toMatchObject({ packageId: 'org.enterprise-blueprints.benefits', idPrefix: 'eb', license: 'MIT' });
     });
 
     it('won’t take a folder name your packages or the library’s have', () => {
@@ -881,6 +893,7 @@ describe('the editor’s files', () => {
     it('takes a capability’s entries in links.yaml with it, and resources’ links to it', () => {
       const path = join(root, 'source', 'offerings', 'resources.yaml');
       writeFileSync(path, `${RESOURCES}\n- id: planning-guide\n  title: Planning guide\n  kind: guide\n  url: https://example.com/g\n  lastReviewedAt: 2026-10-30\n  description: A guide.\n  helps_with:\n    - example:capability:audit-planning\n    - capability:records-management\n`);
+      deleteElement(root, 'audit', 'requirement', 'publish-the-plan', targets);
       deleteElement(root, 'audit', 'capability', 'audit-planning', targets);
       expect(list('audit/capabilities.yaml')).toEqual([]);
       expect(list('offerings/resources.yaml').at(-1)!.helps_with).toEqual(['capability:records-management']);
@@ -890,6 +903,11 @@ describe('the editor’s files', () => {
       deleteElement(root, 'audit', 'mission', 'local-audit', targets);
       expect(list('audit/missions.yaml')).toEqual([]);
       expect(list('audit/outcomes.yaml')).toHaveLength(2);
+    });
+
+    it('won’t leave a requirement with no capability', () => {
+      expect(() => deleteElement(root, 'audit', 'capability', 'audit-planning', targets)).toThrow('“Publish the plan” belongs only to this');
+      expect(text('audit/capabilities.yaml')).toBe(CAPABILITIES);
     });
 
     it('won’t leave a resource with nothing to help with', () => {

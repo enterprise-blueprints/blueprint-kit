@@ -10,7 +10,7 @@ const url = parse(readFileSync('kit.yaml', 'utf8')).site?.url;
 const address = url ? new URL(url) : undefined;
 
 // The editor is only there with `pnpm editor`, so it's never in a build.
-const editing = Boolean(process.env.KIT_EDITOR);
+const editing = Boolean(process.env.SITE_EDITOR);
 
 export default defineConfig({
   site: process.env.SITE_URL || address?.origin || 'https://example.github.io',

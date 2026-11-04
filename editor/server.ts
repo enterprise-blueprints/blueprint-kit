@@ -5,7 +5,7 @@
 // refuse is put back as it was.
 
 import { execFile } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'node:http';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +18,9 @@ import {
 } from './store.ts';
 
 const root = process.cwd();
+
+/** Whether this is a publisher's site, on a release of the library, rather than the library itself. */
+const publisher = existsSync(join(root, 'kit.yaml'));
 
 /** What the editor uses from Astro's dev server. */
 interface DevServer {
@@ -71,17 +74,20 @@ const problemsIn = (text: string, targets: Target[] = []) =>
       return target ? `“${target.title}”` : id;
     }));
 
-const libraryRelease = () => String((parse(readFileSync(join(root, 'kit.yaml'), 'utf8')) as { library: { release: string } }).library.release);
+const libraryRelease = () => (publisher ? String((parse(readFileSync(join(root, 'kit.yaml'), 'utf8')) as { library: { release: string } }).library.release) : '');
 
 async function state() {
   const targets = readTargets(root, libraryRelease());
   const status = await content('status');
   return {
     ...(status.ok ? (JSON.parse(status.stdout) as { release: string; draft: boolean }) : { problems: problemsIn(status.stderr) }),
+    publisher,
     today: new Date().toLocaleDateString('en-CA'),
     packages: packageList(root),
     groups: {
       ...Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
+      // The library's own resources are free ones; services and products belong in other organizations' packages.
+      resource: Object.entries(groupings.resource.groups).filter(([id]) => publisher || !['service', 'product'].includes(id)).map(([id, g]) => ({ id, label: g.label, hint: g.hint })),
       layer: Object.entries(patternLayers).map(([id, l]) => ({ id, label: l.label, hint: l.hint })),
       approach: Object.entries(patternApproaches).map(([id, label]) => ({ id, label })),
       source: Object.entries(sourceKinds).map(([id, label]) => ({ id, label })),
@@ -146,7 +152,7 @@ async function publish(server: DevServer) {
   if (!published.ok) throw new EditError(problemsIn(published.stderr).join('\n'));
   refresh(server);
   // The built site is the one to host, so it's built the way `pnpm build` does, without the editor.
-  const { KIT_EDITOR: _editor, ...env } = process.env;
+  const { SITE_EDITOR: _editor, ...env } = process.env;
   const built = await run([join('node_modules', 'astro', 'bin', 'astro.mjs'), 'build'], env);
   if (!built.ok) throw new EditError(`The release is published, but the site didn't build:\n${built.stderr || built.stdout}`);
   return { message: 'Published, and the site is built in dist/. Copy what’s in that folder to where you host it.' };
@@ -204,7 +210,8 @@ function routes(server: DevServer) {
       };
       const make = changes[path ?? ''];
       if (make) return reply(res, 200, await inTurn(() => change(server, make)));
-      if (path === '/publish') return reply(res, 200, await inTurn(() => publish(server)));
+      // The library publishes by pushing to main, so only a publisher's site does it here.
+      if (path === '/publish' && publisher) return reply(res, 200, await inTurn(() => publish(server)));
       return reply(res, 404, {});
     } catch (e) {
       if (e instanceof EditError) return reply(res, 400, { problems: e.message.split('\n').filter(Boolean) });
@@ -216,7 +223,7 @@ function routes(server: DevServer) {
 
 export default function editor(): AstroIntegration {
   return {
-    name: 'kit-editor',
+    name: 'site-editor',
     hooks: {
       'astro:config:setup': ({ command, injectScript, updateConfig }) => {
         if (command !== 'dev') return;
@@ -225,7 +232,7 @@ export default function editor(): AstroIntegration {
           vite: {
             plugins: [
               {
-                name: 'kit-editor',
+                name: 'site-editor',
                 configureServer(server: DevServer) {
                   holdReloads(server);
                   const handle = routes(server);

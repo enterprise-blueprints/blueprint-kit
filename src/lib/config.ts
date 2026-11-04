@@ -19,6 +19,8 @@ export interface SiteConfig {
    * The library a publisher's site builds on, at the release it names. Its
    * packages are under library/packages/, and the ones this site's packages
    * build on get pages here, under library/, with their own resources added.
+   * With showAll, so does the rest of the release, and the site's lists have a
+   * switch that narrows them to what the site uses.
    */
-  upstream?: { title: string; url: string; release: string };
+  upstream?: { title: string; url: string; release: string; showAll?: boolean };
 }

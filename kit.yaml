@@ -12,6 +12,9 @@ library:
   # Where the library publishes its catalog, and the release your packages build on.
   # Run `pnpm sync` after changing the release, then `pnpm content:build`.
   url: https://enterprise-blueprints.github.io/
-  release: 0.12.0
+  release: 0.14.0
+  # "all" gives the whole release pages here, and the site's lists a switch that narrows
+  # them to your items and what they build on. Leave it out for only what they build on.
+  show: all
   # The version of the library's engine, its pages and the code behind them. pnpm sync --tools sets it.
-  engine: 1.0.0
+  engine: 1.1.0

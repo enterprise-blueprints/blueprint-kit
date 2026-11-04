@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { assessments } from '../../lib/library';
+import LibrarySwitch from '../../components/LibrarySwitch.astro';
+import { assessments, inUse } from '../../lib/library';
 ---
 <Base title="Discovery" description="Question sets for the first conversations of an engagement, with answers that point to capabilities and patterns.">
   <div class="container">
@@ -10,10 +11,11 @@ import { assessments } from '../../lib/library';
         Question sets for the first conversations of an engagement. Each one asks how an office works today, and
         some answers point to capabilities or patterns worth exploring next.
       </p>
+      {assessments.some((a) => !inUse(a.package)) && <LibrarySwitch />}
     </header>
     <div class="discovery-grid">
       {assessments.map((a) => (
-        <article class="card">
+        <article class:list={['card', { 'only-whole': !inUse(a.package) }]}>
           <p class="kicker">{a.questions.length} questions</p>
           <h2 class="card__title"><a href={a.url}>{a.title}</a></h2>
           {a.description && <p class="card__summary">{a.description}</p>}

@@ -8,8 +8,8 @@ and, if you like, missions and capabilities of your own.
 Your packages use the library's own format and are checked by the library's own validator, so anything
 that reads the library, such as Solution Studio, reads yours the same way. You publish them from your own
 repository, with a site that works like the library's: the same mission explorer, outcome, capability,
-and pattern pages, and discovery questions. It shows your own missions and items, and the library's
-missions your packages build on, with what you offer shown wherever it helps.
+and pattern pages, and discovery questions. It shows your own missions and items beside the library's,
+with what you offer shown wherever it helps.
 
 This copy comes with a sample publisher, My Organization, so you can see each piece working before you
 change it.
@@ -99,12 +99,18 @@ name to `dependencies` in `package.yaml`. The folders are under `library/package
 
 ## The library's missions on your site
 
-Your site shows the library's packages that yours build on, and the ones those build on, each item with a
-page under `library/`, such as `/library/missions/independent-government-oversight/`. Your resources show
+With `show: all` under `library` in `kit.yaml`, your site shows the library's whole release, each item with
+a page under `library/`, such as `/library/missions/independent-government-oversight/`. Your resources show
 up there, in the mission explorer and on each page they help with, and each page links to the library's own.
-The sample builds on the Inspector General, Grants, and Common packages, so its site shows those two
-missions. To show another of the library's missions, add its package to your `dependencies` and link
-something to it.
+
+The lists of missions, capabilities, and so on, with Discovery and Sources, open on everything. A switch at
+the top narrows them to your own items and the library packages yours build on, and the ones those build
+on, and the site remembers each reader's choice. Your home page always shows that narrower set, which
+`inUse` from `src/lib/library.ts` picks out. The sample builds on the Inspector General, Grants, and Common
+packages, so those two missions stay when the switch is off.
+
+Leave `show` out to publish only the packages yours build on, with no switch. To add one of the library's
+missions to that set, add its package to your `dependencies` and link something to it.
 
 ## Missions and capabilities of your own
 
@@ -151,6 +157,9 @@ Your copy doesn't follow the kit on its own; you bring updates in when you choos
   them) has a version of its own, which `library.engine` in `kit.yaml` names, and the kit's own shared
   files are listed in `kit.json`. A new engine version can change how your site looks, so it's yours to
   take or leave. A new major version may need a change to your home page, which uses the engine's code.
+
+A copy made before engine 1.1.0 turns on the whole library by adding `show: all` to `kit.yaml`, and keeps
+its home page to its own work by filtering its missions with `inUse`, as the kit's home page does.
 
 Your own files are never touched: `kit.yaml` (but for those two versions), `source/`, `content/`, your
 home page (`src/pages/index.astro` and `src/kit/`), and anything you add. `package.json` takes the kit's

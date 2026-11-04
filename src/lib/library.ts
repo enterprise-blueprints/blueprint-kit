@@ -57,7 +57,7 @@ const upstreamFiles = glob(import.meta.glob<string>('/library/packages/*/*/bluep
 /** The library a publisher's site builds on, with the address its pages and packages are under. */
 export const upstream = site.upstream && { ...site.upstream, base: site.upstream.url.endsWith('/') ? site.upstream.url : `${site.upstream.url}/` };
 
-function load(): { own: PackageFile[]; upstream: { name: string; data: BlueprintPackage }[] } {
+function load(): { own: PackageFile[]; upstream: { name: string; data: BlueprintPackage }[]; builtOn: BlueprintPackage[] } {
   const errors: string[] = [];
   const loaded: Omit<PackageFile, 'latest'>[] = [];
   // Dependencies resolve against every package there is, valid or not; their own problems are reported on their own.
@@ -103,6 +103,13 @@ function load(): { own: PackageFile[]; upstream: { name: string; data: Blueprint
     for (const d of file.data.dependencies ?? []) add(d.packageId, d.version);
   };
   for (const pkg of current) for (const d of pkg.dependencies ?? []) add(d.packageId, d.version);
+  const builtOn = shown.map((s) => s.data);
+  // The rest of the release, on a site that shows it all.
+  if (site.upstream?.showAll) {
+    for (const file of upstreamFiles) {
+      if (file.data.version === site.upstream.release && !shown.some((s) => s.data.packageId === file.data.packageId)) shown.push(file);
+    }
+  }
   for (const pkg of current) {
     const prefix = pkg.idPrefix ?? libraryPrefix;
     if (shown.some((s) => (s.data.idPrefix ?? libraryPrefix) === prefix)) errors.push(`${pkg.packageId}: the "${prefix}" prefix is the library's, so name an idPrefix of your own`);
@@ -122,7 +129,7 @@ function load(): { own: PackageFile[]; upstream: { name: string; data: Blueprint
   if (errors.length) {
     throw new Error(`Blueprint package validation failed:\n  ${errors.join('\n  ')}`);
   }
-  return { own: [...versions.values()].flatMap((list) => list.map((f) => ({ ...f, latest: f.data.version === release }))), upstream: shown };
+  return { own: [...versions.values()].flatMap((list) => list.map((f) => ({ ...f, latest: f.data.version === release }))), upstream: shown, builtOn };
 }
 
 const loaded = load();
@@ -130,13 +137,16 @@ const loaded = load();
 export const packageFiles = loaded.own;
 /** The site's own packages in its current release. */
 export const ownPackages = packageFiles.filter((f) => f.latest).map((f) => f.data);
-/** The packages the pages show: the site's own, then, on a publisher's site, the library's they build on. */
+/** The packages the pages show: the site's own, then, on a publisher's site, the library's they build on, and the rest of the library's if it shows them all. */
 export const packages = [...ownPackages, ...loaded.upstream.map((f) => f.data)];
 /** The site's current release, which every one of its own packages has. */
 export const release = ownPackages[0]?.version;
 
 /** Whether a package is the site's own, rather than one of the library's on a publisher's site. */
 export const isOwn = (pkg: BlueprintPackage) => ownPackages.includes(pkg);
+
+/** Whether a package is one the site uses: its own, or one of the library's they build on, rather than the rest of the library. */
+export const inUse = (pkg: BlueprintPackage) => isOwn(pkg) || loaded.builtOn.includes(pkg);
 
 /**
  * Whether an item is the library's, on a publisher's site, and worth marking

@@ -1,5 +1,5 @@
 ---
-import { shortTitle, tagline, type LibraryElement } from '../lib/library';
+import { inUse, shortTitle, tagline, type LibraryElement } from '../lib/library';
 import type { BlueprintPackage } from '../lib/package';
 import LibraryMark from './LibraryMark.astro';
 
@@ -26,7 +26,7 @@ const { elements, notes, partial, parents, showPackage, within } = Astro.props;
     </thead>
     <tbody>
       {elements.map((e) => (
-        <tr>
+        <tr class:list={{ 'only-whole': !inUse(e.package) }}>
           <th scope="row"><a class={`element-link type-${e.type}`} href={e.url}><span>{e.title}<LibraryMark element={e} within={within} /></span></a></th>
           <td class="muted">
             {tagline(e) && <strong class="element-table__tagline">{tagline(e)}</strong>}

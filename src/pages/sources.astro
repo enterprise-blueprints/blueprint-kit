@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import { sources } from '../lib/library';
+import LibrarySwitch from '../components/LibrarySwitch.astro';
+import { inUse, sources } from '../lib/library';
 import { sourceKinds } from '../lib/vocabulary';
 import { formatDate } from '../lib/format';
 ---
@@ -9,6 +10,7 @@ import { formatDate } from '../lib/format';
     <header class="page-header">
       <h1>Sources</h1>
       <p class="lede">Every factual statement about a mission or capability cites one of these sources.</p>
+      {sources.some((s) => !inUse(s.package)) && <LibrarySwitch />}
     </header>
     <div class="table-wrap">
       <table class="stack-table">
@@ -22,7 +24,7 @@ import { formatDate } from '../lib/format';
         </thead>
         <tbody>
           {sources.map((s) => (
-            <tr>
+            <tr class:list={{ 'only-whole': !inUse(s.package) }}>
               <th scope="row">
                 <a href={s.url} target="_blank" rel="noopener">{s.title}<span class="sr-only"> (opens in a new tab)</span></a>
                 {s.note && <p class="source-list__meta">{s.note}</p>}

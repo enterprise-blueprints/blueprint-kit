@@ -30,7 +30,9 @@ pnpm verify          # content check, type check, tests, and site build
 - The kit's own files: `src/site.ts` (the site config, read from `kit.yaml`), the home page
   `src/pages/index.astro` with `src/kit/`, and the published data in `src/publish.ts`,
   `src/pages/*.json.ts`, and `src/pages/packages/`.
-- The library's packages yours build on get pages under `library/`, with your resources added. The
+- The library's whole release gets pages under `library/` with `show: all` in `kit.yaml`, as the sample has it,
+  and only the packages yours build on without it, your resources added either way. The home page and
+  About page stay with `inUse`, the narrower set. The
   library's `scripts/check-dist.mjs` works on a kit build too:
   `node ../enterprise-blueprints.github.io/scripts/check-dist.mjs <build folder>`.
 

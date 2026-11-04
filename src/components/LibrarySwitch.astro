@@ -1,0 +1,19 @@
+---
+// On a publisher's site that shows the whole library: a switch at the top of a
+// list, on at first, that narrows it to the site's own items and the library
+// packages they build on. The stylesheet does the hiding, of whatever is marked
+// only-whole or only-used, so this only remembers the reader's choice. The
+// script sits here, not in a bundle, so a list that's switched off never flashes.
+import { upstream } from '../lib/library';
+---
+<div class="library-switch">
+  <label><input type="checkbox" checked autocomplete="off" /> Show all of {upstream!.title}</label>
+  <span class="muted">Off shows only this site's work and the parts of the library it builds on.</span>
+</div>
+<script is:inline>
+  (() => {
+    const input = document.currentScript.previousElementSibling.querySelector('input');
+    input.checked = localStorage.getItem('library-switch') !== 'off';
+    input.addEventListener('change', () => localStorage.setItem('library-switch', input.checked ? 'on' : 'off'));
+  })();
+</script>

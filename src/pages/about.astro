@@ -3,13 +3,13 @@
 // until you make the site your own, how to do that. This page is yours to change.
 import Base from '../layouts/Base.astro';
 import LibraryMark from '../components/LibraryMark.astro';
-import { elementsOfType, isOwn, ownPackages, release, upstream } from '../lib/library';
+import { elementsOfType, inUse, isOwn, ownPackages, release, upstream } from '../lib/library';
 import { href } from '../lib/paths';
 import { site } from '../site';
 
 const library = upstream!;
 const publisher = ownPackages[0]?.publisher.name ?? site.title;
-const libraryMissions = elementsOfType('mission').filter((m) => !isOwn(m.package));
+const libraryMissions = elementsOfType('mission').filter((m) => !isOwn(m.package) && inUse(m.package));
 const catalog = new URL(href('catalog.json'), Astro.site).href;
 ---
 <Base title="About" description={`How ${site.title} relates to ${library.title}, and what it adds.`}>

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { elements, elementsOfType, helpsWith, isOwn, ownPackages, packages, release, upstream } from '../src/lib/library';
+import { elements, elementsOfType, helpsWith, inUse, isOwn, ownPackages, packages, release, upstream } from '../src/lib/library';
 import { plan, readSources, type Resolved } from '../src/lib/compile';
 import type { BlueprintPackage } from '../src/lib/package';
 
@@ -46,14 +46,20 @@ describe('your packages', () => {
 describe('the library on your site', () => {
   const shown = packages.filter((p) => !isOwn(p));
 
-  it('shows the library packages yours build on, and the ones those build on', () => {
+  it('uses the library packages yours build on, and the ones those build on', () => {
+    const used = shown.filter(inUse);
     const wanted = new Set(ownPackages.flatMap((p) => (p.dependencies ?? []).map((d) => d.packageId)));
-    for (const id of wanted) expect(shown.map((p) => p.packageId), id).toContain(id);
-    for (const p of shown) {
-      const needed = wanted.has(p.packageId) || shown.some((q) => q.dependencies?.some((d) => d.packageId === p.packageId));
+    for (const id of wanted) expect(used.map((p) => p.packageId), id).toContain(id);
+    for (const p of used) {
+      const needed = wanted.has(p.packageId) || used.some((q) => q.dependencies?.some((d) => d.packageId === p.packageId));
       expect(needed, p.packageId).toBe(true);
-      expect(p.version, p.packageId).toBe(libraryRelease);
     }
+  });
+
+  it('shows the whole release when kit.yaml asks for it, and only what yours use when not', () => {
+    const release = readdirSync('library/packages').filter((name) => existsSync(join('library', 'packages', name, libraryRelease, 'blueprint.json')));
+    expect(shown.length).toBe(upstream!.showAll ? release.length : shown.filter(inUse).length);
+    for (const p of shown) expect(p.version, p.packageId).toBe(libraryRelease);
   });
 
   it('gives library elements pages under library/ that link to the library’s own', () => {

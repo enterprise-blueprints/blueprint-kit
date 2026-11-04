@@ -1,0 +1,14 @@
+---
+// A count that follows the library switch, when the switch changes it.
+interface Props {
+  /** How many there are with the whole library showing. */
+  all: number;
+  /** How many there are with it narrowed to what the site uses. */
+  used: number;
+  /** The count as words, such as "3 capabilities". */
+  format?: (n: number) => string;
+}
+
+const { all, used, format = String } = Astro.props;
+---
+{all === used ? format(all) : <><span class="only-whole">{format(all)}</span><span class="only-used">{format(used)}</span></>}

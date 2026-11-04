@@ -2,8 +2,10 @@
 import type { GetStaticPaths } from 'astro';
 import Base from '../../layouts/Base.astro';
 import ElementTable from '../../components/ElementTable.astro';
+import LibraryCount from '../../components/LibraryCount.astro';
 import LibraryMark from '../../components/LibraryMark.astro';
-import { fromLibrary, indexGroups, indexParents, typesInUse, upstream } from '../../lib/library';
+import LibrarySwitch from '../../components/LibrarySwitch.astro';
+import { fromLibrary, inUse, indexGroups, indexParents, typesInUse, upstream, type LibraryElement } from '../../lib/library';
 import { groupings } from '../../lib/vocabulary';
 import { plural } from '../../lib/format';
 
@@ -19,6 +21,9 @@ const count = (n: number) => plural(n, info.label.toLowerCase(), info.plural.toL
 const grouping = groupings[type];
 // On a publisher's site, a list with the library's items says what marks them.
 const fromTheLibrary = groups.flatMap((g) => g.items).find((e) => fromLibrary(e));
+// On a site that shows the whole library, how many of a list's items it uses, for the library switch.
+const used = (items: LibraryElement[]) => items.filter((e) => inUse(e.package)).length;
+const all = groups.flatMap((g) => g.items);
 ---
 <Base title={info.plural} description={info.definition}>
   <div class="container">
@@ -26,23 +31,25 @@ const fromTheLibrary = groups.flatMap((g) => g.items).find((e) => fromLibrary(e)
       <h1>{info.plural}</h1>
       <p class="lede">{info.definition}</p>
       {fromTheLibrary && <p class="muted"><LibraryMark element={fromTheLibrary} legend /> marks the ones from {upstream!.title}.</p>}
+      {used(all) < all.length && <LibrarySwitch />}
     </header>
     {grouped && (
       <nav class="index-jump" aria-label={`${info.plural} by ${grouping ? grouping.label.toLowerCase() : 'group'}`}>
         {grouping && <span class="index-jump__by">By {grouping.label.toLowerCase()}</span>}
-        {groups.map((g) => <a href={`#${g.id}`}>{g.label} <span class="index-jump__count">{g.items.length}</span></a>)}
+        {groups.map((g) => <a class:list={{ 'only-whole': !used(g.items) }} href={`#${g.id}`}>{g.label} <span class="index-jump__count"><LibraryCount all={g.items.length} used={used(g.items)} /></span></a>)}
       </nav>
     )}
     {groups.map((g) => (
-      <section class="index-group" id={grouped ? g.id : undefined} aria-labelledby={grouped ? `${g.id}-heading` : undefined}>
+      <section class:list={['index-group', { 'only-whole': !used(g.items) }]} id={grouped ? g.id : undefined} aria-labelledby={grouped ? `${g.id}-heading` : undefined}>
         {grouped && (
           <header class="index-group__header">
             <h2 id={`${g.id}-heading`}>{g.label}</h2>
-            <p class="muted">{g.hint && <>{g.hint}{' '}</>}{count(g.items.length)}.</p>
+            <p class="muted">{g.hint && <>{g.hint}{' '}</>}<LibraryCount all={g.items.length} used={used(g.items)} format={count} />.</p>
           </header>
         )}
         <ElementTable elements={g.items} parents={parents} showPackage={type === 'implementationPattern' || !!grouping} />
       </section>
     ))}
+    {!used(all) && <p class="muted only-used">This site doesn't have any {info.plural.toLowerCase()} of its own yet.</p>}
   </div>
 </Base>

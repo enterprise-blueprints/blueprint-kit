@@ -6,13 +6,107 @@ templates, and training, each linked to the library's missions, capabilities, an
 and, if you like, missions and capabilities of your own.
 
 Your packages use the library's own format and are checked by the library's own validator, so anything
-that reads the library, such as Solution Studio, reads yours the same way. You publish them from your
-own site, on GitHub Pages or anywhere else, that works like the library's: the same mission explorer, outcome, capability,
-and pattern pages, and discovery questions. It shows your own missions and items beside the library's,
-with what you offer shown wherever it helps.
+that reads the library, such as Solution Studio, reads yours the same way. You get a site of your own that
+works like the library's: the same mission explorer, outcome, capability, and pattern pages, and discovery
+questions. It shows your own missions and items beside the library's, with what you offer shown wherever
+it helps. It can stay on your computer, or go on GitHub Pages or anywhere else.
 
 This copy comes with a sample publisher, My Organization, so you can see each piece working before you
 change it.
+
+## Try it on your computer
+
+**You don't need a GitHub repository, a GitHub account, or Pages to try the kit.** It runs on your own
+computer, and it can stay there. Publishing is a separate step for later, if you want it at all.
+
+### 1. Install Node and pnpm
+
+You need Node 22.12 or later, which `node --version` shows. To install it, get the LTS from
+[nodejs.org](https://nodejs.org/), or on Windows:
+
+```sh
+winget install OpenJS.NodeJS.LTS
+```
+
+Then open a new terminal, so it finds Node, and install the version of pnpm the kit uses:
+
+```sh
+npm install --global pnpm@10.4.1
+```
+
+To leave your machine as it is, skip that and write `npm exec --yes pnpm@10.4.1 --` in place of `pnpm` in the
+commands below, as in `npm exec --yes pnpm@10.4.1 -- install`.
+
+If PowerShell says `running scripts is disabled on this system`, use Command Prompt instead, or run
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+
+### 2. Get the kit
+
+[Download it as a ZIP](https://github.com/enterprise-blueprints/blueprint-kit/archive/refs/heads/main.zip),
+with no sign-in, unzip it, and open a terminal in its folder. Or clone it:
+
+```sh
+git clone https://github.com/enterprise-blueprints/blueprint-kit.git
+```
+
+### 3. Run it
+
+```sh
+pnpm install
+pnpm verify      # checks the sample and builds the site
+pnpm dev         # shows the site at http://localhost:4321
+```
+
+If something else is using that port, `pnpm dev --port 4400` picks another. Ctrl+C stops the site.
+
+### What you should see
+
+- `pnpm install` ends with `Done in` and a time. A warning that says `Ignored build scripts: sharp` is fine.
+- `pnpm verify` builds a few hundred pages and ends with `[build] Complete!`. A copy you downloaded also says
+  its release is a draft, which is fine too: it means you haven't published anything from this copy yet.
+- http://localhost:4321 shows a site called **My Blueprints**, with **What we offer** listing five resources,
+  and **Missions** listing Local Government Audit, Office of Inspector General, and Grants Management.
+
+**My Organization is made up, on purpose.** Its services, products, and demos aren't real, and their links
+go to `example.com`. If that's what you see, your setup is finished and working, and the sample is there
+to be replaced. Next, [make it yours](#make-it-yours), or run `pnpm editor` to
+[add a resource in the browser](#add-resources-in-the-browser).
+
+### If `pnpm install` can't find a package
+
+Many organizations install packages through a feed of their own, a mirror of the public npm registry. A
+feed can be missing versions, which looks like this:
+
+```text
+ERR_PNPM_FETCH_404  GET https://your-feed.example/ajv/-/ajv-8.20.0.tgz: Not Found - 404
+```
+
+That usually means your feed doesn't have that version, not that the kit's lockfile is wrong, so check
+before you change anything:
+
+```sh
+pnpm config get registry                                            # which feed you're using
+npm view ajv@8.20.0 version --registry=<your feed>                  # prints nothing if the feed lacks it
+npm view ajv@8.20.0 version --registry=https://registry.npmjs.org/  # prints 8.20.0 if it's published
+```
+
+If the feed lacks a version that's published, these are your choices, the first ones changing the least:
+
+1. **Ask whoever runs the feed to add it.** Nothing in your copy changes.
+2. **Install from the public registry, if you're allowed to,** with
+   `pnpm install --registry=https://registry.npmjs.org/`. The lockfile stays as it is.
+3. **For one package, run `pnpm update <package>`.** It moves to the newest version your feed has that
+   `package.json` allows, and changes that package's range in `package.json`.
+4. **For several, delete `pnpm-lock.yaml` and run `pnpm install`.** It chooses every version again from your
+   feed, so much of the lockfile changes.
+
+After the last two, run `pnpm verify`. That lockfile suits your feed, so it belongs to your copy; commit it
+if you use Git, since the kit's workflows install exactly what it says. `--no-frozen-lockfile` and
+`--fix-lockfile` don't help here, since they ask for the same missing version.
+
+Choices 3 and 4 can't help when no other version will do, which ends in `ERR_PNPM_NO_MATCHING_VERSION`. `astro` and
+`yaml` are pinned to exact versions, for one, so your feed has to have those. And a `401` or `403` is a
+different problem: your feed wants you to sign in.
 
 ## What's here
 
@@ -37,19 +131,7 @@ The sample's two packages:
   a capability, and a requirement, and links to capabilities and patterns from the library's Inspector
   General and Common packages.
 
-## Start
-
-On GitHub, choose **Use this template** to make a repository of your own from this one, and clone it. If
-you won't publish from GitHub, you can download the kit as a ZIP instead. You need Node 22.12 or later and
-pnpm.
-
-```sh
-pnpm install
-pnpm verify      # checks the sample and builds the site
-pnpm dev         # shows the site at http://localhost:4321
-```
-
-Then make it yours:
+## Make it yours
 
 1. In `kit.yaml`, set your site's title, description, and color.
 2. In each `source/<package>/package.yaml`, set your `packageId` (a reverse domain name you own, such as
@@ -151,6 +233,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | `pnpm content:build` | Builds `content/` from `source/`, at your next release when anything changed. |
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
+| `pnpm dev` | Shows your site at http://localhost:4321. |
 | `pnpm editor` | Shows your site with the editor on, for adding and changing resources in the browser. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
@@ -174,8 +257,11 @@ different file under a version they already have. Until a release is published i
 
 ### On GitHub Pages
 
-Push to a GitHub repository with Pages turned on, using GitHub Actions as the source, and the workflow in
-`.github/workflows/` checks everything, builds the site, and deploys it.
+On the kit's GitHub page, choose **Use this template** to make a repository of your own, and clone it. A
+copy you've already started can go there too: make an empty repository and push to it.
+
+Turn Pages on, using GitHub Actions as the source, and each push to `main` runs the workflow in
+`.github/workflows/`, which checks everything, builds the site, and deploys it.
 
 ### Anywhere else
 
@@ -198,7 +284,14 @@ site, and can open a package file from disk.
 
 ## Staying current
 
-Your copy doesn't follow the kit on its own; you bring updates in when you choose. Two things move:
+**Working and current are two different things.** Your copy builds on one library release, the one
+`library.release` in `kit.yaml` names, and that's on purpose: nothing you've checked changes under you when
+the library publishes a new one. A copy that passes `pnpm verify` on an older release, such as 0.12.0 with
+0.14.0 out, is working as it should, and there's nothing to fix. The library's current release is in
+[its catalog](https://enterprise-blueprints.github.io/catalog.json).
+
+Updating is a separate choice, for when you want what's new, such as a new mission. Your copy doesn't follow
+the kit on its own; you bring updates in when you choose. Two things move:
 
 - **The library's release,** the missions, capabilities, and patterns your packages build on, which
   `library.release` in `kit.yaml` names.

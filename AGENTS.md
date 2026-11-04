@@ -36,6 +36,10 @@ pnpm verify          # content check, type check, tests, and site build
   the attributes the library's pages carry: `data-resources-for`, `data-resource-id`, and `data-element`. Try it
   in a scratch copy, since a save writes `source/` and `content/`. Keep `allowed()` in `server.ts`: any site
   open in the browser can reach a server on this computer.
+- The README's quickstart is for someone who has only Node, or nothing yet, and no GitHub. Keep it working
+  that way, and keep its pnpm version the same as `packageManager` in `package.json`. Try a change to it in a
+  fresh folder with its own `PATH`. Its advice on package feeds comes from testing each fix against a feed
+  missing locked versions, so test before changing that too.
 - The sample publisher, My Organization, is fictional: `example.com` addresses and the `example` prefix.
   Keep it that way; it must never look like a real organization.
 - The kit's own files: `src/site.ts` (the site config, read from `kit.yaml`), the home page

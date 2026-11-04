@@ -17,6 +17,7 @@ import { measureId, validatePackage, type Assessment, type BlueprintPackage, typ
 import { elementTypes, groupings, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates, resourceKinds, type ElementTypeInfo } from './vocabulary';
 import { href } from './paths';
 import { compareVersions } from './format';
+import type { SearchItem } from './search';
 
 export interface LibraryElement extends Element {
   package: BlueprintPackage;
@@ -628,4 +629,22 @@ export function questionsAbout(element: LibraryElement): { question: LibraryQues
       ];
     }),
   );
+}
+
+/** Everything the site's search looks through, each with what it can be found by. */
+export function searchIndex(): SearchItem[] {
+  const current = elements.filter((e) => e.status !== 'deprecated');
+  const from = (pkg: BlueprintPackage) => shortTitle(pkg);
+  const ways = (e: LibraryElement) => (Array.isArray(e.attributes?.ways) ? (e.attributes.ways as { title: string }[]).map((w) => w.title) : []);
+  // Several packages can cite one source, which is one result.
+  const distinct = sources.filter((s, i) => sources.findIndex((x) => x.url === s.url) === i);
+  return [
+    ...current.map((e) => ({ title: e.title, type: e.type, label: e.typeInfo.label, package: from(e.package), url: e.url, text: [e.description, tagline(e), ...ways(e)].filter(Boolean).join(' ') })),
+    ...current.flatMap(measuresOf).map((m) => ({ title: m.title, type: 'measure', label: 'Measure', package: from(m.outcome.package), url: m.url, text: m.description })),
+    ...assessments.flatMap((a) => [
+      { title: a.title, type: 'discovery', label: 'Question set', package: from(a.package), url: a.url, text: a.description },
+      ...a.questions.map((q) => ({ title: q.prompt, type: 'discovery', label: 'Discovery question', package: from(a.package), url: `${a.url}#${q.id.split(':')[1]}`, text: q.options?.map((o) => o.label).join(' ') })),
+    ]),
+    ...distinct.map((s) => ({ title: s.title, type: 'source', label: 'Source', package: from(s.package), url: s.url, text: s.note, external: true })),
+  ];
 }

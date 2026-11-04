@@ -16,6 +16,9 @@ The editor runs on your own computer and is for one person at a time. Other comp
 
 Restart `pnpm editor` after you pull new code or run `pnpm sync --tools`. Reloading the page isn't enough.
 
+Search works in all three modes. Press `/` on any page, or choose the magnifying glass. In the editor it finds
+what you've just saved once the page reloads.
+
 ## Find your way around
 
 The bar across the top shows the release and whether it's **Published** or a **Draft**, and **+ Add** adds

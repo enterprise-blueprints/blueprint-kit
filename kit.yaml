@@ -20,4 +20,4 @@ library:
   # them to your items and what they build on. Leave it out for only what they build on.
   show: all
   # The version of the library's engine, its pages and the code behind them. pnpm sync --tools sets it.
-  engine: 1.3.0
+  engine: 1.4.0

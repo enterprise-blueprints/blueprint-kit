@@ -1,0 +1,137 @@
+---
+import { href } from '../lib/paths';
+---
+{/* It needs scripts, so the button stays hidden until they've run. */}
+<button type="button" class="site-search__open" aria-label="Search" title="Search (press /)" data-search-open hidden>
+  <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="m13 13 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+</button>
+<dialog class="site-search" aria-label="Search this site" data-search data-index={href('search.json')}>
+  <div class="site-search__box">
+    <div class="site-search__bar">
+      <input type="search" placeholder="Search this site" aria-label="Search this site" autocomplete="off" spellcheck="false" data-search-input />
+      <button type="button" class="site-search__close" aria-label="Close" data-search-close>✕</button>
+    </div>
+    <p class="site-search__status" aria-live="polite" data-search-status></p>
+    <ul class="site-search__results" data-search-results></ul>
+  </div>
+</dialog>
+
+<script>
+  import { prepare, search, type Prepared, type SearchItem } from '../lib/search';
+
+  const HINT = 'Find missions, outcomes, measures, capabilities, requirements, patterns, resources, questions, and sources.';
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search]')!;
+  const opener = document.querySelector<HTMLButtonElement>('[data-search-open]')!;
+  const input = dialog.querySelector<HTMLInputElement>('[data-search-input]')!;
+  const status = dialog.querySelector<HTMLElement>('[data-search-status]')!;
+  const results = dialog.querySelector<HTMLElement>('[data-search-results]')!;
+  let index: Prepared[] | undefined;
+
+  /** The index, fetched the first time search opens, so a page that doesn't search doesn't pay for it. */
+  async function load() {
+    if (index) return;
+    try {
+      const res = await fetch(dialog.dataset.index!);
+      if (!res.ok) throw new Error(res.statusText);
+      index = prepare((await res.json()) as SearchItem[]);
+      show();
+    } catch {
+      status.textContent = 'Search isn’t available right now.';
+    }
+  }
+
+  function result(item: SearchItem) {
+    const li = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = item.url;
+    if (item.external) {
+      link.target = '_blank';
+      link.rel = 'noopener';
+    }
+    const about = document.createElement('span');
+    about.className = 'site-search__about';
+    const kind = document.createElement('span');
+    kind.className = `type-badge type-${item.type}`;
+    kind.textContent = item.label;
+    about.append(kind);
+    if (item.package) about.append(item.package);
+    const title = document.createElement('strong');
+    title.textContent = item.title;
+    link.append(about, title);
+    if (item.text) {
+      const text = document.createElement('span');
+      text.className = 'site-search__text';
+      text.textContent = item.text;
+      link.append(text);
+    }
+    li.append(link);
+    return li;
+  }
+
+  function show() {
+    const query = input.value.trim();
+    if (!query) {
+      results.replaceChildren();
+      status.textContent = HINT;
+      return;
+    }
+    if (!index) {
+      status.textContent = 'Loading…';
+      return;
+    }
+    const found = search(index, query);
+    results.replaceChildren(...found.results.map(result));
+    results.scrollTop = 0;
+    status.textContent = !found.total
+      ? `Nothing matches “${query}”.`
+      : found.total > found.results.length
+        ? `The best ${found.results.length} of ${found.total} results`
+        : `${found.total} ${found.total === 1 ? 'result' : 'results'}`;
+  }
+
+  function open() {
+    dialog.showModal();
+    input.select();
+    show();
+    void load();
+  }
+
+  const links = () => [...results.querySelectorAll('a')];
+
+  opener.hidden = false;
+  opener.addEventListener('click', open);
+  input.addEventListener('input', show);
+  dialog.querySelector('[data-search-close]')!.addEventListener('click', () => dialog.close());
+  // A click outside the box lands on the dialog itself.
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+    else if ((e.target as Element).closest('a')) dialog.close();
+  });
+  dialog.addEventListener('keydown', (e) => {
+    const list = links();
+    const at = list.indexOf(document.activeElement as HTMLAnchorElement);
+    // A search box would take the first Escape to clear itself.
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      dialog.close();
+    } else if (e.key === 'ArrowDown' && list.length) {
+      e.preventDefault();
+      list[Math.min(at + 1, list.length - 1)].focus();
+    } else if (e.key === 'ArrowUp' && at >= 0) {
+      e.preventDefault();
+      (at === 0 ? input : list[at - 1]).focus();
+    } else if (e.key === 'Enter' && document.activeElement === input && list.length) {
+      e.preventDefault();
+      list[0].click();
+    }
+  });
+  // / or Ctrl+K opens it, unless you're typing or something else is open.
+  document.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement;
+    const typing = target.closest('input, textarea, select, [contenteditable]');
+    const wanted = (e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey));
+    if (!wanted || document.querySelector('dialog[open]')) return;
+    e.preventDefault();
+    open();
+  });
+</script>

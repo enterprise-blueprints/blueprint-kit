@@ -1,0 +1,67 @@
+/* The editor, in the site's own colors, so it follows the theme. */
+
+.kit-editor-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .75rem; padding: .4rem 1rem; border-bottom: 1px solid var(--border-strong); background: var(--surface-muted); color: var(--text); font-size: .875rem; }
+.kit-editor-bar__problem { color: #b42318; font-weight: 600; }
+.kit-editor-pill { margin-left: .4rem; padding: .05rem .5rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .75rem; font-weight: 650; }
+.kit-editor-pill--draft { background: #fdf0d5; color: #8a5a00; }
+.kit-editor-spacer { flex: 1; }
+
+.kit-editor-bar button, .kit-editor-dialog footer button { padding: .3rem .7rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+.kit-editor-bar button:hover, .kit-editor-dialog footer button:hover { border-color: var(--accent); }
+.kit-editor-bar .kit-editor-primary, .kit-editor-dialog .kit-editor-primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+.kit-editor-bar button:disabled, .kit-editor-dialog button:disabled { opacity: .6; cursor: progress; }
+.kit-editor-dialog .kit-editor-danger { border-color: #b42318; color: #b42318; }
+
+.kit-editor-add, .kit-editor-edit { padding: .2rem .55rem; border: 1px dashed var(--accent); border-radius: var(--radius-sm); background: transparent; color: var(--accent); font: inherit; font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.kit-editor-add:hover, .kit-editor-edit:hover { border-style: solid; background: var(--accent-soft); }
+.kit-editor-add { margin-top: .5rem; }
+.kit-editor-edit { justify-self: start; width: fit-content; margin-top: .35rem; }
+
+.kit-editor-dialog { width: min(42rem, calc(100vw - 1.5rem)); max-height: calc(100dvh - 1.5rem); padding: 0; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--text); }
+.kit-editor-dialog--small { width: min(30rem, calc(100vw - 1.5rem)); }
+.kit-editor-dialog::backdrop { background: rgb(0 0 0 / .45); }
+.kit-editor-dialog form { display: grid; gap: .85rem; padding: 1.1rem 1.25rem 1.25rem; }
+.kit-editor-dialog form > p { margin: 0; }
+.kit-editor-dialog header { display: flex; align-items: center; justify-content: space-between; }
+.kit-editor-dialog h2 { margin: 0; padding: 0; border: 0; font-size: 1.25rem; }
+.kit-editor-dialog footer { display: flex; align-items: center; gap: .5rem; margin-top: .25rem; }
+
+.kit-editor-field { display: grid; gap: .25rem; }
+.kit-editor-field > span, .kit-editor-dialog legend { font-size: .875rem; font-weight: 650; }
+.kit-editor-field small { color: var(--text-muted); }
+.kit-editor-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .85rem; }
+.kit-editor-dialog fieldset { display: grid; gap: .4rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+.kit-editor-dialog legend { padding: 0; margin-bottom: .25rem; }
+.kit-editor-dialog input, .kit-editor-dialog select, .kit-editor-dialog textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: .4rem .55rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font: inherit; font-size: .9375rem; }
+.kit-editor-dialog textarea { resize: vertical; }
+.kit-editor-dialog input:focus-visible, .kit-editor-dialog select:focus-visible, .kit-editor-dialog textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.kit-editor-links, .kit-editor-results { display: grid; gap: .3rem; margin: 0; padding: 0; list-style: none; }
+.kit-editor-links:not(:empty) { margin-bottom: .4rem; }
+.kit-editor-links li { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .5rem; padding: .3rem .5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-muted); }
+.kit-editor-links__name { flex: 1 1 14rem; min-width: 0; }
+.kit-editor-links select { flex: 0 1 13rem; width: auto; padding: .2rem .35rem; font-size: .8125rem; }
+.kit-editor-dialog small { color: var(--text-muted); font-size: .8125rem; font-weight: 400; }
+
+.kit-editor-results { max-height: 15rem; margin-top: .25rem; overflow-y: auto; padding: .25rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.kit-editor-results[hidden] { display: none; }
+.kit-editor-results button { display: block; width: 100%; padding: .3rem .45rem; border: 0; border-radius: var(--radius-sm); background: none; color: var(--text); font: inherit; font-size: .9375rem; text-align: left; cursor: pointer; }
+.kit-editor-results button:hover, .kit-editor-results button:focus-visible { background: var(--accent-soft); }
+.kit-editor-results__none { padding: .3rem .45rem; color: var(--text-muted); }
+
+.kit-editor-details { display: grid; gap: .35rem; }
+.kit-editor-details__row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto; gap: .35rem; align-items: center; }
+.kit-editor-remove { flex: none; padding: .1rem .4rem; border: 0; border-radius: var(--radius-sm); background: none; color: var(--text-muted); font: inherit; cursor: pointer; }
+.kit-editor-remove:hover { background: var(--surface-muted); color: var(--text); }
+.kit-editor-link { justify-self: start; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer; }
+
+.kit-editor-problems { padding: .55rem .75rem; border-left: 3px solid #b42318; border-radius: var(--radius-sm); background: color-mix(in srgb, #b42318 10%, var(--surface)); font-size: .9375rem; }
+.kit-editor-problems[hidden] { display: none; }
+.kit-editor-problems p { margin: 0 0 .2rem; }
+.kit-editor-problems p:last-child { margin: 0; }
+
+@media (prefers-color-scheme: dark) {
+  .kit-editor-bar .kit-editor-primary, .kit-editor-dialog .kit-editor-primary { color: #0b1118; }
+  .kit-editor-pill--draft { background: #4a3a10; color: #f5d78e; }
+  .kit-editor-bar__problem, .kit-editor-dialog .kit-editor-danger { color: #f97066; border-color: #f97066; }
+}

@@ -9,10 +9,15 @@ import { parse } from 'yaml';
 const url = parse(readFileSync('kit.yaml', 'utf8')).site?.url;
 const address = url ? new URL(url) : undefined;
 
+// The editor is only there with `pnpm editor`, so it's never in a build.
+const editing = Boolean(process.env.KIT_EDITOR);
+
 export default defineConfig({
   site: process.env.SITE_URL || address?.origin || 'https://example.github.io',
   base: process.env.BASE_PATH || address?.pathname || '/',
   outDir: process.env.OUT_DIR || 'dist',
+  integrations: editing ? [(await import('./editor/server.ts')).default()] : [],
+  devToolbar: { enabled: !editing },
   vite: {
     server: { strictPort: true },
     preview: { strictPort: true },

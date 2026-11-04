@@ -13,7 +13,7 @@ const { resource } = Astro.props;
 const details = resourceDetails(resource);
 const helps = helpsWith(resource);
 ---
-<li class="offer type-resource">
+<li class="offer type-resource" data-resource-id={resource.id}>
   <p class="offer__kind">{details.kind}</p>
   <a class="offer__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
   <p class="offer__by">{details.by ?? resource.package.publisher.name}</p>

@@ -4,6 +4,8 @@
 //   pnpm content:check     fail if content/ is behind source/, writing nothing
 //   pnpm content:publish   build, then freeze the release in published.json
 //
+// The editor also asks `status` for the release and whether it's a draft, as JSON.
+//
 // Your packages are released together, as one version, like the library's.
 // A release is published once it's on origin/main or in published.json, and
 // never changes after that. A release built since then is a draft, rebuilt in
@@ -28,8 +30,8 @@ import { plan, readSources, SourceError, type Resolved } from '../src/lib/compil
 import { validatePackage, type BlueprintPackage } from '../src/lib/package.ts';
 
 const mode = process.argv[2];
-if (mode !== 'build' && mode !== 'check' && mode !== 'publish') {
-  console.error('Usage: content.ts build | check | publish');
+if (mode !== 'build' && mode !== 'check' && mode !== 'publish' && mode !== 'status') {
+  console.error('Usage: content.ts build | check | publish | status');
   process.exit(2);
 }
 
@@ -102,7 +104,7 @@ if (mode !== 'check') {
   isPublished = (name, version) => live.has(`content/${name}/${version}/blueprint.json`) || inRecord(name, version);
 
   // With nothing to say what's out there, the versions already here stay as they are.
-  if (!hasRemote && !existsSync(recordFile)) {
+  if (mode !== 'status' && !hasRemote && !existsSync(recordFile)) {
     for (const [name, versions] of Object.entries(content)) {
       record[name] = Object.fromEntries(Object.keys(versions).map((v) => [v, digest(packageFile(name, v))]));
     }
@@ -122,6 +124,12 @@ try {
     process.exit(1);
   }
   throw e;
+}
+
+if (mode === 'status') {
+  const current = steps.filter((s) => !s.retired);
+  console.log(JSON.stringify({ release: current[0]?.version, draft: current.some((s) => !isPublished(s.name, s.version)) }));
+  process.exit(0);
 }
 
 // The release as it will be: what's written, and what stays.

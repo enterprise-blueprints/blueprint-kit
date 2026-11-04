@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "editor": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/editor.ts",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",

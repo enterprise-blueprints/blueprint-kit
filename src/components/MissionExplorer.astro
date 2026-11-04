@@ -6,12 +6,13 @@
 // to patterns, and shows it in the panel beside them, with its measures,
 // requirements, or ways to source it. Requirements stay in the panel, since
 // they're the detail under a capability. Each card says how many resources
-// help with it, and the panel shows them first. Search dims what doesn't match.
-import { byLayer, coversPartly, groupOf, patternDetails, resourcesFor, shortTitle, type LibraryElement, type MissionBlueprint } from '../lib/library';
+// help with it, and the panel shows them first; choosing one opens a drawer
+// over the panel with all about it. Search dims what doesn't match.
+import { byLayer, coversPartly, groupOf, patternDetails, resourcesFor, shortTitle, type ElementResource, type LibraryElement, type MissionBlueprint } from '../lib/library';
 import { plural } from '../lib/format';
 import { capabilityStages, patternLayers } from '../lib/vocabulary';
-import ExplorerResources from './ExplorerResources.astro';
 import LibraryMark from './LibraryMark.astro';
+import ResourceDrawer from './ResourceDrawer.astro';
 
 interface Props {
   blueprint: MissionBlueprint;
@@ -44,6 +45,11 @@ const capabilitiesFor = (p: LibraryElement) => capabilities.filter((c) => c.patt
 const sharedLabel = (e: LibraryElement) => (e.package !== mission ? shortTitle(e.package).replace(/ Capabilities$/, '') : undefined);
 const node = (id: string) => ({ 'data-node': id, 'data-links': neighbors(id).join(' ') });
 const helpCount = (e: LibraryElement) => resourcesFor(e).length;
+// Every resource that helps with something here, once each, for the drawer.
+const items = [...outcomes.map((o) => o.outcome), ...capabilities.map((c) => c.capability), ...patterns];
+const helping = [...new Set(items.flatMap((e) => resourcesFor(e).map((r) => r.resource)))];
+// What a resource's link to this item says, which the drawer shows for this item alone.
+const here = (r: ElementResource) => [r.way && `About one way to source it: ${r.way.title}.`, r.note].filter(Boolean).join(' ') || undefined;
 ---
 <section class="ex" aria-labelledby="ex-heading" data-explorer>
   <div class="ex__bar">
@@ -136,7 +142,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
           <p class="ex__kicker">Outcome{groupOf(o.outcome) && <> · {groupOf(o.outcome)!.label}</>}</p>
           <h3 class="ex__title">{o.outcome.title}<LibraryMark element={o.outcome} always /></h3>
           <p>{o.outcome.description}</p>
-          <ExplorerResources element={o.outcome} within={mission} />
+          <section class="ex__resources" data-resources-for={o.outcome.id}>{resourcesFor(o.outcome).length > 0 && <><h4>Resources</h4><div class="ex__chips type-resource">{resourcesFor(o.outcome).map((r) => <button type="button" class="ex-chip" data-resource={r.resource.id} data-here={here(r)}><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span></button>)}</div></>}</section>
           {o.measures.length > 0 && (
             <>
               <h4>Measures</h4>
@@ -154,7 +160,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
           <p class="ex__kicker">Capability{groupOf(c.capability) && <> · {groupOf(c.capability)!.label}</>}{c.sharedFrom && <> · from {shortTitle(c.sharedFrom)}</>}</p>
           <h3 class="ex__title">{c.capability.title}<LibraryMark element={c.capability} always /></h3>
           <p>{c.capability.description}</p>
-          <ExplorerResources element={c.capability} within={mission} />
+          <section class="ex__resources" data-resources-for={c.capability.id}>{resourcesFor(c.capability).length > 0 && <><h4>Resources</h4><div class="ex__chips type-resource">{resourcesFor(c.capability).map((r) => <button type="button" class="ex-chip" data-resource={r.resource.id} data-here={here(r)}><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span></button>)}</div></>}</section>
           <h4>Outcomes it serves</h4>
           <div class="ex__chips type-outcome">{outcomesFor(c.capability).map((o) => <button type="button" class="ex-chip" data-select={o.id}><span>{o.title}<LibraryMark element={o} within={mission} /></span></button>)}</div>
           {c.patterns.length > 0 && (
@@ -187,7 +193,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
             <p class="ex__kicker">Pattern{details.layer && <> · {patternLayers[details.layer].label}</>}{sharedLabel(p) && <> · from {shortTitle(p.package)}</>}</p>
             <h3 class="ex__title">{p.title}<LibraryMark element={p} always /></h3>
             <p>{p.description}</p>
-            <ExplorerResources element={p} within={mission} />
+            <section class="ex__resources" data-resources-for={p.id}>{resourcesFor(p).length > 0 && <><h4>Resources</h4><div class="ex__chips type-resource">{resourcesFor(p).map((r) => <button type="button" class="ex-chip" data-resource={r.resource.id} data-here={here(r)}><span>{r.resource.title}<LibraryMark element={r.resource} within={mission} /></span><span class="ex-chip__note">{r.details.kind}</span></button>)}</div></>}</section>
             {details.ways.length > 0 && (
               <>
                 <h4>{details.ways.length === 1 ? 'How to source it' : 'Ways to source it'}</h4>
@@ -209,6 +215,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
       })}
     </aside>
   </div>
+  {helping.length > 0 && <ResourceDrawer resources={helping} />}
 </section>
 
 <script>
@@ -226,6 +233,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
     const details = [...root.querySelectorAll<HTMLElement>('[data-detail]')];
     const panel = root.querySelector<HTMLElement>('[data-panel]')!;
     const search = root.querySelector<HTMLInputElement>('[data-search]')!;
+    const drawer = root.querySelector<HTMLDialogElement>('[data-drawer]');
     let selected: string | null = null;
     // A card's own words, without the note that marks a library item on a publisher's site.
     const plainText = (el: Element | null | undefined) => {
@@ -291,9 +299,26 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
       if (id) panel.scrollTop = 0;
     }
 
+    /** Opens the drawer on a chosen resource, with what its link to this item says. */
+    function openResource(chip: HTMLElement) {
+      for (const d of drawer!.querySelectorAll<HTMLElement>('[data-resource-detail]')) {
+        d.hidden = d.dataset.resourceDetail !== chip.dataset.resource;
+        if (d.hidden) continue;
+        const note = d.querySelector<HTMLElement>('[data-here]')!;
+        note.textContent = chip.dataset.here ?? '';
+        note.hidden = !chip.dataset.here;
+      }
+      drawer!.showModal();
+      drawer!.querySelector('.ex-drawer__body')!.scrollTop = 0;
+    }
+
     for (const c of cards) c.addEventListener('click', () => show(selected === c.dataset.node ? null : c.dataset.node!));
     root.addEventListener('click', (e) => {
-      const target = (e.target as HTMLElement).closest<HTMLElement>('[data-select], [data-clear]');
+      const clicked = e.target as HTMLElement;
+      if (clicked === drawer || clicked.closest('[data-drawer-close]')) return drawer!.close();
+      const chip = clicked.closest<HTMLElement>('[data-resource]');
+      if (chip) return openResource(chip);
+      const target = clicked.closest<HTMLElement>('[data-select], [data-clear]');
       if (!target) return;
       if (target.dataset.select) {
         show(target.dataset.select);
@@ -301,7 +326,8 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
       } else show(null);
     });
     root.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && selected) {
+      // With the drawer open, Escape closes the drawer and leaves the selection.
+      if (e.key === 'Escape' && selected && !drawer?.open) {
         const was = byId.get(selected);
         show(null);
         was?.focus();
@@ -373,6 +399,7 @@ const helpCount = (e: LibraryElement) => resourcesFor(e).length;
   .ex-chip:hover { border-color: var(--tc); }
   .ex-chip__note { flex: none; font-weight: 500; font-size: .75rem; opacity: .8; }
   .ex__open { margin-top: 1rem !important; font-weight: 600; }
+  .ex__resources:empty { display: none; }
 
   /* Narrower: the panel opens as a sheet over the bottom of the screen. */
   @media (max-width: 74.99rem) {

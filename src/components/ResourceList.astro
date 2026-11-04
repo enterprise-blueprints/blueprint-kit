@@ -9,22 +9,20 @@ interface Props {
   resources: ElementResource[];
   /** The package of the page the list is on, so a library page's own library resources go unmarked. */
   within?: BlueprintPackage;
-  /** One column of shorter cards, for the explorer's panel. */
-  compact?: boolean;
 }
 
-const { resources, within, compact } = Astro.props;
+const { resources, within } = Astro.props;
 ---
-<ul class:list={['resource-list', { 'resource-list--compact': compact }]}>
+<ul class="resource-list">
   {resources.map(({ resource, details, way, note }) => (
     <li class:list={['resource type-resource', { 'resource--own': upstream && isOwn(resource.package) }]} data-resource-id={resource.id}>
-      <p class="resource__kind">{details.kind}{way && <> · for {compact ? way.title : <a href={`#way-${way.id}`}>{way.title}</a>}</>}</p>
+      <p class="resource__kind">{details.kind}{way && <> · for <a href={`#way-${way.id}`}>{way.title}</a></>}</p>
       <a class="resource__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a><LibraryMark element={resource} within={within} />
       <p class="resource__by">{details.by ?? resource.package.publisher.name}</p>
       <p class="resource__about">{note ?? resource.description}</p>
       <p class="resource__more">
         <a href={resource.url}>What else it helps with</a>
-        {!compact && details.lastReviewedAt && <span class="muted"> · Checked {formatDate(details.lastReviewedAt)}</span>}
+        {details.lastReviewedAt && <span class="muted"> · Checked {formatDate(details.lastReviewedAt)}</span>}
       </p>
     </li>
   ))}
@@ -43,10 +41,4 @@ const { resources, within, compact } = Astro.props;
   .resource__more { margin-top: .35rem !important; font-size: .875rem; }
   /* A publisher's own, among the library's. */
   .resource--own { border-left-width: 5px; background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
-  .resource-list--compact { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
-  .resource-list--compact .resource { padding: .55rem .7rem; }
-  .resource-list--compact .resource__title { font-size: .9375rem; }
-  .resource-list--compact .resource__by,
-  .resource-list--compact .resource__more { font-size: .8125rem; }
-  .resource-list--compact .resource__about { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; font-size: .875rem; }
 </style>

@@ -115,12 +115,14 @@ different problem: your feed wants you to sign in.
 | `kit.yaml` | Your site's name, description, and color, and the library release your packages build on. |
 | `source/<package>/` | What you edit: one folder of YAML per package. The sample has two. |
 | `content/` | Your packages as published, built from `source/` by `pnpm content:build`. Don't edit these by hand. |
+| `published.json` | Which versions you've published, once you've run `pnpm content:publish`. Keep it with your copy. |
 | `library/` | The library's packages and vocabulary at the release you build on, from `pnpm sync`. |
 | `schemas/` | Every version of the package schema, from `pnpm sync`. |
 | `src/site.ts` | Your site as the pages see it, read from `kit.yaml`. |
-| `src/pages/index.astro`, `src/kit/` | Your home page: what you offer, the missions, and your packages. Make it yours. |
+| `src/pages/index.astro`, `src/kit/`, `src/pages/about.astro` | Your home page, with what you offer, the missions, and your packages, and your About page. Make them yours. |
 | `src/publish.ts`, `src/pages/*.json.ts`, `src/pages/packages/` | The data files your site publishes, such as `catalog.json`. |
 | Everything else in `src/` and `public/` | The library's pages and the code behind them, copied as they are. `pnpm sync --tools` refreshes them; the list is the library's `engine.json`. |
+| `editor/`, `scripts/` | The editor and the commands. `pnpm sync --tools` refreshes these too; the list is `kit.json`. |
 
 The sample's two packages:
 
@@ -143,7 +145,8 @@ The sample's two packages:
 
 ## Your first resource
 
-Add it to `source/offerings/resources.yaml`:
+You can [add it in the browser](#add-resources-in-the-browser), or write it by hand in
+`source/offerings/resources.yaml`:
 
 ```yaml
 - id: records-assessment
@@ -303,18 +306,19 @@ the kit on its own; you bring updates in when you choose. Two things move:
 A copy made before engine 1.1.0 turns on the whole library by adding `show: all` to `kit.yaml`, and keeps
 its home page to its own work by filtering its missions with `inUse`, as the kit's home page does.
 
-Your own files are never touched: `kit.yaml` (but for those two versions), `source/`, `content/`, your
-home page (`src/pages/index.astro` and `src/kit/`), and anything you add. `package.json` takes the kit's
+Your own files are never touched: `kit.yaml` (but for those two versions), `source/`, `content/`,
+`published.json`, your home and About pages (`src/pages/index.astro`, `src/kit/`, and `src/pages/about.astro`),
+and anything you add. `package.json` takes the kit's
 scripts and versions and keeps what you added.
 
-**Every week, a pull request.** `.github/workflows/update.yml` runs every Monday, or whenever you start it
+**On GitHub, a pull request every week.** `.github/workflows/update.yml` runs every Monday, or whenever you start it
 from the Actions tab. It moves to the library's current release and the kit's latest shared files,
 rebuilds your packages, runs `pnpm verify`, and opens a pull request that says whether it passed, for you
 to review and merge. To let it open the pull request, turn on **Settings → Actions → General → Allow
 GitHub Actions to create and approve pull requests**. It can't change your workflows itself; when the
 kit's have changed, the pull request says so, and `pnpm sync --tools` on your machine brings them in.
 
-**Or by hand:**
+**Or by hand, which is how a copy that isn't on GitHub stays current:**
 
 ```sh
 pnpm sync --latest --tools  # the library's current release, and the kit's latest shared files
@@ -323,8 +327,9 @@ pnpm content:build          # your next release, built on it
 pnpm verify
 ```
 
-If the library renamed or removed something you link to, `pnpm verify` names each link that no longer
-resolves.
+This reads the library's site and the kit's files on GitHub, so your network has to reach both. If the
+library renamed or removed something you link to, `pnpm verify` names each link that no longer resolves.
+On a site you host yourself, run `pnpm content:publish` when the new release is ready to share.
 
 ## License
 

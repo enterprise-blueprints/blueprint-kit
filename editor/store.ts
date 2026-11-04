@@ -55,7 +55,7 @@ type Raw = Record<string, unknown>;
 type PackageFile = { packageId: string; title: string; elements: { id: string; type: string; title: string; status?: string; attributes?: Raw }[] };
 
 const readJson = <T>(path: string): T => JSON.parse(readFileSync(path, 'utf8')) as T;
-const folders = (dir: string) => (existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name) : []);
+const folders = (dir: string) => (existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort() : []);
 const write = (doc: Document) => doc.toString({ lineWidth: 0 });
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -136,7 +136,7 @@ export function newId(title: string, taken: string[]): string {
   const base =
     title
       .normalize('NFKD')
-      .replace(/[̀-ͯ]/g, '')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .slice(0, 60)

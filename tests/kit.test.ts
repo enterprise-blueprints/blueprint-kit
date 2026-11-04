@@ -73,16 +73,19 @@ describe('the library on your site', () => {
 });
 
 // Runs the content script in a copy with no Git remote, the way an organization
-// hosting its own site does, so what it keeps and rewrites is what's tested.
+// hosting its own site does, so what it keeps and rewrites is what's tested. It
+// uses whatever packages are in source/, since every copy of the kit runs these.
 describe('publishing without a Git remote', () => {
   let dir: string;
+  const packagesHere = readdirSync('source').sort();
+  const name = packagesHere[0];
   const run = (mode: string) =>
     spawnSync(process.execPath, ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', 'scripts/content.ts', mode], { cwd: dir, encoding: 'utf8' });
-  const versions = (name: string) => readdirSync(join(dir, 'content', name)).sort();
-  const packageText = (name: string, version: string) => readFileSync(join(dir, 'content', name, version, 'blueprint.json'), 'utf8');
+  const versions = () => readdirSync(join(dir, 'content', name)).sort();
+  const packageText = (version: string) => readFileSync(join(dir, 'content', name, version, 'blueprint.json'), 'utf8');
   const record = () => JSON.parse(readFileSync(join(dir, 'published.json'), 'utf8'));
   const edit = (title: string) => {
-    const path = join(dir, 'source', 'offerings', 'package.yaml');
+    const path = join(dir, 'source', name, 'package.yaml');
     writeFileSync(path, readFileSync(path, 'utf8').replace(/^title: .*$/m, `title: ${title}`));
   };
 
@@ -100,31 +103,31 @@ describe('publishing without a Git remote', () => {
     expect(run('build').stdout).toContain('Release 0.1.0 is a draft');
     edit('First draft');
     expect(run('build').status).toBe(0);
-    expect(versions('offerings')).toEqual(['0.1.0']);
-    expect(packageText('offerings', '0.1.0')).toContain('First draft');
+    expect(versions()).toEqual(['0.1.0']);
+    expect(packageText('0.1.0')).toContain('First draft');
 
     expect(run('publish').stdout).toContain('Published release 0.1.0');
-    const frozen = packageText('offerings', '0.1.0');
-    expect(Object.keys(record()).sort()).toEqual(['local-audit', 'offerings']);
+    const frozen = packageText('0.1.0');
+    expect(Object.keys(record()).sort()).toEqual(packagesHere);
     expect(run('publish').stdout).toContain('Release 0.1.0 is already published');
 
     edit('Second');
     run('build');
     edit('Third');
     run('build');
-    expect(versions('offerings')).toEqual(['0.1.0', '0.2.0']);
-    expect(packageText('offerings', '0.1.0')).toBe(frozen);
-    expect(packageText('offerings', '0.2.0')).toContain('Third');
+    expect(versions()).toEqual(['0.1.0', '0.2.0']);
+    expect(packageText('0.1.0')).toBe(frozen);
+    expect(packageText('0.2.0')).toContain('Third');
 
     // Back to what's published, the draft is no longer needed.
     edit('First draft');
     run('build');
-    expect(versions('offerings')).toEqual(['0.1.0']);
+    expect(versions()).toEqual(['0.1.0']);
   });
 
   it('refuses to go on when a published version has changed', { timeout: 60_000 }, () => {
     run('publish');
-    const path = join(dir, 'content', 'offerings', '0.1.0', 'blueprint.json');
+    const path = join(dir, 'content', name, '0.1.0', 'blueprint.json');
     writeFileSync(path, `${readFileSync(path, 'utf8')}\n`);
     for (const mode of ['check', 'build', 'publish']) {
       const result = run(mode);
@@ -135,14 +138,13 @@ describe('publishing without a Git remote', () => {
 
   it('keeps the versions already in content/ the first time it runs', { timeout: 60_000 }, () => {
     cpSync('content', join(dir, 'content'), { recursive: true });
-    const before = versions('offerings');
-    const newest = before.at(-1)!;
-    const text = packageText('offerings', newest);
+    const before = versions();
+    const texts = before.map(packageText);
     edit('Edited');
     expect(run('build').status).toBe(0);
-    expect(versions('offerings').slice(0, before.length)).toEqual(before);
-    expect(versions('offerings')).toHaveLength(before.length + 1);
-    expect(packageText('offerings', newest)).toBe(text);
-    expect(Object.keys(record().offerings)).toEqual(before);
+    expect(versions()).toEqual(expect.arrayContaining(before));
+    expect(versions()).toHaveLength(before.length + 1);
+    expect(before.map(packageText)).toEqual(texts);
+    expect(Object.keys(record()[name]).sort()).toEqual(before);
   });
 });

@@ -36,14 +36,15 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
       <h2>Finding your way</h2>
       <ul>
         <li>
-          <strong>The library's missions</strong> this site's work builds on{libraryMissions.length > 0 && <>, such as{' '}
-          <a href={libraryMissions[0].url}>{libraryMissions[0].title}</a></>}, have their pages here, with what
-          we offer shown beside the items it helps with.
+          <strong>The library's missions</strong>{site.upstream?.showAll ? ', all of them at this release,' : " this site's work builds on"}{libraryMissions.length > 0 && <>, such as{' '}
+          <a href={libraryMissions[0].url}>{libraryMissions[0].title}</a>,</>} have their pages here, with what
+          we offer shown beside the items it helps with.{site.upstream?.showAll && <> A switch on each list narrows
+          it to what this site's work builds on.</>}
         </li>
         <li>
           <strong>A small book</strong>{libraryMissions.length > 0 && <> (<LibraryMark element={libraryMissions[0]} legend />)</>}
           marks items from {library.title}. Each of their pages links to the original in the library, which has
-          the newest release and every other mission.
+          the newest release.
         </li>
         <li>
           <strong>Everything else is ours:</strong> our offerings, and any missions, capabilities, or patterns of
@@ -66,10 +67,10 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
         <ol>
           <li><strong>Name the site</strong> and choose its color in <code>kit.yaml</code>.</li>
           <li>
-            <strong>Describe what you offer</strong> in <code>source/offerings/resources.yaml</code>: services,
-            products, demos, templates, training, or case studies, each naming the library items it helps with
-            by the IDs on the library's pages. Add missions or capabilities of your own in their own package if
-            the library doesn't cover them yet.
+            <strong>Describe what you offer</strong> in the browser with <code>pnpm editor</code>, or by hand in
+            <code>source/offerings/resources.yaml</code>: services, products, demos, templates, training, or case
+            studies, each naming the library items it helps with. Add missions or capabilities of your own in
+            their own package if the library doesn't cover them yet.
           </li>
           <li>
             <strong>Build and check:</strong> <code>pnpm content:build</code>, then <code>pnpm verify</code>,
@@ -77,8 +78,8 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
           </li>
           <li>
             <strong>Make the pages yours:</strong> the home page is <code>src/pages/index.astro</code> and this
-            page is <code>src/pages/about.astro</code>. The rest of the pages are the library's, and stay current
-            on their own.
+            page is <code>src/pages/about.astro</code>. The rest of the pages are the library's, and
+            <code>pnpm sync --tools</code> brings them up to date when you choose.
           </li>
           <li>
             <strong>Publish:</strong> push to GitHub with Pages turned on, and each week a pull request brings in

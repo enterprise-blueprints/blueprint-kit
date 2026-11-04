@@ -6,6 +6,14 @@
 .kit-editor-pill--draft { background: #fdf0d5; color: #8a5a00; }
 .kit-editor-spacer { flex: 1; }
 
+.kit-editor-menu { position: relative; }
+.kit-editor-menu summary { padding: .3rem .7rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); font-weight: 600; list-style: none; cursor: pointer; }
+.kit-editor-menu summary::-webkit-details-marker { display: none; }
+.kit-editor-menu summary:hover { border-color: var(--accent); }
+.kit-editor-menu > div { position: absolute; right: 0; z-index: 40; display: grid; gap: .15rem; min-width: 12rem; margin-top: .25rem; padding: .3rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+.kit-editor-bar .kit-editor-menu button { border: 0; background: none; text-align: left; }
+.kit-editor-bar .kit-editor-menu button:hover { background: var(--accent-soft); }
+
 .kit-editor-bar button, .kit-editor-dialog footer button { padding: .3rem .7rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
 .kit-editor-bar button:hover, .kit-editor-dialog footer button:hover { border-color: var(--accent); }
 .kit-editor-bar .kit-editor-primary, .kit-editor-dialog .kit-editor-primary { border-color: var(--accent); background: var(--accent); color: #fff; }
@@ -16,6 +24,8 @@
 .kit-editor-add:hover, .kit-editor-edit:hover { border-style: solid; background: var(--accent-soft); }
 .kit-editor-add { margin-top: .5rem; }
 .kit-editor-edit { justify-self: start; width: fit-content; margin-top: .35rem; }
+.kit-editor-actions { display: flex; flex-wrap: wrap; gap: .4rem; clear: both; margin-top: .6rem; }
+.kit-editor-actions .kit-editor-edit { margin-top: 0; }
 
 .kit-editor-dialog { width: min(42rem, calc(100vw - 1.5rem)); max-height: calc(100dvh - 1.5rem); padding: 0; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--text); }
 .kit-editor-dialog--small { width: min(30rem, calc(100vw - 1.5rem)); }
@@ -41,6 +51,13 @@
 .kit-editor-links li { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .5rem; padding: .3rem .5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-muted); }
 .kit-editor-links__name { flex: 1 1 14rem; min-width: 0; }
 .kit-editor-links select { flex: 0 1 13rem; width: auto; padding: .2rem .35rem; font-size: .8125rem; }
+.kit-editor-dialog .kit-editor-links__note { flex: 1 1 100%; padding: .2rem .4rem; font-size: .875rem; }
+.kit-editor-check { display: inline-flex; align-items: center; gap: .3rem; font-size: .8125rem; white-space: nowrap; }
+.kit-editor-dialog .kit-editor-check input { width: auto; }
+.kit-editor-suggest { display: flex; flex-wrap: wrap; gap: .3rem; }
+.kit-editor-suggest:not(:empty) { margin-bottom: .4rem; }
+.kit-editor-suggest button { padding: .15rem .5rem; border: 1px dashed var(--accent); border-radius: 999px; background: none; color: var(--accent); font: inherit; font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.kit-editor-suggest button:hover { border-style: solid; background: var(--accent-soft); }
 .kit-editor-dialog small { color: var(--text-muted); font-size: .8125rem; font-weight: 400; }
 
 .kit-editor-results { max-height: 15rem; margin-top: .25rem; overflow-y: auto; padding: .25rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }
@@ -49,7 +66,9 @@
 .kit-editor-results button:hover, .kit-editor-results button:focus-visible { background: var(--accent-soft); }
 .kit-editor-results__none { padding: .3rem .45rem; color: var(--text-muted); }
 
-.kit-editor-details { display: grid; gap: .35rem; }
+.kit-editor-details, .kit-editor-measures { display: grid; gap: .35rem; }
+.kit-editor-measures__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .25rem .35rem; padding-bottom: .35rem; }
+.kit-editor-measures__row input:last-child { grid-column: 1 / -1; }
 .kit-editor-details__row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto; gap: .35rem; align-items: center; }
 .kit-editor-remove { flex: none; padding: .1rem .4rem; border: 0; border-radius: var(--radius-sm); background: none; color: var(--text-muted); font: inherit; cursor: pointer; }
 .kit-editor-remove:hover { background: var(--surface-muted); color: var(--text); }

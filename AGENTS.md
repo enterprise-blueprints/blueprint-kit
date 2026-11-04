@@ -31,10 +31,13 @@ pnpm verify          # content check, type check, tests, and site build
   copy with no remote.
 - `editor/` is the editor, the kit's own, listed in `kit.json`. `pnpm editor` sets `KIT_EDITOR`, and only then does
   `astro.config.mjs` load `editor/server.ts`, an integration on the dev server, so builds and `pnpm dev` never
-  have it. `store.ts` edits `source/*.yaml` in place with the `yaml` library's Document API, and a save runs
-  `scripts/content.ts build`, whose checks decide; a refused change is undone. `client.ts` finds its places by
-  the attributes the library's pages carry: `data-resources-for`, `data-resource-id`, and `data-element`. Try it
-  in a scratch copy, since a save writes `source/` and `content/`. Keep `allowed()` in `server.ts`: any site
+  have it. `store.ts` edits `source/*.yaml` in place with the `yaml` library's Document API; `forms` there lists
+  the types it handles and what each form holds, and a change's files are written and undone together. A save
+  runs `scripts/content.ts build`, whose checks decide; a refused change is undone. A link that can't go on
+  the other end's element, such as a library capability contributing to your outcome, goes in `links.yaml`.
+  `client.ts` finds its places by the attributes the library's pages carry: `data-resources-for`,
+  `data-resource-id`, `data-element`, and `data-detail`. Try it in a scratch copy, since a save writes `source/`
+  and `content/`. Tests in `tests/` run in every organization's copy, so they can't rely on the sample. Keep `allowed()` in `server.ts`: any site
   open in the browser can reach a server on this computer.
 - The README's quickstart is for someone who has only Node, or nothing yet, and no GitHub. Keep it working
   that way, and keep its pnpm version the same as `packageManager` in `package.json`. Try a change to it in a

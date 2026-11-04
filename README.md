@@ -70,7 +70,7 @@ If something else is using that port, `pnpm dev --port 4400` picks another. Ctrl
 **My Organization is made up, on purpose.** Its services, products, and demos aren't real, and their links
 go to `example.com`. If that's what you see, your setup is finished and working, and the sample is there
 to be replaced. Next, [make it yours](#make-it-yours), or run `pnpm editor` to
-[add a resource in the browser](#add-resources-in-the-browser).
+[edit in the browser](#edit-in-the-browser).
 
 ### If `pnpm install` can't find a package
 
@@ -145,7 +145,7 @@ The sample's two packages:
 
 ## Your first resource
 
-You can [add it in the browser](#add-resources-in-the-browser), or write it by hand in
+You can [add it in the browser](#edit-in-the-browser), or write it by hand in
 `source/offerings/resources.yaml`:
 
 ```yaml
@@ -183,28 +183,40 @@ helps with.
 To link to something in a library package your package doesn't build on yet, add that package's folder
 name to `dependencies` in `package.yaml`. The folders are under `library/packages/`.
 
-## Add resources in the browser
+## Edit in the browser
 
-Instead of editing `resources.yaml` by hand, you can work on the site itself:
+Instead of editing the YAML by hand, you can work on the site itself:
 
 ```sh
 pnpm editor      # starts the editor at http://127.0.0.1:4322
 ```
 
-It's your site with an editing bar across the top. Go to anything, in the library or your own, and choose
-**Add a resource here**, or **Edit** on one of your resources. The form searches everything a resource can
-help with, and adds the package to `dependencies` when a link needs a new one.
+It's your site with an editing bar across the top, and it edits your resources, missions, outcomes, and
+capabilities:
 
-Saving writes to `source/<package>/resources.yaml`, keeping your comments, and rebuilds your draft release
-with the same checks as `pnpm content:build`. If those checks refuse a change, the form says why and your
-files stay as they were. So you can still edit the YAML by hand, or use Git, whenever you like. A
-resource's ID comes from its title and doesn't change after that, since tools link to it.
+- **Resources.** Go to anything, in the library or your own, and choose **Add a resource here**.
+- **Missions.** Choose **+ Add** on the bar, then **Add an outcome** and **Add a capability** on the
+  mission's page.
+- **The library's capabilities.** On an outcome's form, choose them under **Capabilities that contribute**,
+  and your mission reuses them without changing them. If one brings in a pattern that needs another, the
+  form says which capability to add as well.
+- **Anything of your own.** Choose **Edit** on its page, or in the mission explorer's panel. The library's
+  own items can't be changed here; you add yours beside them.
+
+The forms search everything a link can reach, and add the package to `dependencies` when a link needs a new
+one. Deleting something takes the links to it along too.
+
+Saving writes to your files under `source/<package>/`, keeping your comments and any fields the forms don't
+show, and rebuilds your draft release with the same checks as `pnpm content:build`. If those checks refuse a
+change, the form says why and your files stay as they were. So you can still edit the YAML by hand, or use
+Git, whenever you like. An item's ID comes from its title and doesn't change after that, since tools link
+to it.
 
 **Publish** on the bar does what `pnpm content:publish` does, and builds the site into `dist/`.
 
 The editor is for you alone. It listens only on your own computer, and only with `pnpm editor`, so neither
-`pnpm dev` nor your built site has any of it. It adds and changes resources; missions, capabilities, and
-the rest are still written in their YAML files.
+`pnpm dev` nor your built site has any of it. Requirements, patterns, sources, and discovery questions are
+still written in their YAML files, and a new package starts as a folder under `source/`.
 
 ## The library's missions on your site
 
@@ -223,7 +235,7 @@ missions to that set, add its package to your `dependencies` and link something 
 
 ## Missions and capabilities of your own
 
-A package can hold any of the library's types: `missions.yaml`, `outcomes.yaml`, `capabilities.yaml`,
+You can [add these in the browser](#edit-in-the-browser), or by hand. A package can hold any of the library's types: `missions.yaml`, `outcomes.yaml`, `capabilities.yaml`,
 `requirements.yaml`, `patterns.yaml`, and `resources.yaml`, plus `links.yaml` for links that start from the
 library's items, such as a library capability that contributes to your outcome. `source/local-audit/` shows
 each one. The validator holds your mission to the library's rules: for example, if a pattern your
@@ -237,7 +249,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
 | `pnpm dev` | Shows your site at http://localhost:4321. |
-| `pnpm editor` | Shows your site with the editor on, for adding and changing resources in the browser. |
+| `pnpm editor` | Shows your site with the editor on, for editing your resources, missions, outcomes, and capabilities in the browser. |
 | `pnpm verify` | Checks the content, types, and tests, and builds the site. |
 | `pnpm sync` | Downloads the library release `kit.yaml` names, checking each package against the library's catalog. |
 | `pnpm sync --latest` | Moves `kit.yaml` to the library's current release first. |

@@ -11,8 +11,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { parse } from 'yaml';
-import { resourceKinds } from '../src/lib/vocabulary.ts';
-import { deleteResource, EditError, packageList, readResources, readTargets, saveResource, type ResourceFields } from './store.ts';
+import { elementTypes, groupings, statuses } from '../src/lib/vocabulary.ts';
+import { capabilitiesProviding, deleteElement, EditError, forms, packageList, readElements, readTargets, saveElement, type ElementFields, type Target } from './store.ts';
 
 const root = process.cwd();
 
@@ -44,12 +44,29 @@ function run(args: string[], env: NodeJS.ProcessEnv = process.env): Promise<{ ok
 
 const content = (mode: string) => run(['--experimental-strip-types', '--disable-warning=ExperimentalWarning', join('scripts', 'content.ts'), mode]);
 
-/** The problems in the content script's output, one to a line. */
-const problemsIn = (text: string) =>
+/**
+ * A pattern can need another, which a mission has to have too. What you can add
+ * to a mission is a capability, so a problem naming a missing pattern says
+ * which capabilities would bring it in.
+ */
+function whatWouldFix(line: string, targets: Target[]) {
+  const missing = line.match(/needs ([a-z0-9-]+:implementationPattern:[a-z0-9-]+), but none of the mission's capabilities points to it/)?.[1];
+  if (!missing) return line;
+  const titles = capabilitiesProviding(root, libraryRelease(), missing, targets).slice(0, 3).map((c) => `“${c.title}”`);
+  return titles.length ? `${line}. Add ${new Intl.ListFormat('en', { type: 'disjunction' }).format(titles)} to the mission's capabilities, which brings it in.` : line;
+}
+
+/** The problems in the content script's output, one to a line, in words, with the items they name by their titles. */
+const problemsIn = (text: string, targets: Target[] = []) =>
   text
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line && !/^(Source problems:|The release has problems)/.test(line));
+    .filter((line) => line && !/^(Source problems:|The release has problems)/.test(line))
+    .map((line) => whatWouldFix(line.replace(/^[a-z0-9-]+ \d+\.\d+\.\d+: /, '').replace(/^mission /, 'Mission '), targets))
+    .map((line) => line.replace(/[a-z0-9-]+:[A-Za-z]+:[a-z0-9-]+/g, (id) => {
+      const target = targets.find((t) => t.id === id);
+      return target ? `“${target.title}”` : id;
+    }));
 
 const libraryRelease = () => String((parse(readFileSync(join(root, 'kit.yaml'), 'utf8')) as { library: { release: string } }).library.release);
 
@@ -60,8 +77,10 @@ async function state() {
     ...(status.ok ? (JSON.parse(status.stdout) as { release: string; draft: boolean }) : { problems: problemsIn(status.stderr) }),
     today: new Date().toLocaleDateString('en-CA'),
     packages: packageList(root),
-    kinds: Object.entries(resourceKinds.groups).map(([id, g]) => ({ id, label: g.label })),
-    resources: readResources(root, targets),
+    groups: Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
+    statuses: Object.entries(statuses).map(([id, label]) => ({ id, label })),
+    sections: Object.fromEntries(Object.keys(forms).map((t) => [t, elementTypes[t].section])),
+    elements: readElements(root, targets),
     targets,
   };
 }
@@ -91,13 +110,14 @@ const ownWrites = async <T>(work: () => Promise<T>): Promise<T> => {
 };
 
 /** Makes a change to source/, then builds, putting the change back if the build refuses it. */
-async function change<T extends { undo: () => void }>(server: DevServer, make: () => T): Promise<Omit<T, 'undo'>> {
+async function change<T extends { undo: () => void }>(server: DevServer, make: (targets: Target[]) => T): Promise<Omit<T, 'undo'>> {
   return ownWrites(async () => {
-    const { undo, ...result } = make();
+    const targets = readTargets(root, libraryRelease());
+    const { undo, ...result } = make(targets);
     const built = await content('build');
     if (!built.ok) {
       undo();
-      throw new EditError(problemsIn(built.stderr).join('\n'));
+      throw new EditError(problemsIn(built.stderr, targets).join('\n'));
     }
     refresh(server);
     return result;
@@ -159,11 +179,8 @@ function routes(server: DevServer) {
       if (req.method === 'GET' && path === '/state') return reply(res, 200, await state());
       if (req.method !== 'POST') return reply(res, 404, {});
       const body = await readBody(req);
-      if (path === '/save') {
-        const targets = readTargets(root, libraryRelease());
-        return reply(res, 200, await inTurn(() => change(server, () => saveResource(root, body as unknown as ResourceFields & { package: string; id?: string }, targets))));
-      }
-      if (path === '/delete') return reply(res, 200, await inTurn(() => change(server, () => deleteResource(root, String(body.package), String(body.id)))));
+      if (path === '/save') return reply(res, 200, await inTurn(() => change(server, (targets) => saveElement(root, body as unknown as ElementFields & { id?: string }, targets))));
+      if (path === '/delete') return reply(res, 200, await inTurn(() => change(server, (targets) => deleteElement(root, String(body.package), String(body.type), String(body.id), targets))));
       if (path === '/publish') return reply(res, 200, await inTurn(() => publish(server)));
       return reply(res, 404, {});
     } catch (e) {

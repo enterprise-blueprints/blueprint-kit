@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "com.example.offerings",
+  "idPrefix": "example",
+  "version": "0.4.0",
+  "title": "My Offerings",
+  "description": "My organization’s services, demos, products, templates, and training, each linked to the Enterprise Blueprints missions, capabilities, and patterns it helps with. A sample of what an organization’s package can hold.",
+  "publisher": {
+    "name": "My Organization",
+    "url": "https://example.com"
+  },
+  "license": "CC-BY-4.0",
+  "publishedAt": "2026-11-04",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies"
+  ],
+  "tags": [
+    "offerings"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.15.0"
+    },
+    {
+      "packageId": "org.enterprise-blueprints.federal-oig",
+      "version": "0.15.0"
+    },
+    {
+      "packageId": "org.enterprise-blueprints.federal-grants",
+      "version": "0.15.0"
+    }
+  ],
+  "elements": [
+    {
+      "id": "example:resource:oversight-intake-assessment",
+      "type": "resource",
+      "title": "Oversight intake assessment",
+      "description": "Two weeks with an Inspector General’s office mapping how complaints, allegations, and disclosures come in, where they wait, and how they’re tracked, ending in a short plan for intake and case tracking that fits the office.",
+      "status": "reference",
+      "attributes": {
+        "typicalLength": "2 weeks",
+        "deliverables": "Current-state map, findings, and a phased plan",
+        "kind": "service",
+        "url": "https://example.com/services/oversight-intake-assessment",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "example:resource:intake-to-referral-demo",
+      "type": "resource",
+      "title": "From intake to referral, on a shared case platform",
+      "description": "A 15-minute recorded walkthrough of a hotline complaint taken in, screened, protected, and referred for investigation, built on an agency’s existing case management platform.",
+      "status": "reference",
+      "attributes": {
+        "kind": "demo",
+        "url": "https://example.com/demos/intake-to-referral",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "example:resource:example-case-manager",
+      "type": "resource",
+      "title": "Example Case Manager",
+      "description": "A case management product for oversight offices, with intake forms, confidential reporter handling, case assignment, and referral tracking that come configured for an Inspector General’s work.",
+      "status": "reference",
+      "attributes": {
+        "editions": "Standard, Government Cloud",
+        "kind": "product",
+        "url": "https://example.com/products/case-manager",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "example:resource:grant-risk-review-scorecard",
+      "type": "resource",
+      "title": "Grant risk review scorecard",
+      "description": "A spreadsheet that scores an applicant’s risk before an award from its financial stability, audit history, and past performance, with notes on where to find each in SAM.gov and the Federal Audit Clearinghouse.",
+      "status": "reference",
+      "attributes": {
+        "kind": "template",
+        "url": "https://example.com/templates/grant-risk-scorecard",
+        "lastReviewedAt": "2026-10-30"
+      }
+    },
+    {
+      "id": "example:resource:records-schedules-workshop",
+      "type": "resource",
+      "title": "Records schedules in practice",
+      "description": "A half-day workshop for records officers and system owners on applying records schedules inside business systems, with exercises on legal holds and disposal.",
+      "status": "reference",
+      "attributes": {
+        "format": "Virtual or on site",
+        "kind": "course",
+        "url": "https://example.com/training/records-schedules",
+        "lastReviewedAt": "2026-10-30"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:oversight-intake-assessment-helps-with-complaint-allegation-disclosure-intake",
+      "from": "example:resource:oversight-intake-assessment",
+      "predicate": "helps_with",
+      "to": "eb:capability:complaint-allegation-disclosure-intake"
+    },
+    {
+      "id": "rel:oversight-intake-assessment-helps-with-oversight-intake-case-tracking",
+      "from": "example:resource:oversight-intake-assessment",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking"
+    },
+    {
+      "id": "rel:intake-to-referral-demo-helps-with-shared-case-platform",
+      "from": "example:resource:intake-to-referral-demo",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "way": "platform"
+    },
+    {
+      "id": "rel:intake-to-referral-demo-helps-with-complaint-allegation-disclosure-intake",
+      "from": "example:resource:intake-to-referral-demo",
+      "predicate": "helps_with",
+      "to": "eb:capability:complaint-allegation-disclosure-intake"
+    },
+    {
+      "id": "rel:example-case-manager-helps-with-oversight-intake-case-tracking",
+      "from": "example:resource:example-case-manager",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:oversight-intake-case-tracking",
+      "way": "product"
+    },
+    {
+      "id": "rel:grant-risk-review-scorecard-helps-with-risk-review-award",
+      "from": "example:resource:grant-risk-review-scorecard",
+      "predicate": "helps_with",
+      "to": "eb:capability:risk-review-award"
+    },
+    {
+      "id": "rel:records-schedules-workshop-helps-with-records-management",
+      "from": "example:resource:records-schedules-workshop",
+      "predicate": "helps_with",
+      "to": "eb:capability:records-management"
+    },
+    {
+      "id": "rel:records-schedules-workshop-helps-with-records-in-business-systems",
+      "from": "example:resource:records-schedules-workshop",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:records-in-business-systems",
+      "way": "built-in"
+    }
+  ]
+}

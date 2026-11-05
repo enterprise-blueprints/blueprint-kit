@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "0.6.0",
+  "packageId": "com.example.local-audit",
+  "idPrefix": "example",
+  "version": "0.4.0",
+  "title": "Local Government Audit — A Sample Mission",
+  "description": "A sample mission of an organization’s own, for a city or county audit office: two outcomes, a capability of its own, and capabilities and patterns from the library’s Inspector General and Common packages. It shows how a package adds a mission while reusing the library’s items.",
+  "publisher": {
+    "name": "My Organization",
+    "url": "https://example.com"
+  },
+  "license": "CC-BY-4.0",
+  "publishedAt": "2026-11-04",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — local government audit offices"
+  ],
+  "tags": [
+    "local-government",
+    "audits"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.15.0"
+    },
+    {
+      "packageId": "org.enterprise-blueprints.federal-oig",
+      "version": "0.15.0"
+    }
+  ],
+  "elements": [
+    {
+      "id": "example:mission:local-government-audit",
+      "type": "mission",
+      "title": "Local Government Audit",
+      "description": "A city or county auditor’s office plans and performs audits of the government’s programs and spending, reports what it finds to the council and the public, and follows up until problems are fixed.",
+      "status": "draft"
+    },
+    {
+      "id": "example:outcome:audits-on-plan",
+      "type": "outcome",
+      "title": "The audit plan is carried out on time",
+      "description": "The audits the council approved for the year are done and reported when planned.",
+      "status": "draft",
+      "attributes": {
+        "measures": [
+          {
+            "id": "audit-plan-completed",
+            "title": "Share of the audit plan completed",
+            "description": "Audits reported this year, out of those in the approved plan."
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "example:outcome:findings-resolved",
+      "type": "outcome",
+      "title": "Audit findings are resolved",
+      "description": "Departments act on the audit office’s recommendations, and the office confirms it.",
+      "status": "draft",
+      "attributes": {
+        "measures": [
+          {
+            "id": "recommendations-closed",
+            "title": "Recommendations closed within a year",
+            "description": "Recommendations confirmed as carried out within a year of the report."
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "example:capability:risk-based-audit-planning",
+      "type": "capability",
+      "title": "Risk-Based Audit Planning",
+      "description": "Ability to rank the government’s programs and departments by risk each year, propose an audit plan from the ranking, and have the council approve it.",
+      "status": "draft",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "example:requirement:publish-the-audit-plan",
+      "type": "requirement",
+      "title": "Publish the approved audit plan",
+      "description": "Publish the audit plan once the council approves it, and report against it during the year.",
+      "status": "draft",
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:local-government-audit-seeks-audits-on-plan",
+      "from": "example:mission:local-government-audit",
+      "predicate": "seeks",
+      "to": "example:outcome:audits-on-plan"
+    },
+    {
+      "id": "rel:local-government-audit-seeks-findings-resolved",
+      "from": "example:mission:local-government-audit",
+      "predicate": "seeks",
+      "to": "example:outcome:findings-resolved"
+    },
+    {
+      "id": "rel:risk-based-audit-planning-contributes-to-audits-on-plan",
+      "from": "example:capability:risk-based-audit-planning",
+      "predicate": "contributes_to",
+      "to": "example:outcome:audits-on-plan"
+    },
+    {
+      "id": "rel:risk-based-audit-planning-satisfies-publish-the-audit-plan",
+      "from": "example:capability:risk-based-audit-planning",
+      "predicate": "satisfies",
+      "to": "example:requirement:publish-the-audit-plan"
+    },
+    {
+      "id": "rel:risk-based-audit-planning-candidate-pattern-audit-management-system",
+      "from": "example:capability:risk-based-audit-planning",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:audit-management-system",
+      "coverage": "partial",
+      "description": "Holds the plan once it’s approved. Ranking risk takes data from the finance and budget systems too."
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-contributes-to-audits-on-plan",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "contributes_to",
+      "to": "example:outcome:audits-on-plan"
+    },
+    {
+      "id": "rel:audit-inspection-evaluation-contributes-to-findings-resolved",
+      "from": "eb:capability:audit-inspection-evaluation",
+      "predicate": "contributes_to",
+      "to": "example:outcome:findings-resolved"
+    },
+    {
+      "id": "rel:recommendations-corrective-action-monitoring-contributes-to-findings-resolved",
+      "from": "eb:capability:recommendations-corrective-action-monitoring",
+      "predicate": "contributes_to",
+      "to": "example:outcome:findings-resolved"
+    },
+    {
+      "id": "rel:records-management-contributes-to-findings-resolved",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "example:outcome:findings-resolved"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-audits-on-plan",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "example:outcome:audits-on-plan"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-findings-resolved",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "example:outcome:findings-resolved"
+    }
+  ]
+}

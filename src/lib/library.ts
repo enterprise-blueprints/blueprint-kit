@@ -392,17 +392,20 @@ export function relationNote(from: LibraryElement, predicate: string, to: Librar
 }
 
 export interface PatternDetails {
-  /** How it's sourced, in a few words: its one way's approach, such as "Configure a product", or how many ways it has. */
+  /** How it's sourced, in a few words: its one way's or solution's approach, such as "Configure a product", or how many there are. */
   sourcing?: string;
   /** The layer of the architecture it belongs to, such as "business-applications". */
   layer?: string;
   fields: { key: string; label: string; items: string[] }[];
-  /** Its ways to source it, each with what it needs. */
+  /** Its ways to source it, each with what it needs: since schema 0.7.0, the solutions that implement it. */
   ways: PatternWay[];
 }
 
 export interface PatternWay {
+  /** The way's ID, or the solution's key. */
   id: string;
+  /** The solution it is, since schema 0.7.0. Before then, a way is part of its pattern. */
+  solution?: LibraryElement;
   /** The approach's label, such as "Configure a product". */
   approach: string;
   title: string;
@@ -412,28 +415,53 @@ export interface PatternWay {
   needs: { pattern: LibraryElement; note?: string }[];
 }
 
-/** An implementation pattern's or solution's own fields, in vocabulary order. */
+/**
+ * An implementation pattern's or solution's own fields, in vocabulary order,
+ * and a pattern's ways to source it: since schema 0.7.0, the solutions that
+ * implement it, a publisher's own first; before then, the ways it lists.
+ */
 export function patternDetails(pattern: LibraryElement): PatternDetails {
   const a = pattern.attributes ?? {};
   const fieldsOf = (o: Record<string, unknown>) =>
     Object.entries(patternFields).flatMap(([key, f]) => (Array.isArray(o[key]) ? [{ key, label: f.label, items: o[key] as string[] }] : []));
-  const ways = Array.isArray(a.ways) ? (a.ways as Record<string, unknown>[]) : [];
   const approach = (value: unknown) => patternApproaches[String(value)] ?? String(value);
+  const listed = Array.isArray(a.ways) ? (a.ways as Record<string, unknown>[]) : [];
+  const solutions = pattern.type === 'implementationPattern' ? relationsOf(pattern, 'implements', 'incoming').map((r) => byId.get(r.from)!) : [];
+  solutions.sort((x, y) => Number(isOwn(y.package)) - Number(isOwn(x.package)));
+  const ways: PatternWay[] = listed.length
+    ? listed.map((w) => ({
+        id: String(w.id),
+        approach: approach(w.approach),
+        title: String(w.title),
+        description: typeof w.description === 'string' ? w.description : undefined,
+        fields: fieldsOf(w),
+        needs: relationsOf(pattern, 'depends_on', 'outgoing')
+          .filter((r) => r.way === w.id)
+          .map((r) => ({ pattern: byId.get(r.to)!, note: r.description })),
+      }))
+    : solutions.map((s) => ({
+        id: s.id.split(':').at(-1)!,
+        solution: s,
+        approach: approach(s.attributes?.approach),
+        title: s.title,
+        description: s.description,
+        fields: fieldsOf(s.attributes ?? {}),
+        needs: relationsOf(s, 'depends_on', 'outgoing').map((r) => ({ pattern: byId.get(r.to)!, note: r.description })),
+      }));
+  const sourcing =
+    pattern.type === 'solution'
+      ? approach(a.approach)
+      : ways.length === 1
+        ? ways[0].approach
+        : ways.length
+          ? `${ways.length} ${listed.length ? 'ways to source it' : 'solutions'}`
+          : undefined;
   return {
-    sourcing: ways.length === 1 ? approach(ways[0].approach) : ways.length ? `${ways.length} ways to source it` : undefined,
+    sourcing,
     // Called its role before schema 0.4.0.
     layer: [a.layer, a.role].find((l): l is string => typeof l === 'string' && Boolean(patternLayers[l])),
     fields: fieldsOf(a),
-    ways: ways.map((w) => ({
-      id: String(w.id),
-      approach: approach(w.approach),
-      title: String(w.title),
-      description: typeof w.description === 'string' ? w.description : undefined,
-      fields: fieldsOf(w),
-      needs: relationsOf(pattern, 'depends_on', 'outgoing')
-        .filter((r) => r.way === w.id)
-        .map((r) => ({ pattern: byId.get(r.to)!, note: r.description })),
-    })),
+    ways,
   };
 }
 
@@ -489,7 +517,8 @@ export interface IndexGroup {
 }
 
 /** The predicate that names each item's parent on an index page, such as the capability a requirement belongs to. */
-const parentLinks: Record<string, string> = { requirement: 'satisfies' };
+// On the index, a requirement says the capability it belongs to, and a solution the pattern it implements.
+const parentLinks: Record<string, [string, 'incoming' | 'outgoing']> = { requirement: ['satisfies', 'incoming'], solution: ['implements', 'outgoing'] };
 
 /** The group an outcome, capability, or requirement names, since schema 0.5.0, with the address of its place on the index page. */
 export function groupOf(e: LibraryElement): { id: string; label: string; hint: string; url: string } | undefined {
@@ -528,11 +557,12 @@ export function indexGroups(type: string): IndexGroup[] {
 
 /** Each item's parent within its own package, such as a requirement's capability, for the index pages. */
 export function indexParents(type: string): Map<string, LibraryElement> | undefined {
-  const predicate = parentLinks[type];
-  if (!predicate) return undefined;
+  const link = parentLinks[type];
+  if (!link) return undefined;
+  const [predicate, direction] = link;
   const parents = new Map<string, LibraryElement>();
   for (const e of elementsOfType(type)) {
-    const parent = related(e, predicate, 'incoming', [e.package])[0];
+    const parent = related(e, predicate, direction, [e.package])[0];
     if (parent) parents.set(e.id, parent);
   }
   return parents;

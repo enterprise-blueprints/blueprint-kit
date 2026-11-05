@@ -45,7 +45,9 @@ Work from the top down, since each step links to the one before it.
    choose it under **Capabilities that contribute**. That leaves the other package unchanged. A shared
    capability can need another one first, such as Identity & Access Management, and the form says which.
 4. **Add requirements and patterns** from each capability's page. Each requirement belongs to one capability
-   in its package. A pattern needs a layer and at least one way to source it.
+   in its package. A pattern needs a layer. Then add its **solutions**, the ways to source it, with **+ Add a
+   solution** on its page: each has an approach and the patterns it implements, and a product can have a
+   link.
 5. **Add sources.** Choose **Add a new source** under **Sources** on any form, without leaving it. An item can
    cite only its own package's sources.
 6. **Add discovery questions.** Choose **+ Add > Add a question set**, which starts with its first question.
@@ -59,8 +61,8 @@ Work from the top down, since each step links to the one before it.
 - **It's still YAML.** The editor writes to the files under `source/<package>/`, and keeps your comments and
   any fields the forms don't show. You can edit by hand or use Git whenever you like.
 - **IDs don't change.** A new item's form suggests an ID from its title. Shorten it before you add the item,
-  since it stays: it's in web addresses, and tools link to it. Measures and ways always take theirs from
-  their titles.
+  since it stays: it's in web addresses, and tools link to it. Measures always take theirs from their
+  titles.
 - **Deleting takes links along.** The form stops first if that would leave a resource with nothing to help
   with, or a requirement with no capability, and names it.
 - **Dependencies look after themselves.** A link to a new package adds it to `package.yaml`. Keep missions

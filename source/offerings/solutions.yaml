@@ -1,0 +1,22 @@
+# Solutions, in the order the pages show them: your products, and the ways you
+# build or run things, each with the library's patterns it implements.
+#
+# A solution names its approach (product, platform, shared, combine, or build),
+# and can have a link, who makes it if that isn't you, and what's particular to
+# it, in attributes: strengths, fitsWhen, and watchFor add to the pattern's, and
+# anything else, such as its editions, shows on its page.
+
+- id: example-case-manager
+  title: Example Case Manager
+  approach: product
+  url: https://example.com/products/case-manager
+  lastReviewedAt: 2026-10-30
+  description: A case management product for oversight offices, with intake forms, confidential reporter handling, case assignment, and referral tracking that come configured for an Inspector General’s work.
+  attributes:
+    editions: Standard, Government Cloud
+    strengths:
+      - Comes configured for an Inspector General’s intake, referrals, and confidential reporters
+  implements: [ oversight-intake-case-tracking ]
+  depends_on:
+    - to: agency-sign-on
+      note: Staff sign in through the agency’s identity provider.

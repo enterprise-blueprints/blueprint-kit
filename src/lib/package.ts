@@ -8,8 +8,10 @@
 // outcomes, capabilities, and requirements name a group that holds across
 // missions. Schema 0.6.0 adds resources and what they help with, and gives
 // each package a prefix for its element IDs, so packages from other
-// publishers can build on the library's. Packages stay valid under the
-// schema they were published with.
+// publishers can build on the library's. Schema 0.7.0 makes the ways to
+// source a pattern solutions that implement it, so organizations' products
+// are solutions too, and a link no longer names a way. Packages stay valid
+// under the schema they were published with.
 
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
@@ -19,6 +21,7 @@ import schema030 from '../../schemas/blueprint-package-0.3.0.schema.json' with {
 import schema040 from '../../schemas/blueprint-package-0.4.0.schema.json' with { type: 'json' };
 import schema050 from '../../schemas/blueprint-package-0.5.0.schema.json' with { type: 'json' };
 import schema060 from '../../schemas/blueprint-package-0.6.0.schema.json' with { type: 'json' };
+import schema070 from '../../schemas/blueprint-package-0.7.0.schema.json' with { type: 'json' };
 import { earlierLayers, elementTypes, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates } from './vocabulary.ts';
 
 export interface Source {
@@ -52,7 +55,7 @@ export interface Relation {
   to: string;
   /** For candidate_pattern, since schema 0.3.0: "partial" when the pattern covers only part of the capability. */
   coverage?: 'full' | 'partial';
-  /** Since schema 0.4.0. For depends_on, the way that needs the other pattern; since schema 0.6.0, for helps_with, the way of the pattern the resource helps with. */
+  /** From schema 0.4.0 to 0.6.0. For depends_on, the way that needs the other pattern; in 0.6.0, for helps_with, the way of the pattern the resource helps with. */
   way?: string;
   description?: string;
   sourceIds?: string[];
@@ -93,7 +96,7 @@ export interface Dependency {
 }
 
 export interface BlueprintPackage {
-  schemaVersion: '0.1.0' | '0.2.0' | '0.3.0' | '0.4.0' | '0.5.0' | '0.6.0';
+  schemaVersion: '0.1.0' | '0.2.0' | '0.3.0' | '0.4.0' | '0.5.0' | '0.6.0' | '0.7.0';
   packageId: string;
   /** Since schema 0.6.0: the first part of its element IDs. Before then, always "eb". */
   idPrefix?: string;
@@ -122,6 +125,7 @@ const schemas = {
   '0.4.0': ajv.compile<BlueprintPackage>(schema040),
   '0.5.0': ajv.compile<BlueprintPackage>(schema050),
   '0.6.0': ajv.compile<BlueprintPackage>(schema060),
+  '0.7.0': ajv.compile<BlueprintPackage>(schema070),
 };
 export const schemaVersions = Object.keys(schemas) as (keyof typeof schemas)[];
 
@@ -187,6 +191,10 @@ export function validatePackage(data: unknown, resolve: Resolve = () => undefine
     if (!e.id.startsWith(`${prefix}:`)) errors.push(`element ${e.id} doesn't start with the package's prefix "${prefix}"`);
     else if (!e.id.startsWith(`${prefix}:${e.type}:`)) errors.push(`element ${e.id} doesn't match its type "${e.type}"`);
     if (e.type === 'resource' && BEFORE_060.has(pkg.schemaVersion)) errors.push(`element ${e.id}: resources are new in schema 0.6.0`);
+    // Since schema 0.7.0, a solution sources one or more patterns.
+    if (e.type === 'solution' && !BEFORE_070.has(pkg.schemaVersion) && !pkg.relations.some((r) => r.from === e.id && r.predicate === 'implements')) {
+      errors.push(`solution ${e.id} doesn't implement a pattern`);
+    }
     for (const s of e.sourceIds ?? []) {
       if (!sourceIds.has(s)) errors.push(`element ${e.id} cites unknown source ${s}`);
     }
@@ -225,6 +233,8 @@ export function validatePackage(data: unknown, resolve: Resolve = () => undefine
     if (r.predicate === 'measured_by' && !BEFORE_040.has(pkg.schemaVersion)) errors.push(`relation ${r.id}: since schema 0.4.0, an outcome lists its measures instead`);
     if (r.from === r.to) errors.push(`relation ${r.id} links ${r.from} to itself`);
     if (r.predicate === 'helps_with' && BEFORE_060.has(pkg.schemaVersion)) errors.push(`relation ${r.id}: helps_with is new in schema 0.6.0`);
+    if (r.predicate === 'implements' && BEFORE_070.has(pkg.schemaVersion)) errors.push(`relation ${r.id}: implements is new in schema 0.7.0`);
+    if (from?.type === 'solution' && r.predicate === 'depends_on' && BEFORE_070.has(pkg.schemaVersion)) errors.push(`relation ${r.id}: a solution's needs are new in schema 0.7.0`);
     if (r.way !== undefined) {
       // The way names one of a pattern's ways: the one that has the need, or the one the resource helps with.
       const pattern = r.predicate === 'depends_on' ? from : r.predicate === 'helps_with' ? to : undefined;
@@ -251,17 +261,23 @@ const waysOf = (e: Element) => (Array.isArray(e.attributes?.ways) ? (e.attribute
 export const measureId = (outcome: Pick<Element, 'id'>, id: string) => `${outcome.id.split(':')[0]}:measure:${id}`;
 /** Schema versions before 0.6.0, which have no resources or ID prefixes of their own. */
 const BEFORE_060 = new Set(['0.1.0', '0.2.0', '0.3.0', '0.4.0', '0.5.0']);
+/** Schema versions before 0.7.0, whose patterns list their ways instead of having solutions. */
+const BEFORE_070 = new Set([...BEFORE_060, '0.6.0']);
 /** Schema versions before 0.4.0, which have example solutions, and measures as elements of their own. */
 const BEFORE_040 = new Set(['0.1.0', '0.2.0', '0.3.0']);
 /**
  * Since schema 0.4.0, a mission's own patterns are its architecture, so a
- * package has no solutions. The patterns a mission's capabilities point to
- * include whatever they need, whichever way they're sourced.
+ * package has no solutions of several patterns; since schema 0.7.0, a
+ * solution implements patterns instead. The patterns a mission's
+ * capabilities point to include whatever they need, however they're sourced:
+ * a need of one way or solution only is that one's.
  */
 function missionProblems(pkg: BlueprintPackage, relations: Relation[]): string[] {
   if (BEFORE_040.has(pkg.schemaVersion)) return [];
   const errors: string[] = [];
-  for (const e of pkg.elements) if (e.type === 'solution') errors.push(`element ${e.id}: since schema 0.4.0, a mission's patterns are its architecture, so there are no solutions`);
+  if (BEFORE_070.has(pkg.schemaVersion)) {
+    for (const e of pkg.elements) if (e.type === 'solution') errors.push(`element ${e.id}: from schema 0.4.0 to 0.6.0, a mission's patterns are its architecture, so there are no solutions`);
+  }
   for (const r of pkg.relations) {
     if (r.predicate === 'includes' || r.predicate === 'supports') errors.push(`relation ${r.id}: since schema 0.4.0, there are no solutions to link`);
   }

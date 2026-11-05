@@ -31,6 +31,13 @@ import {
 } from '../lib/library';
 import { groupings, patternFields, patternLayers, predicates, resourceFields, statuses } from '../lib/vocabulary';
 import { attributeLabel, attributeValue, formatDate } from '../lib/format';
+
+/** Where to read about an element, who made it, and when that was checked. */
+const resourceFieldsOf = (e: LibraryElement) => {
+  const a = e.attributes ?? {};
+  const text = (v: unknown) => (typeof v === 'string' && v ? v : undefined);
+  return { url: String(a.url), by: text(a.by), lastReviewedAt: text(a.lastReviewedAt) };
+};
 import { href } from '../lib/paths';
 
 interface Props {
@@ -46,12 +53,18 @@ const sources = sourcesOf(element);
 const reviewed = lastReviewed(sources);
 const scope = element.jurisdictions ?? pkg.jurisdictions ?? [];
 const isPattern = element.type === 'implementationPattern';
-// A pattern describes itself with fields of its own, which get sections.
+// A pattern, and a solution that implements one, describe themselves with fields of their own, which get sections.
 const pattern = isPattern ? patternDetails(element) : null;
+const solution = element.type === 'solution' ? patternDetails(element) : null;
 const ownFields = ['approach', 'layer', 'role', 'ways', ...Object.keys(patternFields)];
+const fields = (pattern ?? solution)?.fields ?? [];
+// A pattern's solutions, since schema 0.7.0, each with a page of its own; before then, its ways.
+const solutions = pattern?.ways.some((w) => w.solution);
+// A solution from an organization, such as a product, can say where to read about it.
+const link = solution && typeof element.attributes?.url === 'string' ? resourceFieldsOf(element) : null;
 // A mission's tagline and principles, an outcome's measures, and the group an item names have places of their own.
 const placed = ['tagline', 'principles', 'measures', ...resourceFields, ...Object.values(groupings).map((g) => g.field)];
-const attributes = Object.entries(element.attributes ?? {}).filter(([key]) => (!pattern || !ownFields.includes(key)) && !placed.includes(key));
+const attributes = Object.entries(element.attributes ?? {}).filter(([key]) => (!(pattern || solution) || !ownFields.includes(key)) && !placed.includes(key));
 // An outcome's theme, a capability's stage, or a requirement's kind, linking to its group on the index page.
 const group = groupOf(element);
 const line = tagline(element);
@@ -68,7 +81,7 @@ const resources = resourcesFor(element);
 const canHaveResources = predicates.helps_with.to.includes(element.type);
 const replacement = element.replacedBy ? elements.find((e) => e.id === element.replacedBy) : undefined;
 // The stack already shows the mission's outcomes and capabilities, and a capability compares its patterns.
-const covered = [predicates.helps_with.incoming, ...(stacked ? [predicates.seeks.outgoing, predicates.supports_mission.incoming] : [])];
+const covered = [predicates.helps_with.incoming, ...(solutions ? [predicates.implements.incoming] : []), ...(stacked ? [predicates.seeks.outgoing, predicates.supports_mission.incoming] : [])];
 const patternGroup = groups.find((g) => g.heading === predicates.candidate_pattern.outgoing);
 const perLink = [predicates.candidate_pattern.incoming, predicates.depends_on.outgoing, predicates.depends_on.incoming, predicates.works_with.outgoing];
 const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes(g.heading));
@@ -107,6 +120,12 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           <span class="muted">By {resource.by ?? pkg.publisher.name}{resource.lastReviewedAt && <> · Checked {formatDate(resource.lastReviewedAt)}</>}</span>
         </p>
       )}
+      {link && (
+        <p class="record-resource">
+          <a class="button button--primary" href={link.url} target="_blank" rel="noopener">Read about it<span class="sr-only"> (opens in a new tab)</span></a>
+          <span class="muted">By {link.by ?? pkg.publisher.name}{link.lastReviewedAt && <> · Checked {formatDate(link.lastReviewedAt)}</>}</span>
+        </p>
+      )}
     </header>
 
     {stacked && <MissionExplorer blueprint={blueprint!} />}
@@ -115,7 +134,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
       <div class="record-main">
         {replacement && (
           <div class="notice">
-            <p>This pattern has been replaced by <a href={replacement.url}>{replacement.title}</a>, which describes it as one of its ways.</p>
+            <p>This pattern has been replaced by <a href={replacement.url}>{replacement.title}</a>, which has it among its ways to source it.</p>
           </div>
         )}
 
@@ -160,9 +179,9 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           </div>
         )}
 
-        {pattern && pattern.fields.length > 0 && (
+        {fields.length > 0 && (
           <div class="pattern-fields">
-            {pattern.fields.map((f) => (
+            {fields.map((f) => (
               <section class={`pattern-field pattern-field--${f.key}`}>
                 <h2>{f.label}</h2>
                 <ul>{f.items.map((s) => <li>{s}</li>)}</ul>
@@ -171,15 +190,19 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           </div>
         )}
 
-        {pattern && pattern.ways.length > 1 && (
+        {pattern && (solutions || pattern.ways.length > 1) && (
           <section class="section">
-            <h2>Ways to source it</h2>
-            <p class="section-note">Any of these can supply the parts above. Each has its own tradeoffs, and some need another pattern.</p>
+            <h2>{solutions ? 'Solutions' : 'Ways to source it'}</h2>
+            <p class="section-note">
+              {solutions
+                ? 'Example solutions that implement this pattern. Any of these can supply the parts above. Each has its own tradeoffs, and some need another pattern.'
+                : 'Any of these can supply the parts above. Each has its own tradeoffs, and some need another pattern.'}
+            </p>
             <div class="ways">
               {pattern.ways.map((w) => (
-                <article class="way" id={`way-${w.id}`}>
+                <article class="way" id={`way-${w.id}`} data-element={w.solution?.id}>
                   <p class="way__approach">{w.approach}</p>
-                  <h3>{w.title}</h3>
+                  <h3>{w.solution ? <a href={w.solution.url}>{w.title}<LibraryMark element={w.solution} within={pkg} /></a> : w.title}</h3>
                   {w.description && <p>{w.description}</p>}
                   {w.fields.map((f) => (
                     <div class="way__field">

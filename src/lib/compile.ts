@@ -14,7 +14,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import { compareVersions } from './format.ts';
-import { elementTypes, groupings, libraryPrefix, predicates, resourceFields } from './vocabulary.ts';
+import { elementTypes, groupings, libraryPrefix, linkedTypes, predicates, resourceFields } from './vocabulary.ts';
 import type { Assessment, BlueprintPackage, Element, Question, Relation, Source } from './package.ts';
 
 type Raw = Record<string, unknown>;
@@ -38,6 +38,8 @@ const PACKAGE_KEYS = ['schemaVersion', 'packageId', 'idPrefix', 'title', 'descri
 const ELEMENT_KEYS = ['id', 'title', 'description', 'status', 'replacedBy', 'sources', 'tags', 'jurisdictions', 'applicabilityNotes', 'attributes', 'measures', ...resourceFields, ...new Set(Object.values(groupings).map((g) => g.field))];
 const MEASURE_KEYS = ['id', 'title', 'description', 'sources'];
 const LINK_KEYS = ['to', 'note', 'sources', 'id', 'coverage', 'way'];
+/** Schema versions whose links can name one of a pattern's ways; since 0.7.0, a solution is linked instead. */
+const WAYS = ['0.4.0', '0.5.0', '0.6.0'];
 
 // Written out in full, since Node runs this file without compiling it.
 export class SourceError extends Error {
@@ -200,10 +202,10 @@ export function compilePackage(src: PackageSource, deps: Record<string, Resolved
       } else if (!g.groups[raw[field] as string]) problems.push(`${where}: unknown ${field} "${raw[field]}", which should be one of ${Object.keys(g.groups).join(', ')}`);
       e.attributes = { ...e.attributes, [field]: raw[field] };
     }
-    // A resource's link, who made it, and when it was checked, likewise.
+    // A resource's or a solution's link, who made it, and when it was checked, likewise.
     for (const field of resourceFields) {
       if (raw[field] === undefined) continue;
-      if (type !== 'resource') problems.push(`${where}: only a resource has a ${field}`);
+      if (!linkedTypes.includes(type)) problems.push(`${where}: only a resource or a solution has a ${field}`);
       e.attributes = { ...e.attributes, [field]: String(raw[field]) };
     }
     return e;
@@ -232,7 +234,10 @@ export function compilePackage(src: PackageSource, deps: Record<string, Resolved
           to,
         };
         if (link.coverage !== undefined) r.coverage = link.coverage as Relation['coverage'];
-        if (link.way !== undefined) r.way = String(link.way);
+        if (link.way !== undefined) {
+          if (WAYS.includes(String(m.schemaVersion))) r.way = String(link.way);
+          else problems.push(`${where}: since schema 0.7.0, a link names a solution, such as solution:<pattern>-${link.way}, instead of a way`);
+        }
         if (link.note) r.description = link.note as string;
         if (link.sources) r.sourceIds = strings(link.sources).map((s) => `src:${s}`);
         relations.push(r);

@@ -1,9 +1,11 @@
 # Resources, in the order the pages show them, each with what it helps with.
 #
 # A reference without a prefix, such as capability:records-management, means
-# your own element when you have one, and otherwise the library's. A link to a
-# pattern can name one of its ways, for something about sourcing it that way.
-# Anything else you want to say goes in attributes, and shows on its page.
+# your own element when you have one, and otherwise the library's. Something
+# about one way of sourcing a pattern helps with that solution, such as
+# solution:shared-case-platform-platform. A product of yours is a solution, in
+# solutions.yaml. Anything else you want to say goes in attributes, and shows
+# on its page.
 
 - id: oversight-intake-assessment
   title: Oversight intake assessment
@@ -25,21 +27,8 @@
   lastReviewedAt: 2026-10-30
   description: A 15-minute recorded walkthrough of a hotline complaint taken in, screened, protected, and referred for investigation, built on an agency’s existing case management platform.
   helps_with:
-    - to: implementationPattern:shared-case-platform
-      way: platform
+    - solution:shared-case-platform-platform
     - capability:complaint-allegation-disclosure-intake
-
-- id: example-case-manager
-  title: Example Case Manager
-  kind: product
-  url: https://example.com/products/case-manager
-  lastReviewedAt: 2026-10-30
-  description: A case management product for oversight offices, with intake forms, confidential reporter handling, case assignment, and referral tracking that come configured for an Inspector General’s work.
-  attributes:
-    editions: Standard, Government Cloud
-  helps_with:
-    - to: implementationPattern:oversight-intake-case-tracking
-      way: product
 
 - id: grant-risk-review-scorecard
   title: Grant risk review scorecard
@@ -59,5 +48,4 @@
     format: Virtual or on site
   helps_with:
     - capability:records-management
-    - to: implementationPattern:records-in-business-systems
-      way: built-in
+    - solution:records-in-business-systems-built-in

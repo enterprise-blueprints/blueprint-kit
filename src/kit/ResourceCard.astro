@@ -1,7 +1,8 @@
 ---
-// One of your resources, as a card for the home page: what it is, who it's by,
-// and the missions, capabilities, and patterns it helps with.
-import { helpsWith, resourceDetails, type LibraryElement } from '../lib/library';
+// One of your resources or solutions, as a card for the home page: what it
+// is, who it's by, and the missions, capabilities, and patterns it helps with,
+// or the patterns a solution implements.
+import { groupOf, helpsWith, related, resourceDetails, type LibraryElement } from '../lib/library';
 import { formatDate } from '../lib/format';
 import LibraryMark from '../components/LibraryMark.astro';
 
@@ -10,16 +11,25 @@ interface Props {
 }
 
 const { resource } = Astro.props;
-const details = resourceDetails(resource);
-const helps = helpsWith(resource);
+const solution = resource.type === 'solution';
+const a = resource.attributes ?? {};
+const text = (v: unknown) => (typeof v === 'string' && v ? v : undefined);
+// A solution's link is its own, if it has one, and its page otherwise.
+const details = solution
+  ? { kind: `Solution · ${groupOf(resource)?.label ?? ''}`, url: text(a.url) ?? resource.url, by: text(a.by), lastReviewedAt: text(a.lastReviewedAt) }
+  : resourceDetails(resource);
+const helps = solution ? related(resource, 'implements', 'outgoing').map((element) => ({ element, way: undefined })) : helpsWith(resource);
+const away = !solution || Boolean(text(a.url));
 ---
-<li class="offer type-resource" data-resource-id={resource.id}>
+<li class={`offer type-${resource.type}`} data-resource-id={solution ? undefined : resource.id} data-element={solution ? resource.id : undefined}>
   <p class="offer__kind">{details.kind}</p>
-  <a class="offer__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
+  {away
+    ? <a class="offer__title" href={details.url} target="_blank" rel="noopener">{resource.title}<span class="sr-only"> (opens in a new tab)</span></a>
+    : <a class="offer__title" href={details.url}>{resource.title}</a>}
   <p class="offer__by">{details.by ?? resource.package.publisher.name}</p>
   <p class="offer__about">{resource.description}</p>
   {helps.length > 0 && (
-    <div class="element-links offer__helps" aria-label="Helps with">
+    <div class="element-links offer__helps" aria-label={solution ? 'Implements' : 'Helps with'}>
       {helps.map(({ element, way }) => (
         <a class={`element-link type-${element.type}`} href={way ? `${element.url}#way-${way.id}` : element.url}>
           <span>{element.title}<LibraryMark element={element} /></span>{way && <span class="offer__way">{way.title}</span>}

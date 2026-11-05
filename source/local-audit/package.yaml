@@ -1,6 +1,6 @@
 # The package itself. Its version and date are set when it is built (pnpm content:build).
 
-schemaVersion: 0.6.0
+schemaVersion: 0.7.0
 packageId: com.example.local-audit
 idPrefix: example
 title: Local Government Audit — A Sample Mission

@@ -64,13 +64,16 @@ export const elementTypes: Record<string, ElementTypeInfo> = {
     section: 'resources',
     definition: 'Something that helps you learn about an item or act on it, such as a video, a course, or a guide.',
   },
-  // Packages before schema 0.4.0 only. Since then, a mission's own patterns are its architecture.
+  // Since schema 0.7.0, what implements a pattern: a product, a platform the
+  // agency has, a shared service, or something built. Before schema 0.4.0, an
+  // example of several patterns together, which a mission's own patterns
+  // replaced; its `includes` reads as `implements`.
   solution: {
     label: 'Solution',
     plural: 'Solutions',
     navLabel: 'Solutions',
     section: 'solutions',
-    definition: 'An example of how several patterns could fit together to support an agency’s missions.',
+    definition: 'An example of how a pattern could be sourced: a product, a platform the agency has, a shared service, or something built.',
   },
 };
 
@@ -122,6 +125,13 @@ export const predicates: Record<string, PredicateInfo> = {
     outgoing: 'Candidate implementation patterns',
     incoming: 'Capabilities it might help realize',
   },
+  // Since schema 0.7.0: the patterns a solution sources. One platform can implement several.
+  implements: {
+    from: ['solution'],
+    to: ['implementationPattern'],
+    outgoing: 'Implements',
+    incoming: 'Solutions',
+  },
   includes: {
     from: ['solution'],
     to: ['implementationPattern'],
@@ -135,9 +145,10 @@ export const predicates: Record<string, PredicateInfo> = {
     incoming: 'Example solutions',
   },
   // How patterns fit together, since schema 0.3.0: one can't work without
-  // the other, or the two are often used together.
+  // the other, or the two are often used together. Since schema 0.7.0, a
+  // solution can need a pattern too, a need of that solution only.
   depends_on: {
-    from: ['implementationPattern'],
+    from: ['implementationPattern', 'solution'],
     to: ['implementationPattern'],
     outgoing: 'Needs',
     incoming: 'Needed by',
@@ -148,11 +159,12 @@ export const predicates: Record<string, PredicateInfo> = {
     outgoing: 'Works well with',
     incoming: 'Works well with',
   },
-  // Since schema 0.6.0: what a resource helps with. A link to a pattern can
-  // name one of its ways, for a resource about sourcing it that way.
+  // Since schema 0.6.0: what a resource helps with. Before schema 0.7.0, a
+  // link to a pattern can name one of its ways; since then, a resource about
+  // one way of sourcing a pattern helps with that solution.
   helps_with: {
     from: ['resource'],
-    to: ['mission', 'outcome', 'capability', 'requirement', 'implementationPattern'],
+    to: ['mission', 'outcome', 'capability', 'requirement', 'implementationPattern', 'solution'],
     outgoing: 'Helps with',
     incoming: 'Resources',
   },
@@ -279,6 +291,7 @@ export const resourceKinds: Grouping = {
     template: { label: 'Template', hint: 'Templates, samples, and checklists to start from.' },
     demo: { label: 'Demo', hint: 'A working example to see or try.' },
     service: { label: 'Service', hint: 'Help an organization offers, such as an assessment or an implementation.' },
+    // Before schema 0.7.0. Since then, a product is a solution.
     product: { label: 'Product', hint: 'A product, or a feature of one, that fits.' },
     'case-study': { label: 'Case study', hint: 'How an agency did it, and what it learned.' },
   },
@@ -287,16 +300,38 @@ export const resourceKinds: Grouping = {
 /** Kinds the library's own resources don't use. */
 export const soldKinds = ['service', 'product'];
 
+/** Resource kinds packages no longer use: since schema 0.7.0, a product is a solution. */
+export const retiredKinds = ['product'];
+
+// Since schema 0.7.0, each solution names its approach, how it sources its
+// patterns, so the index can group them and a pattern's solutions can be
+// compared. The library's own are examples; organizations publish products.
+export const solutionApproaches: Grouping = {
+  field: 'approach',
+  label: 'Approach',
+  groups: {
+    product: { label: 'Configure a product', hint: 'A product, configured for the agency.' },
+    platform: { label: 'Extend a platform the agency has', hint: 'A platform the agency already runs, such as its low-code platform or its office suite.' },
+    shared: { label: 'Use a shared service', hint: 'A service another agency runs for others, such as Login.gov or a payroll provider.' },
+    combine: { label: 'Combine tools', hint: 'Tools put together, each doing part of the work.' },
+    build: { label: 'Build to fit', hint: 'Something the agency builds, or has built, to fit.' },
+  },
+};
+
 /** The grouping each type uses, by element type. */
 export const groupings: Record<string, Grouping> = {
   outcome: outcomeThemes,
   capability: capabilityStages,
   requirement: requirementKinds,
   resource: resourceKinds,
+  solution: solutionApproaches,
 };
 
-/** What a resource holds besides its kind, written on it and published in its attributes. */
+/** What a resource holds besides its kind, written on it and published in its attributes. A solution can have them too. */
 export const resourceFields = ['url', 'by', 'lastReviewedAt'];
+
+/** The types that can say where to find them, who made them, and when that was checked. */
+export const linkedTypes = ['resource', 'solution'];
 
 /** The ID prefix of packages that don't name one, before schema 0.6.0: the library's own. */
 export const libraryPrefix = 'eb';
@@ -304,6 +339,7 @@ export const libraryPrefix = 'eb';
 export const patternApproaches: Record<string, string> = {
   product: 'Configure a product',
   platform: 'Extend a platform the agency has',
+  shared: 'Use a shared service',
   combine: 'Combine tools',
   build: 'Build to fit',
 };

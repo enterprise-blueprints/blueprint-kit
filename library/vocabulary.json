@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.6.0",
+  "schemaVersion": "0.7.0",
   "types": {
     "mission": {
       "label": "Mission",
@@ -46,7 +46,7 @@
     "solution": {
       "label": "Solution",
       "plural": "Solutions",
-      "definition": "An example of how several patterns could fit together to support an agency’s missions.",
+      "definition": "An example of how a pattern could be sourced: a product, a platform the agency has, a shared service, or something built.",
       "page": "solutions/{key}/"
     }
   },
@@ -111,6 +111,16 @@
       "outgoing": "Candidate implementation patterns",
       "incoming": "Capabilities it might help realize"
     },
+    "implements": {
+      "from": [
+        "solution"
+      ],
+      "to": [
+        "implementationPattern"
+      ],
+      "outgoing": "Implements",
+      "incoming": "Solutions"
+    },
     "includes": {
       "from": [
         "solution"
@@ -133,7 +143,8 @@
     },
     "depends_on": {
       "from": [
-        "implementationPattern"
+        "implementationPattern",
+        "solution"
       ],
       "to": [
         "implementationPattern"
@@ -160,7 +171,8 @@
         "outcome",
         "capability",
         "requirement",
-        "implementationPattern"
+        "implementationPattern",
+        "solution"
       ],
       "outgoing": "Helps with",
       "incoming": "Resources"
@@ -210,6 +222,7 @@
     "approaches": {
       "product": "Configure a product",
       "platform": "Extend a platform the agency has",
+      "shared": "Use a shared service",
       "combine": "Combine tools",
       "build": "Build to fit"
     },

@@ -1,0 +1,3548 @@
+{
+  "schemaVersion": "0.7.0",
+  "packageId": "org.enterprise-blueprints.federal-hr-administration",
+  "idPrefix": "eb",
+  "version": "0.16.0",
+  "title": "HR Administration — Hiring, Paying, and Supporting the Federal Civilian Workforce",
+  "description": "U.S. federal civilian human resources blueprint: one mission with the outcomes it seeks and ways to measure them, eleven capabilities from position management and onboarding through separation and workforce reporting, with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for HR results and for HR operations. It follows Title 5 of the U.S. Code and OPM’s rules, including the 2025 Merit Hiring Plan and the move to one government-wide core HR system, and builds on Common Capabilities for case management, records, identity and access, and data protection.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-11-05",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal executive agencies with civilian employees under Title 5"
+  ],
+  "tags": [
+    "human-resources",
+    "human-capital",
+    "hiring",
+    "personnel-actions",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.16.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:federal-hr-2-0",
+      "title": "OMB and OPM — Creating “Federal HR 2.0” by Consolidating Core Human Capital Management Across the Federal Government (December 10, 2025)",
+      "url": "https://www.opm.gov/chcoc/latest-memos/creating-federal-hr-20-by-consolidating-core-human-capital-management-across-the-federal-government.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-12-10",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Moves executive agencies onto one commercial core human capital management system, covering personnel action processing, the employee system of record, position management, self-service, analytics, time and attendance, and learning, connected to payroll, benefits, hiring, performance, and retirement systems. Agencies move in two waves from fiscal year 2026, with government-wide adoption the goal by fiscal year 2028, and pause their own core HR purchases and projects unless the OMB and OPM Directors grant an exception. The system will make eOPF and EHRI redundant. Military personnel and intelligence agencies aren’t included at first."
+    },
+    {
+      "id": "src:merit-hiring-plan",
+      "title": "White House Domestic Policy Council and OPM — Merit Hiring Plan (May 29, 2025)",
+      "url": "https://www.opm.gov/chcoc/latest-memos/merit-hiring-plan.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-05-29",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Carries out Executive Order 14170. Every competitive hiring process includes at least one technical or alternative assessment before the certificate, self-assessments are no longer used for ranking, and agencies use USAJOBS, USA Staffing, talent pools, and shared certificates. Sets the goal of time to initial offer under 80 days, and cites vetting goals of 21 days for low-risk positions, 25 days for non-sensitive moderate-risk positions, and 45 days for top secret, and 3 days when reciprocity applies."
+    },
+    {
+      "id": "src:rule-of-many",
+      "title": "OPM — Reinvigorating Merit-Based Hiring Through Candidate Ranking in the Competitive and Excepted Service (Rule of Many), final rule (September 8, 2025)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-09-08/pdf/2025-17125.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-09-08",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Lets agencies rank candidates by numerical score, with veterans’ preference points, and certify a set number of the highest-ranked to the hiring manager, using cut scores set by the assessment, business necessity, or a number or share of applicants. Effective November 7, 2025, with full compliance by March 9, 2026."
+    },
+    {
+      "id": "src:eo-14356-guidance",
+      "title": "OMB and OPM — Guidance on Executive Order 14356, Ensuring Continued Accountability in Federal Hiring (November 5, 2025)",
+      "url": "https://www.opm.gov/chcoc/latest-memos/guidance-on-executive-order-14356-ensuring-continued-accountability-in-federal-hiring.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-11-05",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each agency’s Strategic Hiring Committee approves the creation or filling of each vacancy, consistent with the Merit Hiring Plan and an Annual Staffing Plan the agency prepares with OMB and OPM, and gives OPM prompt written notice of approved hires."
+    },
+    {
+      "id": "src:classification-5-usc-5107",
+      "title": "5 U.S.C. § 5107 — Classification of positions",
+      "url": "https://www.govinfo.gov/link/uscode/5/5107?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each agency places each position under its jurisdiction in its appropriate class and grade in conformance with standards OPM publishes, and those actions are the basis for pay and personnel transactions."
+    },
+    {
+      "id": "src:vacancies-5-usc-3327",
+      "title": "5 U.S.C. § 3327 — Civil service employment information",
+      "url": "https://www.govinfo.gov/link/uscode/5/3327?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each agency promptly notifies OPM of each competitive service vacancy for which it seeks applications from people outside the federal service, and when applications will be accepted."
+    },
+    {
+      "id": "src:veterans-preference-5-usc-3309",
+      "title": "5 U.S.C. § 3309 — Preference eligibles; examinations; additional points for",
+      "url": "https://www.govinfo.gov/link/uscode/5/3309?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "A preference eligible who passes a competitive service examination receives 10 or 5 additional points above the earned rating, depending on the kind of preference."
+    },
+    {
+      "id": "src:suitability-5-cfr-731",
+      "title": "5 CFR § 731.106 — Designation of public trust positions and investigative requirements",
+      "url": "https://www.law.cornell.edu/cfr/text/5/731.106",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The agency head designates each covered position at high, moderate, or low risk, which sets the investigation it needs, and people in public trust positions are subject to continuous vetting."
+    },
+    {
+      "id": "src:form-i9-8-cfr-274a-2",
+      "title": "8 CFR § 274a.2 — Verification of identity and employment authorization",
+      "url": "https://www.law.cornell.edu/cfr/text/8/274a.2",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The employee completes Section 1 of Form I-9 at the time of hire, and the employer examines the documents and completes Section 2 within three business days of the hire."
+    },
+    {
+      "id": "src:security-awareness-5-cfr-930-301",
+      "title": "5 CFR § 930.301 — Information systems security awareness training program",
+      "url": "https://www.law.cornell.edu/cfr/text/5/930.301",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Agencies provide information security awareness material to all new employees before allowing them access to the systems, and all users of federal information systems see awareness material at least annually."
+    },
+    {
+      "id": "src:ethics-training-5-cfr-2638-304",
+      "title": "5 CFR § 2638.304 — Initial ethics training",
+      "url": "https://www.law.cornell.edu/cfr/text/5/2638.304",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each new employee subject to the Standards of Conduct completes initial ethics training within 3 months of appointment, covering financial conflicts of interest, impartiality, misuse of position, and gifts."
+    },
+    {
+      "id": "src:no-fear-training-5-cfr-724-203",
+      "title": "5 CFR § 724.203 — Training (No FEAR Act)",
+      "url": "https://www.law.cornell.edu/cfr/text/5/724.203",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Agencies train all employees on their rights and remedies under the antidiscrimination and whistleblower protection laws at least every 2 years, and, unless new employee orientation covers it, train new employees within 90 calendar days of appointment."
+    },
+    {
+      "id": "src:dod-onboarding-portal",
+      "title": "Defense Civilian Personnel Advisory Service — DoD Onboarding Resource Portal (April 2, 2024)",
+      "url": "https://www.dcpas.osd.mil/sites/default/files/DoD%20Onboarding%20Resource%20Portal.pdf",
+      "kind": "background",
+      "publicationDate": "2024-04-02",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Guides, tip sheets, checklists, and templates for onboarding new, transferred, and promoted civilian employees, with the roles of supervisors, sponsors, and mentors, aimed at helping employees become productive quickly and stay."
+    },
+    {
+      "id": "src:gppa",
+      "title": "OPM — Guide to Processing Personnel Actions",
+      "url": "https://www.opm.gov/policy-data-oversight/data-analysis-documentation/personnel-documentation/processing-personnel-actions/guide_to_processing_personnel_actions.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "OPM’s instructions for personnel actions, revised continually (Update 112 took effect October 7, 2026). Most actions are approved by an appointing officer on or before their effective dates, and none takes effect before approval except as the guide allows. Agencies notify employees of every action, with an SF-50 for appointments, conversions, and separations, and report each action to EHRI accurately and on time."
+    },
+    {
+      "id": "src:workforce-information-5-cfr-9",
+      "title": "5 CFR § 9.2 — Reporting workforce information",
+      "url": "https://www.law.cornell.edu/cfr/text/5/9.2",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The OPM Director may require executive agencies to report workforce information, sets the standards for it, and agencies make their submissions meet those standards consistent with the Privacy Act."
+    },
+    {
+      "id": "src:ehri",
+      "title": "OPM — Enterprise Human Resources Integration (EHRI)",
+      "url": "https://www.opm.gov/policy-data-oversight/data-analysis-documentation/enterprise-human-resources-integration/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "OPM’s government-wide HR data warehouse for about 2 million executive branch employees. Agencies send HR, payroll, and training data through standard interfaces, collected every two weeks, and retirement data to its standard. EHRI also hosts the electronic Official Personnel Folder."
+    },
+    {
+      "id": "src:federal-workforce-data",
+      "title": "OPM — Federal Workforce Data",
+      "url": "https://data.opm.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "OPM’s public site of federal civilian workforce data, updated monthly, covering employment, hiring, separations, pay, location, and demographics. It replaced FedScope in January 2026."
+    },
+    {
+      "id": "src:pay-debts-5-usc-5514",
+      "title": "5 U.S.C. § 5514 — Installment deduction for indebtedness to the United States",
+      "url": "https://www.govinfo.gov/link/uscode/5/5514?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Before collecting a debt from an employee’s pay, the agency gives at least 30 days’ written notice, a chance to inspect the records, to agree a repayment schedule, and to request a hearing. Deductions may not exceed 15 percent of disposable pay without the employee’s written consent."
+    },
+    {
+      "id": "src:fehb-5-cfr-890-301",
+      "title": "5 CFR § 890.301 — Opportunities for employees to enroll or change enrollment (Federal Employees Health Benefits)",
+      "url": "https://www.law.cornell.edu/cfr/text/5/890.301",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "An employee who becomes eligible may elect to enroll or not to enroll within 60 days after becoming eligible."
+    },
+    {
+      "id": "src:online-retirement-application",
+      "title": "OPM — Online Retirement Application (ORA)",
+      "url": "https://www.opm.gov/retirement-center/apply/online-retirement-application/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "OPM’s fully digital system that replaces the paper retirement process. The employee’s HR office starts the application, which is prefilled from EHRI and eOPF data, and the applicant, HR, and payroll share one view of its status."
+    },
+    {
+      "id": "src:appraisal-5-usc-4302",
+      "title": "5 U.S.C. § 4302 — Establishment of performance appraisal systems",
+      "url": "https://www.govinfo.gov/link/uscode/5/4302?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each performance appraisal system communicates performance standards and critical elements to each employee at the beginning of each appraisal period, evaluates employees against them, assists employees in improving unacceptable performance, and reassigns, reduces in grade, or removes those who continue to perform unacceptably only after an opportunity to demonstrate acceptable performance."
+    },
+    {
+      "id": "src:appraisal-5-cfr-430",
+      "title": "5 CFR Part 430, Subpart B — Performance Appraisal for General Schedule, Prevailing Rate, and Certain Other Employees",
+      "url": "https://www.law.cornell.edu/cfr/text/5/part-430/subpart-B",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Performance plans are provided at the beginning of each appraisal period, normally within 30 days, and the appraisal period is generally 12 months (§ 430.206). Programs use one of OPM’s rating patterns, and OPM may set a standardized distribution of rating levels (§ 430.208). Amended by a final rule effective August 6, 2026, with compliance with the new rating patterns and distribution by January 1, 2027."
+    },
+    {
+      "id": "src:rating-distribution-fy2026",
+      "title": "OPM — FY 2026 Standardized Distribution of Rating Levels and FY 2026 Performance Awards Guidance for Federal Employees (September 21, 2026)",
+      "url": "https://www.opm.gov/chcoc/latest-memos/fy-2026-standardized-distribution-of-rating-levels-and-fy-2026-performance-awards-guidance-for-federal-employees.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2026-09-21",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Caps Level 4 and Level 5 ratings at 40 percent of each covered population, career SES, Senior Professional, and General Schedule employees, for appraisal periods ending September 30, 2026, as a ceiling, not a target. At least 60 percent of each bonus pool should go to Level 4 and Level 5 performers."
+    },
+    {
+      "id": "src:probation-5-cfr-11-5",
+      "title": "5 CFR § 11.5 — Civil Service Rule XI, finalizing probationary appointments",
+      "url": "https://www.law.cornell.edu/cfr/text/5/11.5",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Added by Executive Order 14284 of April 24, 2025, and amended August 3, 2026. Within the last 30 days of a probationary or trial period, the agency head or a designated official certifies in writing whether the employee’s continued employment will advance the public interest; without certification, the employee’s service ends with the period."
+    },
+    {
+      "id": "src:adverse-actions-5-usc-7513",
+      "title": "5 U.S.C. § 7513 — Cause and procedure (adverse actions)",
+      "url": "https://www.govinfo.gov/link/uscode/5/7513?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "An employee against whom an adverse action is proposed is entitled to at least 30 days’ advance written notice with the specific reasons, unless there is reasonable cause to believe the employee committed a crime punishable by imprisonment, at least 7 days to answer orally and in writing, representation, and a written decision with its specific reasons."
+    },
+    {
+      "id": "src:rif-5-cfr-351",
+      "title": "5 CFR § 351.801 — Notice period (reduction in force)",
+      "url": "https://www.law.cornell.edu/cfr/text/5/351.801",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each competing employee selected for release is entitled to specific written notice at least 60 full days before the effective date, or at least 30 full days when OPM approves a shorter period for circumstances not reasonably foreseeable."
+    },
+    {
+      "id": "src:rif-rule-2026",
+      "title": "OPM — Reduction in Force, final rule, 91 FR 49178 (August 3, 2026)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2026-08-03/pdf/2026-15665.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2026-08-03",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Rewrites subparts B through H of 5 CFR Part 351 for notices issued on or after September 2, 2026. Employees are ranked by tenure group, then by performance credit with veterans’ preference, with tenure subgroup and service computation date as tie-breakers, and each notice lists the factors used."
+    },
+    {
+      "id": "src:personnel-records-5-cfr-293",
+      "title": "5 CFR § 293.302 — Establishment of the Official Personnel Folder",
+      "url": "https://www.law.cornell.edu/cfr/text/5/293.302",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each agency establishes an Official Personnel Folder for each employee, and except as OPM’s Guide to Personnel Recordkeeping provides, only one is kept for each employee."
+    },
+    {
+      "id": "src:grs-2-2",
+      "title": "National Archives — General Records Schedule 2.2, Employee Management Records",
+      "url": "https://www.archives.gov/files/records-mgmt/grs/grs02-2.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Covers records of supervising employees, processing personnel actions, and managing performance, including the Official Personnel Folder and its electronic equivalent, with how long each is kept and when separated employees’ folders are transferred (Transmittal 35, May 2024)."
+    },
+    {
+      "id": "src:omb-m-25-21",
+      "title": "OMB Memorandum M-25-21 — Accelerating Federal Use of AI through Innovation, Governance, and Public Trust (April 3, 2025)",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-04-03",
+      "lastReviewedAt": "2026-11-02",
+      "note": "AI whose output is a principal basis for decisions with a significant effect on rights or safety is high-impact, and AI used to determine the terms or conditions of federal employment, including pre-employment screening, pay or promotion, performance management, hiring or termination, or recommending disciplinary action, is presumed to be (§ 6(n)). High-impact uses need testing, an impact assessment, monitoring, human oversight, and human review and appeal (§ 4(b))."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-11-02",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:administering-the-civilian-workforce",
+      "type": "mission",
+      "title": "HR Administration",
+      "description": "Hire, pay, and support the agency’s civilian employees under the merit system: fill the positions the agency needs on merit and on time, give new employees a good start, process each personnel action correctly, pay people accurately, manage their performance, handle conduct fairly, see them through retirement or separation, and keep the records and data the law requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:federal-hr-2-0",
+        "src:merit-hiring-plan"
+      ],
+      "attributes": {
+        "tagline": "Hiring, paying, and supporting the federal civilian workforce",
+        "sector": "public-sector",
+        "scope": "US-federal-civilian-HR",
+        "principles": [
+          "Each employee has one record, from the job offer to retirement, in one system of record",
+          "Personnel actions are entered once and reach payroll, benefits, retirement, and OPM without retyping",
+          "Positions are records of their own, with their classification, funding, and approvals",
+          "Each new employee follows one onboarding journey, from the offer through their first year, with everything ready on day one",
+          "Hiring uses validated assessments and ranks candidates by score, with veterans’ preference, and tells applicants where they stand",
+          "Managers and employees do routine tasks themselves, such as updating details or starting a request",
+          "Workforce figures come from the system of record, not from spreadsheets",
+          "AI drafts documents and answers policy questions, and people make every decision about a person’s employment"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:positions-filled-on-time",
+      "type": "outcome",
+      "title": "The agency fills the positions it needs on time",
+      "description": "Approved positions are announced, assessed, and offered quickly enough that the work doesn’t wait, within the government-wide goal of under 80 days to an initial offer.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "time-to-initial-offer",
+            "title": "Time to initial offer",
+            "description": "The days from the start of a hiring action to the initial job offer, by office and kind of position, against the government-wide goal of under 80 days. OPM tracks it on its hiring compliance dashboard.",
+            "sourceIds": [
+              "src:merit-hiring-plan"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:hiring-on-merit",
+      "type": "outcome",
+      "title": "People are hired on merit, with veterans’ preference",
+      "description": "Vacancies are open to the people the law allows to apply, candidates are ranked on validated assessments of their skills, and veterans’ preference is applied as the law requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan",
+        "src:veterans-preference-5-usc-3309",
+        "src:rule-of-many"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "actions-with-technical-assessment",
+            "title": "Hiring actions with a technical or alternative assessment",
+            "description": "The share of competitive hiring actions that used at least one technical or alternative assessment before the certificate was issued, rather than a self-assessment alone.",
+            "sourceIds": [
+              "src:merit-hiring-plan"
+            ]
+          },
+          {
+            "id": "certificates-without-selection",
+            "title": "Certificates returned without a selection",
+            "description": "The share of certificates of eligible candidates that hiring managers returned without selecting anyone, which can mean the assessment didn’t find the right people.",
+            "sourceIds": [
+              "src:rule-of-many"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:new-employees-start-well",
+      "type": "outcome",
+      "title": "New employees start well, vetted, equipped, and supported",
+      "description": "Each new employee is vetted promptly to the level their position needs, finds their equipment, accounts, and credential ready on their first day, and has an orientation, a sponsor, and their supervisor’s attention through their first year, so they become effective quickly and stay.",
+      "status": "reference",
+      "sourceIds": [
+        "src:suitability-5-cfr-731",
+        "src:merit-hiring-plan",
+        "src:dod-onboarding-portal"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "vetting-timeliness",
+            "title": "Vetting completed within the timeliness goals",
+            "description": "The share of new employees whose vetting finished within the goals the Merit Hiring Plan cites, 21 days for low-risk positions, 25 days for non-sensitive moderate-risk positions, and 45 days for top secret, and within 3 days when reciprocity applies.",
+            "sourceIds": [
+              "src:merit-hiring-plan"
+            ]
+          },
+          {
+            "id": "ready-on-day-one",
+            "title": "New employees ready to work on their first day",
+            "description": "The share of new employees whose equipment, accounts, credential, and workspace were ready on their first day, from the onboarding tasks or a short question to each new employee.",
+            "sourceIds": [
+              "src:dod-onboarding-portal"
+            ]
+          },
+          {
+            "id": "new-employee-training-on-time",
+            "title": "New employee training completed on time",
+            "description": "The share of new employees who completed security awareness training before their system access, initial ethics training within 3 months, and No FEAR Act training within 90 days.",
+            "sourceIds": [
+              "src:security-awareness-5-cfr-930-301",
+              "src:ethics-training-5-cfr-2638-304",
+              "src:no-fear-training-5-cfr-724-203"
+            ]
+          },
+          {
+            "id": "first-year-departures",
+            "title": "New employees who leave in their first year",
+            "description": "The share of new employees who separate within a year of starting, by office and occupation, from the separations the agency reports to OPM.",
+            "sourceIds": [
+              "src:ehri",
+              "src:federal-workforce-data"
+            ]
+          }
+        ],
+        "theme": "easy-to-use"
+      }
+    },
+    {
+      "id": "eb:outcome:actions-correct-on-time",
+      "type": "outcome",
+      "title": "Personnel actions are correct and take effect on time",
+      "description": "Each appointment, promotion, change, and separation is approved by its effective date, coded correctly, and reported to OPM accurately, so pay, benefits, and records follow without correction.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gppa",
+        "src:workforce-information-5-cfr-9"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "retroactive-actions",
+            "title": "Actions processed after their effective date",
+            "description": "The share of personnel actions processed after the date they took effect, by kind of action and office.",
+            "sourceIds": [
+              "src:gppa"
+            ]
+          },
+          {
+            "id": "ehri-errors",
+            "title": "Errors returned from OPM’s data screening",
+            "description": "The number of errors OPM finds when it screens each submission to its Enterprise Human Resources Integration data warehouse, and how long they take to fix.",
+            "sourceIds": [
+              "src:gppa",
+              "src:ehri"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:employees-paid-correctly",
+      "type": "outcome",
+      "title": "Employees are paid correctly and on time",
+      "description": "Pay, leave, and deductions follow each employee’s personnel actions and approved time, so overpayments and the debts they create are rare.",
+      "status": "reference",
+      "sourceIds": [
+        "src:pay-debts-5-usc-5514"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "pay-debts-established",
+            "title": "Pay debts established",
+            "description": "The number and amount of debts established because an employee was overpaid, by cause, such as a late personnel action or a time and attendance error.",
+            "sourceIds": [
+              "src:pay-debts-5-usc-5514"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:retirements-without-delay",
+      "type": "outcome",
+      "title": "Retiring employees get their annuity without delay",
+      "description": "The agency prepares each retirement application completely and sends it to OPM promptly, so OPM can begin paying the annuity without returning it for more information.",
+      "status": "reference",
+      "sourceIds": [
+        "src:online-retirement-application"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "days-to-submit-retirement",
+            "title": "Days from retirement to submission to OPM",
+            "description": "The days from each employee’s retirement date to the agency’s submission of the complete application to OPM, through HR and payroll.",
+            "sourceIds": [
+              "src:online-retirement-application"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:performance-managed",
+      "type": "outcome",
+      "title": "Employees know what’s expected and are rated on it",
+      "description": "Each employee has a performance plan at the start of the appraisal period, is rated against it at the end, and ratings distinguish levels of performance as OPM’s rules require.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-usc-4302",
+        "src:appraisal-5-cfr-430"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "plans-and-ratings-on-time",
+            "title": "Performance plans and ratings on time",
+            "description": "The share of employees given a performance plan within 30 days of the appraisal period’s start, and the share with a rating of record soon after it ends.",
+            "sourceIds": [
+              "src:appraisal-5-cfr-430"
+            ]
+          },
+          {
+            "id": "top-ratings-share",
+            "title": "Share of ratings at the top two levels",
+            "description": "The share of employees in each covered population rated at Level 4 or Level 5, against OPM’s cap, which is 40 percent for the 2026 appraisal cycle.",
+            "sourceIds": [
+              "src:rating-distribution-fy2026",
+              "src:appraisal-5-cfr-430"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:actions-hold-up",
+      "type": "outcome",
+      "title": "Discipline and removals are fair and hold up on appeal",
+      "description": "Each adverse or performance-based action gives the employee the notice, time to reply, and decision the law requires, rests on a documented record, and stands up when appealed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:adverse-actions-5-usc-7513",
+        "src:appraisal-5-usc-4302"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "actions-sustained-on-appeal",
+            "title": "Actions sustained on appeal",
+            "description": "The number of adverse and performance-based actions appealed, and the share that were sustained, settled, or reversed.",
+            "sourceIds": [
+              "src:adverse-actions-5-usc-7513"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:workforce-data-public",
+      "type": "outcome",
+      "title": "The workforce’s data is open to view",
+      "description": "The agency reports complete, accurate workforce data to OPM on schedule, so the public can see the size, hiring, pay, and separations of the federal workforce each month.",
+      "status": "reference",
+      "sourceIds": [
+        "src:workforce-information-5-cfr-9",
+        "src:ehri",
+        "src:federal-workforce-data"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "ehri-submissions-on-time",
+            "title": "Workforce data submitted on schedule",
+            "description": "The share of the agency’s scheduled submissions to EHRI accepted on time, which feed OPM’s monthly Federal Workforce Data site.",
+            "sourceIds": [
+              "src:ehri",
+              "src:federal-workforce-data"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:capability:workforce-position-management",
+      "type": "capability",
+      "title": "Workforce & Position Management",
+      "description": "Ability to plan the staff the agency needs each year, keep each position as a record with its organization, classification, and funding, classify positions against OPM’s standards, and get the approvals each new or vacant position needs before it’s filled.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eo-14356-guidance",
+        "src:classification-5-usc-5107"
+      ],
+      "applicabilityNotes": "Since October 2025, each agency’s Strategic Hiring Committee approves the creation or filling of every vacancy against the agency’s Annual Staffing Plan. Many agencies keep position data in a separate tool today; the government-wide core HR system includes position management.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:recruitment-hiring",
+      "type": "capability",
+      "title": "Recruitment & Hiring",
+      "description": "Ability to announce vacancies on USAJOBS, assess applicants with validated, skills-based assessments, rank them by score with veterans’ preference, issue certificates to hiring managers, and make offers, sharing certificates and talent pools across offices and agencies.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan",
+        "src:vacancies-5-usc-3327",
+        "src:veterans-preference-5-usc-3309",
+        "src:rule-of-many"
+      ],
+      "applicabilityNotes": "Excepted service and special hiring authorities, such as for veterans or people with disabilities, follow their own rules. Agencies had to comply with the Rule of Many by March 9, 2026.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:pre-employment-vetting",
+      "type": "capability",
+      "title": "Pre-Employment & Vetting",
+      "description": "Ability to designate each position’s risk and sensitivity, and between the tentative offer and the first day, start each selectee’s background investigation and credential, verify their eligibility to work, and set a start date the vetting allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:suitability-5-cfr-731",
+        "src:form-i9-8-cfr-274a-2",
+        "src:merit-hiring-plan"
+      ],
+      "applicabilityNotes": "Agencies with delegated investigative authority run some of their own background investigations. Reciprocity lets a previously vetted person start sooner, and the Merit Hiring Plan asks for vetting within 3 days when it applies.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:new-employee-onboarding",
+      "type": "capability",
+      "title": "New Employee Onboarding",
+      "description": "Ability to give each new employee a good start, with their equipment, accounts, credential, and workspace ready on their first day, an orientation, a sponsor who helps them settle in, the training every new employee needs assigned and tracked, and check-ins with their supervisor through their first year.",
+      "status": "reference",
+      "sourceIds": [
+        "src:dod-onboarding-portal",
+        "src:ethics-training-5-cfr-2638-304",
+        "src:security-awareness-5-cfr-930-301",
+        "src:no-fear-training-5-cfr-724-203"
+      ],
+      "applicabilityNotes": "The same steps suit employees who transfer in or are promoted into a new role. Day-one readiness depends on IT, facilities, and security teams outside HR, and employees who work remotely need their equipment and accounts working before they start.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:personnel-action-processing",
+      "type": "capability",
+      "title": "Personnel Action Processing",
+      "description": "Ability to request, approve, and process each personnel action, such as an appointment, promotion, reassignment, or change in pay, coded as OPM’s guide directs, approved by its effective date, and sent to payroll and the employee’s record.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gppa"
+      ],
+      "applicabilityNotes": "Most agencies process actions through an HR shared service provider or a department system today, and will move to the government-wide core HR system in their wave.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:pay-leave-administration",
+      "type": "capability",
+      "title": "Pay & Leave Administration",
+      "description": "Ability to record and approve each employee’s time and leave, pay them correctly each pay period from their personnel actions, and, when someone is overpaid, give the notice and choices the law requires before collecting.",
+      "status": "reference",
+      "sourceIds": [
+        "src:pay-debts-5-usc-5514"
+      ],
+      "applicabilityNotes": "A federal payroll provider calculates and pays salaries for most agencies. The agency owns the personnel actions and approved time that payroll runs on.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:benefits-retirement",
+      "type": "capability",
+      "title": "Benefits & Retirement",
+      "description": "Ability to offer new employees their benefits, such as health and life insurance and the Thrift Savings Plan, within their enrollment periods, counsel employees nearing retirement, and prepare and certify each retirement application to OPM.",
+      "status": "reference",
+      "sourceIds": [
+        "src:fehb-5-cfr-890-301",
+        "src:online-retirement-application"
+      ],
+      "applicabilityNotes": "OPM decides retirement eligibility and pays annuities; the agency prepares the application, certifies the service history, and sends it on through payroll.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:performance-management",
+      "type": "capability",
+      "title": "Performance Management",
+      "description": "Ability to give each employee a performance plan at the start of the appraisal period, check in during it, rate them against it at the end within OPM’s rating distribution, and certify each probationer’s continued employment before the probationary period ends.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-usc-4302",
+        "src:appraisal-5-cfr-430",
+        "src:probation-5-cfr-11-5"
+      ],
+      "applicabilityNotes": "Agencies must move to OPM’s new rating patterns and apply its distribution caps by January 1, 2027. Senior Executive Service ratings follow their own rules.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:employee-relations-conduct",
+      "type": "capability",
+      "title": "Employee Relations & Conduct",
+      "description": "Ability to help managers address misconduct and poor performance, give employees an opportunity to improve where the law requires one, propose and decide adverse actions with the notice and reply the law requires, and keep the record that supports each action if it’s appealed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:adverse-actions-5-usc-7513",
+        "src:appraisal-5-usc-4302"
+      ],
+      "applicabilityNotes": "Agency counsel often advises on proposed actions. Collective bargaining agreements can add steps for employees in a bargaining unit.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:separations-reshaping",
+      "type": "capability",
+      "title": "Separations & Workforce Reshaping",
+      "description": "Ability to process each resignation, retirement, removal, and reduction in force with the right notices, final pay, and clearance, and, in a reduction in force, rank employees by the retention factors in OPM’s rules.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rif-5-cfr-351",
+        "src:rif-rule-2026"
+      ],
+      "applicabilityNotes": "OPM rewrote its reduction in force rules for notices issued on or after September 2, 2026, ranking employees by performance credit with veterans’ preference within each tenure group, with length of service as the tie-breaker.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:capability:personnel-records-reporting",
+      "type": "capability",
+      "title": "Personnel Records & Workforce Reporting",
+      "description": "Ability to keep one Official Personnel Folder for each employee, move it with them between agencies and to the National Archives when they leave, and report the agency’s workforce data to OPM accurately and on schedule.",
+      "status": "reference",
+      "sourceIds": [
+        "src:personnel-records-5-cfr-293",
+        "src:grs-2-2",
+        "src:workforce-information-5-cfr-9",
+        "src:ehri"
+      ],
+      "applicabilityNotes": "OPM runs the electronic Official Personnel Folder and EHRI for most agencies. The government-wide core HR system is meant to replace both once agencies have moved to it.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:approve-each-vacancy",
+      "type": "requirement",
+      "title": "Get each new or vacant position approved before filling it",
+      "description": "Have the agency’s Strategic Hiring Committee approve the creation or filling of each vacancy, consistent with the Annual Staffing Plan prepared with OMB and OPM at the start of each fiscal year, and notify OPM promptly in writing of approved hires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eo-14356-guidance"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:classify-positions",
+      "type": "requirement",
+      "title": "Classify each position against OPM’s standards",
+      "description": "Place each position in its class and grade in conformance with the standards OPM publishes, and record the classification that pay and personnel actions rest on.",
+      "status": "reference",
+      "sourceIds": [
+        "src:classification-5-usc-5107"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:announce-vacancies",
+      "type": "requirement",
+      "title": "Announce vacancies open to applicants from outside the government",
+      "description": "Notify OPM promptly of each competitive service vacancy for which the agency seeks applications from outside the federal service, and say when applications will be accepted.",
+      "status": "reference",
+      "sourceIds": [
+        "src:vacancies-5-usc-3327"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:assess-before-certifying",
+      "type": "requirement",
+      "title": "Use at least one technical or alternative assessment before the certificate",
+      "description": "Include at least one technical or alternative assessment in every competitive hiring process before the certificate is issued, tell applicants how they’ll be assessed, and use self-assessments only for minimum qualifications and eligibility.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:rank-with-veterans-preference",
+      "type": "requirement",
+      "title": "Rank candidates by score, with veterans’ preference",
+      "description": "Add 5 or 10 points to the passing scores of preference eligibles as the law provides, rank candidates in score order, and certify the number the agency’s Rule of Many method sets.",
+      "status": "reference",
+      "sourceIds": [
+        "src:veterans-preference-5-usc-3309",
+        "src:rule-of-many"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:designate-position-risk",
+      "type": "requirement",
+      "title": "Designate each position’s risk level",
+      "description": "Designate each covered position at high, moderate, or low risk, so each person is investigated to the level the position needs, and enroll employees in continuous vetting.",
+      "status": "reference",
+      "sourceIds": [
+        "src:suitability-5-cfr-731"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:verify-employment-eligibility",
+      "type": "requirement",
+      "title": "Verify each new employee’s eligibility to work within 3 business days",
+      "description": "Have each new employee complete Section 1 of Form I-9 at the time of hire, and examine their documents and complete Section 2 within three business days of the hire.",
+      "status": "reference",
+      "sourceIds": [
+        "src:form-i9-8-cfr-274a-2"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:vet-within-goals",
+      "type": "requirement",
+      "title": "Complete vetting within the government’s timeliness goals",
+      "description": "Aim to finish vetting within 21 days for low-risk positions, 25 days for non-sensitive moderate-risk positions, and 45 days for top secret, and within 3 days when reciprocity applies, using preliminary determinations where allowed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:security-awareness-before-access",
+      "type": "requirement",
+      "title": "Give security awareness training before system access",
+      "description": "Give each new employee information security awareness training before allowing them access to the agency’s systems, and refresh it at least once a year.",
+      "status": "reference",
+      "sourceIds": [
+        "src:security-awareness-5-cfr-930-301"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:ethics-training-within-3-months",
+      "type": "requirement",
+      "title": "Complete initial ethics training within 3 months",
+      "description": "Have each new employee subject to the Standards of Conduct complete initial ethics training, on conflicts of interest, impartiality, misuse of position, and gifts, within 3 months of appointment.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ethics-training-5-cfr-2638-304"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:no-fear-training-within-90-days",
+      "type": "requirement",
+      "title": "Train new employees on the No FEAR Act within 90 days",
+      "description": "Train each new employee on their rights and remedies under the antidiscrimination and whistleblower protection laws within 90 calendar days of appointment, unless new employee orientation covers it, and all employees at least every 2 years.",
+      "status": "reference",
+      "sourceIds": [
+        "src:no-fear-training-5-cfr-724-203"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:approve-by-effective-date",
+      "type": "requirement",
+      "title": "Approve each personnel action by its effective date",
+      "description": "Have an appointing officer approve most personnel actions on or before their effective dates, since no action can take effect before it’s approved except as OPM’s guide allows, and code each one as the guide directs.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gppa"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:notify-employees-of-actions",
+      "type": "requirement",
+      "title": "Tell each employee about every personnel action taken on them",
+      "description": "Give employees an SF-50 for appointments, conversions, and separations, and an electronic or paper notice they can print for other actions, without making them ask whether an action was processed.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gppa"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:notice-before-pay-debt-collection",
+      "type": "requirement",
+      "title": "Give notice and choices before collecting an overpayment from pay",
+      "description": "Give at least 30 days’ written notice of the debt and the plan to collect it from pay, a chance to inspect the records, to agree a repayment schedule, and to request a hearing, and deduct no more than 15 percent of disposable pay without consent.",
+      "status": "reference",
+      "sourceIds": [
+        "src:pay-debts-5-usc-5514"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:offer-enrollment-in-time",
+      "type": "requirement",
+      "title": "Let new employees enroll in health benefits within 60 days",
+      "description": "Give each newly eligible employee the information and chance to enroll in the Federal Employees Health Benefits Program, or not, within 60 days after they become eligible.",
+      "status": "reference",
+      "sourceIds": [
+        "src:fehb-5-cfr-890-301"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:submit-retirements-online",
+      "type": "requirement",
+      "title": "Prepare and certify retirement applications in OPM’s online system",
+      "description": "Start each retirement application in OPM’s Online Retirement Application, review the employee’s documents, certify the summary of service, and send the package through payroll to OPM.",
+      "status": "reference",
+      "sourceIds": [
+        "src:online-retirement-application"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:communicate-performance-plans",
+      "type": "requirement",
+      "title": "Give each employee a performance plan at the start of the appraisal period",
+      "description": "Communicate each employee’s critical elements and performance standards at the beginning of the appraisal period, normally within 30 days, and rate them against those standards at its end.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-usc-4302",
+        "src:appraisal-5-cfr-430"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:rate-within-distribution",
+      "type": "requirement",
+      "title": "Keep ratings within OPM’s distribution of rating levels",
+      "description": "Use one of OPM’s rating patterns, and keep the share of each covered population rated at the top levels within the cap OPM sets each year, which for 2026 is 40 percent at Levels 4 and 5 combined.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-cfr-430",
+        "src:rating-distribution-fy2026"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:certify-probationers",
+      "type": "requirement",
+      "title": "Certify each probationer before the probationary period ends",
+      "description": "Have the agency head or a designated official decide in writing, within the last 30 days of each probationary or trial period, whether the employee’s continued employment will advance the public interest; without that certification, the employee’s service ends with the period.",
+      "status": "reference",
+      "sourceIds": [
+        "src:probation-5-cfr-11-5"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:notice-and-reply-before-adverse-action",
+      "type": "requirement",
+      "title": "Give 30 days’ notice and 7 days to reply before an adverse action",
+      "description": "Give the employee at least 30 days’ written notice with the specific reasons, at least 7 days to answer orally and in writing, the right to a representative, and a written decision with its reasons, except where the law allows a shorter notice.",
+      "status": "reference",
+      "sourceIds": [
+        "src:adverse-actions-5-usc-7513"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:opportunity-to-improve",
+      "type": "requirement",
+      "title": "Give an opportunity to improve before acting on poor performance",
+      "description": "Help an employee whose performance is unacceptable to improve, and reassign, reduce in grade, or remove them for it only after an opportunity to demonstrate acceptable performance.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-usc-4302"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:give-rif-notice",
+      "type": "requirement",
+      "title": "Give at least 60 days’ notice before release in a reduction in force",
+      "description": "Give each employee released in a reduction in force specific written notice at least 60 full days before the release, or at least 30 days with OPM’s approval when the cause wasn’t foreseeable, with the retention factors the ranking used.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rif-5-cfr-351",
+        "src:rif-rule-2026"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-one-personnel-folder",
+      "type": "requirement",
+      "title": "Keep one Official Personnel Folder for each employee",
+      "description": "Keep a single Official Personnel Folder, or its approved electronic equivalent, for each employee, with the records OPM’s rules require, and keep or transfer it as General Records Schedule 2.2 directs when the employee leaves.",
+      "status": "reference",
+      "sourceIds": [
+        "src:personnel-records-5-cfr-293",
+        "src:grs-2-2"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:report-workforce-data",
+      "type": "requirement",
+      "title": "Report workforce data to OPM accurately and on schedule",
+      "description": "Send OPM the personnel action, status, payroll, and other workforce data it requires, in its data standards and on its schedule, and fix the errors its screening returns.",
+      "status": "reference",
+      "sourceIds": [
+        "src:workforce-information-5-cfr-9",
+        "src:ehri",
+        "src:gppa"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:core-hr-system",
+      "type": "implementationPattern",
+      "title": "One Core HR System of Record",
+      "description": "An example architecture: one core human capital management system holds each employee’s record, each position, and each personnel action, gives managers and employees self-service, records time and attendance, and sends actions to payroll, benefits, retirement, and OPM.",
+      "status": "reference",
+      "sourceIds": [
+        "src:federal-hr-2-0",
+        "src:gppa"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "The employee record, from the job offer to separation, with each personnel action on it",
+          "Positions as records of their own, with their organization, classification, funding, and approvals",
+          "Requests for personnel actions from managers, routed for approval by the appointing officer before the effective date",
+          "Self-service for employees and managers, such as changes of address, benefits, and direct deposit",
+          "Time and attendance, approved by supervisors each pay period",
+          "Connections to hiring, payroll, benefits, retirement, performance, and learning systems",
+          "Reports and dashboards from the same records"
+        ],
+        "strengths": [
+          "One record for each employee and position, instead of copies in several systems",
+          "Actions entered once reach payroll and OPM without retyping",
+          "Workforce figures come from the system of record"
+        ],
+        "fitsWhen": [
+          "Every executive agency with civilian employees, since OMB and OPM are moving all of them to one system"
+        ],
+        "watchFor": [
+          "Moving decades of records needs early work on which data moves, which is kept elsewhere, and which is cleaned first",
+          "Each agency-unique practice either fits the common system or has to be given up, so they need listing and deciding early",
+          "Connections to payroll and other systems often take the most work"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:usa-staffing-hiring",
+      "type": "implementationPattern",
+      "title": "Hiring through USAJOBS and USA Staffing with Validated Assessments",
+      "description": "An example architecture: vacancies are posted on USAJOBS, applicants are assessed with validated, skills-based assessments, ranked by score with veterans’ preference, and certified to hiring managers in OPM’s USA Staffing, with talent pools and shared certificates reaching across offices and agencies.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan",
+        "src:rule-of-many"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "Job announcements on USAJOBS that say how applicants will be assessed",
+          "A short eligibility questionnaire, then technical assessments such as USA Hire, structured interviews, or work samples",
+          "Scores with veterans’ preference points, ranked and certified by the agency’s Rule of Many method",
+          "Talent pools and shared certificates, so one assessment can fill several positions",
+          "Automatic notices to applicants at each stage",
+          "Hiring data that shows time to hire and assessment use"
+        ],
+        "strengths": [
+          "Applicants find and apply for every job in one place",
+          "Validated assessments rank on skills instead of how applicants rate themselves",
+          "Shared certificates and talent pools cut the time to the next hire"
+        ],
+        "fitsWhen": [
+          "The agency still ranks applicants with self-assessments",
+          "Several offices hire for the same kinds of positions"
+        ],
+        "watchFor": [
+          "Validated assessments exist for many job series but not all, so some need subject matter experts to build them",
+          "OPM plans to merge USAJOBS and USA Staffing, so steps and connections may change"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:pre-employment-connections",
+      "type": "implementationPattern",
+      "title": "Pre-Employment Steps Connected to Vetting, E-Verify, and Credentials",
+      "description": "An example architecture: each tentative offer starts one pre-employment case that sends the selectee’s forms to the background investigation system, checks employment eligibility through E-Verify, orders the identity credential, and tracks each step to the first day.",
+      "status": "reference",
+      "sourceIds": [
+        "src:merit-hiring-plan",
+        "src:form-i9-8-cfr-274a-2",
+        "src:suitability-5-cfr-731"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A pre-employment case for each selectee, opened from the tentative offer",
+          "Investigation forms sent to the background investigation system, with the position’s risk designation",
+          "Form I-9 completed online, with E-Verify checks",
+          "Identity credential and system accounts ordered once vetting allows",
+          "Status for the selectee, the hiring manager, and HR at each step"
+        ],
+        "strengths": [
+          "Selectees fill in each form once",
+          "Everyone can see what’s holding up a start date",
+          "Vetting starts the day the offer is made"
+        ],
+        "fitsWhen": [
+          "Onboarding runs on email, PDFs, and spreadsheets",
+          "Start dates often slip while vetting and credentials catch up"
+        ],
+        "watchFor": [
+          "Each connection to a vetting or credential system needs approval and keeping up",
+          "Preliminary determinations and reciprocity rules need to be set up correctly to save time"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:guided-onboarding",
+      "type": "implementationPattern",
+      "title": "A Guided Onboarding Journey for New Employees",
+      "description": "An example architecture: each new employee follows one onboarding journey, from the tentative offer through their first year, that shows them what comes next, sends tasks to IT, facilities, security, the supervisor, and a sponsor so everything is ready on day one, assigns the training every new employee needs, and prompts check-ins along the way.",
+      "status": "reference",
+      "sourceIds": [
+        "src:dod-onboarding-portal",
+        "src:security-awareness-5-cfr-930-301",
+        "src:ethics-training-5-cfr-2638-304",
+        "src:no-fear-training-5-cfr-724-203"
+      ],
+      "attributes": {
+        "layer": "worker-productivity",
+        "parts": [
+          "A personal onboarding page for each new employee, with each step, its owner, and its date",
+          "Forms completed online before the first day, prefilled where the agency already has the information",
+          "Tasks for IT, facilities, security, and the supervisor, with deadlines before the first day, for equipment, accounts, credential, and workspace",
+          "A sponsor named for each new employee, with a short guide to the role",
+          "An orientation schedule, and the training every new employee needs assigned with its due date, security awareness before system access first",
+          "Check-ins with the supervisor at set points, such as 30, 60, and 90 days, starting with the performance plan",
+          "A short survey after the first few months, with results by office"
+        ],
+        "strengths": [
+          "New employees know what comes next instead of waiting to be told",
+          "Day-one readiness is tracked as tasks with owners, not hoped for",
+          "Required training doesn’t slip past its deadlines",
+          "Supervisors and sponsors get prompts at the moments that matter"
+        ],
+        "fitsWhen": [
+          "Onboarding steps live in email, checklists, and people’s memories",
+          "New employees often start without equipment or accounts",
+          "Many new employees work remotely or at sites away from HR"
+        ],
+        "watchFor": [
+          "Tasks for teams outside HR only work if those teams accept them, with owners and deadlines",
+          "A portal doesn’t replace a supervisor and sponsor who make time for the new employee",
+          "Too many steps on day one overwhelm people, so spread them over the first weeks"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:federal-payroll-provider",
+      "type": "implementationPattern",
+      "title": "Payroll from a Federal Payroll Provider",
+      "description": "An example architecture: a federal payroll provider calculates each employee’s pay every pay period from the agency’s personnel actions and approved time, pays salaries, withholds taxes and benefits, and manages pay debts with the notices the law requires.",
+      "status": "reference",
+      "sourceIds": [
+        "src:pay-debts-5-usc-5514"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Personnel actions and approved time received from the core HR system each pay period",
+          "Pay, deductions, and leave balances calculated and paid",
+          "Earnings and leave statements for employees",
+          "Overpayments found, with debt notices, repayment agreements, and hearing requests handled",
+          "Payroll data sent to OPM and to the agency’s financial system"
+        ],
+        "strengths": [
+          "Payroll rules and tax changes are kept up by the provider for many agencies",
+          "The agency doesn’t run its own payroll system"
+        ],
+        "fitsWhen": [
+          "Most executive agencies, which pay employees through one of a few federal payroll providers"
+        ],
+        "watchFor": [
+          "Late or wrong personnel actions are the most common cause of pay errors, so the hand-off from HR needs watching",
+          "Changes to the core HR system need testing with the payroll provider before they go live"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:online-retirement-application",
+      "type": "implementationPattern",
+      "title": "Retirement Applications through OPM’s Online Retirement Application",
+      "description": "An example architecture: HR starts each retirement application in OPM’s Online Retirement Application, prefilled from EHRI and eOPF data, the employee completes it online, HR reviews and certifies the summary of service, and payroll certifies its part before the package goes to OPM.",
+      "status": "reference",
+      "sourceIds": [
+        "src:online-retirement-application"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Applications started by HR with the employee’s email, prefilled with service history, salary, and sick leave from EHRI and eOPF",
+          "Documents uploaded by the employee and reviewed by HR",
+          "A summary of service certified by HR",
+          "Payroll’s certification, then submission to OPM",
+          "One view of each application’s status for the employee, HR, and payroll"
+        ],
+        "strengths": [
+          "Replaces the paper process, so applications reach OPM sooner and complete",
+          "Prefilled data cuts errors in service and salary history",
+          "Everyone sees the same status"
+        ],
+        "fitsWhen": [
+          "Every agency whose employees retire under the federal retirement systems"
+        ],
+        "watchFor": [
+          "Prefilled data is only as good as the agency’s records, so gaps in service history still need finding early",
+          "HR specialists and payroll staff need access and training before a wave of retirements"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:eopf-and-ehri",
+      "type": "implementationPattern",
+      "title": "Electronic Personnel Folders and Workforce Data through OPM",
+      "description": "An example architecture: each employee’s Official Personnel Folder is kept electronically in OPM’s eOPF, and the agency’s personnel action, status, and payroll data reach OPM’s Enterprise Human Resources Integration warehouse on schedule, screened and corrected, for OPM’s reports and public data.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ehri",
+        "src:personnel-records-5-cfr-293",
+        "src:grs-2-2"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "An electronic personnel folder for each employee, with documents filed as OPM’s recordkeeping guide directs",
+          "Folders that move with employees between agencies, and to the National Personnel Records Center when they leave",
+          "Regular submissions of personnel action, status, and payroll data to EHRI in OPM’s data standards",
+          "Error lists returned by OPM, worked and corrected at the source",
+          "Data that feeds OPM’s retirement processing and its public Federal Workforce Data site"
+        ],
+        "strengths": [
+          "One folder for each employee across their federal career",
+          "The agency’s data reaches OPM’s reports and the public without a separate effort"
+        ],
+        "fitsWhen": [
+          "Every agency, until the government-wide core HR system replaces these systems"
+        ],
+        "watchFor": [
+          "Errors fixed in EHRI but not in the agency’s own system come back next time",
+          "OMB and OPM plan to retire eOPF and EHRI once the core HR system is in place, so new connections to them should be few"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:performance-appraisal-system",
+      "type": "implementationPattern",
+      "title": "Performance Plans and Appraisals Online",
+      "description": "An example architecture: performance plans, check-ins, and ratings are kept online, plans go to employees at the start of the appraisal period, ratings are checked against OPM’s distribution cap before they’re final, and ratings of record reach the core HR system and personnel folder.",
+      "status": "reference",
+      "sourceIds": [
+        "src:appraisal-5-cfr-430",
+        "src:rating-distribution-fy2026"
+      ],
+      "attributes": {
+        "layer": "worker-productivity",
+        "parts": [
+          "Performance plans with critical elements and standards, built from templates for each kind of position",
+          "Acknowledgment by each employee at the start of the period, and check-ins during it",
+          "Ratings proposed by supervisors and reviewed by higher-level officials",
+          "A view of proposed ratings against OPM’s cap, by covered population, before ratings are final",
+          "Ratings of record sent to the core HR system, the personnel folder, and awards",
+          "Probationers’ end dates, with reminders for each certification decision"
+        ],
+        "strengths": [
+          "Plans and ratings are on time and in one place",
+          "Leaders can see the distribution before ratings are final, not after",
+          "Ratings flow to awards and to reduction in force retention without retyping"
+        ],
+        "fitsWhen": [
+          "Plans and ratings are kept on paper or in documents",
+          "The agency needs to change rating patterns and apply the cap by January 2027"
+        ],
+        "watchFor": [
+          "Templates help consistency but can make standards too general to rate against",
+          "Probationary certifications have a hard deadline, so reminders need an owner"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:hr-ai-drafting",
+      "type": "implementationPattern",
+      "title": "AI Help Drafting HR Documents and Answering Policy Questions",
+      "description": "An example architecture: HR specialists and managers use an AI model, in an environment the agency approves, to draft position descriptions, job analyses, announcements, and interview questions from OPM’s standards and the agency’s templates, and to find answers in OPM’s guides, and then check and finish each draft themselves. It isn’t used to screen, rate, or rank applicants or employees.",
+      "status": "reference",
+      "sourceIds": [
+        "src:omb-m-25-21",
+        "src:nist-ai-rmf"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "An AI model in an environment the agency has approved for HR information",
+          "OPM’s classification and qualification standards, its processing and recordkeeping guides, and the agency’s templates as reference material",
+          "Drafts shown with the sources they drew on",
+          "HR specialists and managers who check, correct, and approve each draft",
+          "Rules that keep the model away from decisions about people, such as screening applicants or proposing ratings"
+        ],
+        "strengths": [
+          "Specialists start from a draft instead of a blank page",
+          "Answers point to the guide and section they came from",
+          "Managers can get help writing clear job requirements before they reach HR"
+        ],
+        "fitsWhen": [
+          "Writing position descriptions and announcements takes much of the time to hire",
+          "HR specialists field many routine policy questions"
+        ],
+        "watchFor": [
+          "Drafts can be wrong or cite rules that have changed, as many did in 2025 and 2026, so specialists check each one",
+          "Using AI to decide the terms of someone’s employment, such as hiring, pay, ratings, or discipline, is presumed high-impact under OMB’s AI memo",
+          "The agency’s AI governance may require a listing in its AI use case inventory first"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:workforce-analytics",
+      "type": "implementationPattern",
+      "title": "Workforce Analytics from Core HR Data",
+      "description": "An example architecture: an analytics workspace draws on the core HR, hiring, payroll, and performance data to show hiring against the staffing plan, time to hire, retirement eligibility and attrition, ratings against the cap, and data errors before they reach OPM.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eo-14356-guidance",
+        "src:federal-workforce-data"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Regular feeds from the core HR system, hiring, payroll, and performance tools",
+          "Hiring against the Annual Staffing Plan, by office and occupation",
+          "Time to hire by step, so delays show where they happen",
+          "Retirement eligibility and departures, by office and skill",
+          "Plans, ratings, and probationary certifications due or overdue",
+          "Checks of the agency’s data against OPM’s standards before each submission"
+        ],
+        "strengths": [
+          "Leaders see gaps coming before positions sit empty",
+          "The same figures support the staffing plan, OPM’s reports, and the agency’s own decisions"
+        ],
+        "fitsWhen": [
+          "Reports are built by hand from several systems",
+          "Leaders ask the same workforce questions every month"
+        ],
+        "watchFor": [
+          "Person-level HR data is sensitive, so who sees what needs setting with care",
+          "Figures defined differently from OPM’s, such as time to hire, need reconciling first"
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:merit-hiring-plan-resources",
+      "type": "resource",
+      "title": "Merit Hiring Plan resources",
+      "description": "Guidance, FAQs, and fact sheets for putting the Merit Hiring Plan in place, on applications, assessments, pooled hiring, and Rule of Many ranking, with a webinar series and templates such as a sample Rule of Many policy.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/hiring-information/merit-hiring-plan-resources/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:assessment-and-selection",
+      "type": "resource",
+      "title": "Assessment and selection",
+      "description": "How to assess applicants, from job analysis and competencies to structured interviews and other assessment methods, and how to design an assessment strategy for a position.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:classification-qualifications",
+      "type": "resource",
+      "title": "Classification and qualifications",
+      "description": "OPM’s grading criteria for the General Schedule and Federal Wage System, draft standards, classification flysheets, and the government-wide qualification standards, for anyone classifying positions or writing job requirements.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/classification-qualifications/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:dod-onboarding-resource-portal",
+      "type": "resource",
+      "title": "DoD Onboarding Resource Portal",
+      "description": "A 2024 collection of guides, tip sheets, checklists, and templates for onboarding new, transferred, and promoted civilian employees, with what supervisors, sponsors, and mentors each do, useful well beyond Defense.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.dcpas.osd.mil/sites/default/files/DoD%20Onboarding%20Resource%20Portal.pdf",
+        "by": "Defense Civilian Personnel Advisory Service, Department of Defense",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:guide-to-processing-personnel-actions",
+      "type": "resource",
+      "title": "Guide to Processing Personnel Actions",
+      "description": "OPM’s instructions for preparing personnel actions and keeping the Official Personnel Folder, revised as rules change, alongside the Guide to Personnel Recordkeeping.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/data-analysis-documentation/personnel-documentation/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:ora-hr-specialist-guide",
+      "type": "resource",
+      "title": "Online Retirement Application — Human Resources Specialist Guide",
+      "description": "A 2025 step-by-step guide for HR specialists using OPM’s Online Retirement Application, from creating the applicant’s profile through the pre-application and the certified summary of service to sending the package to payroll.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/retirement-center/retirement-quick-guide/ora-hr-specialist-guide.pdf",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:performance-management-resources",
+      "type": "resource",
+      "title": "Performance management",
+      "description": "OPM’s Performance Management Playbook for agency leaders, toolkits for managers and employees, and the memos and rules on rating patterns and distribution, including the 2026 changes.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/performance-management/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:employee-relations-resources",
+      "type": "resource",
+      "title": "Employee relations",
+      "description": "The laws, rules, and precedents for addressing conduct and performance, including adverse and performance-based actions, appeals, and alternative dispute resolution, with training and an interagency network of employee relations managers.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/employee-relations/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:reductions-in-force",
+      "type": "resource",
+      "title": "Reductions in force",
+      "description": "A summary of the reduction in force rules, the notice employees must receive, a guide to pay, leave, and benefits for employees, and handbooks for agencies.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.opm.gov/policy-data-oversight/workforce-restructuring/reductions-in-force/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:federal-workforce-data",
+      "type": "resource",
+      "title": "Federal Workforce Data",
+      "description": "OPM’s open data site on the federal civilian workforce, updated monthly, with employment, hiring, separations, pay, location, and demographics to explore and download. It replaced FedScope in January 2026.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://data.opm.gov/",
+        "by": "Office of Personnel Management",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:solution:core-hr-system-federal-core-hcm",
+      "type": "solution",
+      "title": "OPM’s government-wide core HR system",
+      "description": "The single commercial core HR platform OMB and OPM are moving executive agencies onto under Federal HR 2.0, in two waves from fiscal year 2026, with government-wide adoption the goal by 2028.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "One system across government, so employees moving between agencies keep one record",
+          "It will make the separate eOPF and EHRI systems unnecessary over time"
+        ],
+        "fitsWhen": [
+          "The agency’s wave has begun, or it’s preparing data, connections, and staff for it"
+        ],
+        "watchFor": [
+          "Agencies were told to pause their own core HR purchases and projects, with exceptions only from the OMB and OPM Directors",
+          "Military personnel and intelligence agencies aren’t included at first"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:core-hr-system-hr-shared-service",
+      "type": "solution",
+      "title": "The agency’s current HR shared service provider",
+      "description": "The core HR system the agency uses today through a federal HR shared service provider or its department, until its move to the government-wide system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Already in place, with staff who know it"
+        ],
+        "fitsWhen": [
+          "The agency’s wave hasn’t begun yet"
+        ],
+        "watchFor": [
+          "Changes worth making now are the ones that also prepare for the move, such as cleaning data and documenting connections"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:usa-staffing-hiring-usa-staffing",
+      "type": "solution",
+      "title": "OPM’s USA Staffing",
+      "description": "OPM’s talent acquisition system, used with USAJOBS and USA Hire, which the Merit Hiring Plan asks agencies to use.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Built for federal hiring rules and OPM’s hiring data",
+          "Shared certificates and talent pools work across agencies that use it"
+        ],
+        "fitsWhen": [
+          "Most agencies, especially those changing how they assess applicants"
+        ],
+        "watchFor": [
+          "Each agency still sets up its own assessments, ranking method, and approvals"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:usa-staffing-hiring-talent-acquisition-product",
+      "type": "solution",
+      "title": "A talent acquisition product connected to USAJOBS",
+      "description": "A commercial talent acquisition product that posts to USAJOBS and sends hiring data to OPM.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Can suit agencies with unusual hiring authorities or very high volume"
+        ],
+        "fitsWhen": [
+          "The agency already runs one and it meets the Merit Hiring Plan’s steps"
+        ],
+        "watchFor": [
+          "Shared certificates and OPM’s hiring data are harder outside USA Staffing"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:pre-employment-connections-talent-acquisition-onboarding",
+      "type": "solution",
+      "title": "The talent acquisition system’s onboarding",
+      "description": "The onboarding features of the agency’s talent acquisition system, connected to the vetting, E-Verify, and credentialing systems.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Picks up where the hiring action ends, with no retyping"
+        ],
+        "fitsWhen": [
+          "The agency uses USA Staffing or a product with onboarding"
+        ],
+        "watchFor": [
+          "Connections the Merit Hiring Plan names, such as to background investigations and credentials, may still need building"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:guided-onboarding-core-hcm",
+      "type": "solution",
+      "title": "The core HR system’s onboarding and learning",
+      "description": "The new employee self-service, onboarding, and learning features of the agency’s core HR system, which the government-wide system includes.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The employee record, training, and onboarding steps share one system"
+        ],
+        "fitsWhen": [
+          "The agency’s core HR system offers onboarding journeys"
+        ],
+        "watchFor": [
+          "Tasks for IT, facilities, and security may still need sending to the systems those teams use"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:guided-onboarding-service-platform",
+      "type": "solution",
+      "title": "The agency’s shared service or case platform",
+      "description": "Onboarding journeys built on the platform the agency already uses for IT and facilities requests, with tasks routed to each team.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Tasks land in the queues IT, facilities, and security already work from"
+        ],
+        "fitsWhen": [
+          "Day-one readiness is the biggest problem, and those teams already use the platform"
+        ],
+        "watchFor": [
+          "Training assignments and the employee record stay in the HR systems, so connections are needed"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:guided-onboarding-product",
+      "type": "solution",
+      "title": "An onboarding product",
+      "description": "An onboarding product connected to the core HR system and the agency’s request systems.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Built for a new employee’s experience, with welcome content and check-ins"
+        ],
+        "fitsWhen": [
+          "The agency hires many people a year across many sites"
+        ],
+        "watchFor": [
+          "Another product to buy and keep up, and its data and connections may need moving when the agency joins the government-wide core HR system"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:federal-payroll-provider-payroll-provider",
+      "type": "solution",
+      "title": "The agency’s federal payroll provider",
+      "description": "The federal payroll provider that serves the agency, fed with its personnel actions and approved time.",
+      "status": "reference",
+      "attributes": {
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:online-retirement-application-ora",
+      "type": "solution",
+      "title": "OPM’s Online Retirement Application",
+      "description": "OPM’s Online Retirement Application, prefilled from EHRI and eOPF and completed by the employee, HR, and payroll.",
+      "status": "reference",
+      "attributes": {
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:eopf-and-ehri-opm-systems",
+      "type": "solution",
+      "title": "OPM’s eOPF and EHRI",
+      "description": "OPM’s eOPF for personnel folders and EHRI for workforce data, with the agency’s data sent on schedule.",
+      "status": "reference",
+      "attributes": {
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:performance-appraisal-system-hr-provider-module",
+      "type": "solution",
+      "title": "The HR provider’s performance tool",
+      "description": "The performance management tool the agency’s HR shared service provider or department offers, connected to its core HR system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Shares data with the core HR system the agency already uses"
+        ],
+        "fitsWhen": [
+          "The provider’s tool supports OPM’s current rating patterns"
+        ],
+        "watchFor": [
+          "The connection to the government-wide core HR system will need building when the agency moves"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:performance-appraisal-system-product",
+      "type": "solution",
+      "title": "A performance management product",
+      "description": "A performance management product configured for OPM’s rules and connected to the core HR system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Can offer better check-ins and goal setting than a basic tool"
+        ],
+        "fitsWhen": [
+          "The agency’s current tool can’t meet the new rules"
+        ],
+        "watchFor": [
+          "Another product to buy and keep up, and to connect to the core HR system"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:hr-ai-drafting-platform",
+      "type": "solution",
+      "title": "An AI model the agency approves",
+      "description": "An AI model in an environment the agency has approved, used with OPM’s standards and the agency’s templates to draft HR documents.",
+      "status": "reference",
+      "attributes": {
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:workforce-analytics-build",
+      "type": "solution",
+      "title": "An analytics workspace",
+      "description": "HR data brought together in the agency’s analytics tools.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Joins data from every HR system the agency uses"
+        ],
+        "fitsWhen": [
+          "The agency has analytics tools and people who use them"
+        ],
+        "watchFor": [
+          "Feeds need rebuilding when the agency moves to the government-wide core HR system"
+        ],
+        "approach": "build"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-positions-filled-on-time",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:positions-filled-on-time"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-hiring-on-merit",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:hiring-on-merit"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-new-employees-start-well",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:new-employees-start-well"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-actions-correct-on-time",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:actions-correct-on-time"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-employees-paid-correctly",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:employees-paid-correctly"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-retirements-without-delay",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:retirements-without-delay"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-performance-managed",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:performance-managed"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-actions-hold-up",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:administering-the-civilian-workforce-seeks-workforce-data-public",
+      "from": "eb:mission:administering-the-civilian-workforce",
+      "predicate": "seeks",
+      "to": "eb:outcome:workforce-data-public"
+    },
+    {
+      "id": "rel:workforce-position-management-contributes-to-positions-filled-on-time",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:positions-filled-on-time"
+    },
+    {
+      "id": "rel:workforce-position-management-contributes-to-hiring-on-merit",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:hiring-on-merit"
+    },
+    {
+      "id": "rel:workforce-position-management-satisfies-approve-each-vacancy",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:approve-each-vacancy"
+    },
+    {
+      "id": "rel:workforce-position-management-satisfies-classify-positions",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:classify-positions"
+    },
+    {
+      "id": "rel:workforce-position-management-candidate-pattern-core-hr-system",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:workforce-position-management-candidate-pattern-workforce-analytics",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:workforce-analytics",
+      "coverage": "partial",
+      "description": "Tracks hiring against the staffing plan and shows where retirements and departures will open gaps."
+    },
+    {
+      "id": "rel:workforce-position-management-candidate-pattern-hr-ai-drafting",
+      "from": "eb:capability:workforce-position-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:hr-ai-drafting",
+      "coverage": "partial",
+      "description": "Drafts position descriptions and job analyses for classifiers to check and finish."
+    },
+    {
+      "id": "rel:recruitment-hiring-contributes-to-positions-filled-on-time",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:positions-filled-on-time"
+    },
+    {
+      "id": "rel:recruitment-hiring-contributes-to-hiring-on-merit",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:hiring-on-merit"
+    },
+    {
+      "id": "rel:recruitment-hiring-satisfies-announce-vacancies",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:announce-vacancies"
+    },
+    {
+      "id": "rel:recruitment-hiring-satisfies-assess-before-certifying",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:assess-before-certifying"
+    },
+    {
+      "id": "rel:recruitment-hiring-satisfies-rank-with-veterans-preference",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "satisfies",
+      "to": "eb:requirement:rank-with-veterans-preference"
+    },
+    {
+      "id": "rel:recruitment-hiring-candidate-pattern-usa-staffing-hiring",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:usa-staffing-hiring"
+    },
+    {
+      "id": "rel:recruitment-hiring-candidate-pattern-hr-ai-drafting",
+      "from": "eb:capability:recruitment-hiring",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:hr-ai-drafting",
+      "coverage": "partial",
+      "description": "Drafts job announcements and interview questions from the job analysis. It doesn’t screen, rate, or rank applicants."
+    },
+    {
+      "id": "rel:pre-employment-vetting-contributes-to-new-employees-start-well",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:new-employees-start-well"
+    },
+    {
+      "id": "rel:pre-employment-vetting-contributes-to-positions-filled-on-time",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:positions-filled-on-time"
+    },
+    {
+      "id": "rel:pre-employment-vetting-satisfies-designate-position-risk",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:designate-position-risk"
+    },
+    {
+      "id": "rel:pre-employment-vetting-satisfies-verify-employment-eligibility",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:verify-employment-eligibility"
+    },
+    {
+      "id": "rel:pre-employment-vetting-satisfies-vet-within-goals",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:vet-within-goals"
+    },
+    {
+      "id": "rel:pre-employment-vetting-candidate-pattern-pre-employment-connections",
+      "from": "eb:capability:pre-employment-vetting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:pre-employment-connections"
+    },
+    {
+      "id": "rel:new-employee-onboarding-contributes-to-new-employees-start-well",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:new-employees-start-well"
+    },
+    {
+      "id": "rel:new-employee-onboarding-contributes-to-performance-managed",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:performance-managed"
+    },
+    {
+      "id": "rel:new-employee-onboarding-satisfies-security-awareness-before-access",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "satisfies",
+      "to": "eb:requirement:security-awareness-before-access"
+    },
+    {
+      "id": "rel:new-employee-onboarding-satisfies-ethics-training-within-3-months",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "satisfies",
+      "to": "eb:requirement:ethics-training-within-3-months"
+    },
+    {
+      "id": "rel:new-employee-onboarding-satisfies-no-fear-training-within-90-days",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "satisfies",
+      "to": "eb:requirement:no-fear-training-within-90-days"
+    },
+    {
+      "id": "rel:new-employee-onboarding-candidate-pattern-guided-onboarding",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:guided-onboarding"
+    },
+    {
+      "id": "rel:new-employee-onboarding-candidate-pattern-core-hr-system",
+      "from": "eb:capability:new-employee-onboarding",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system",
+      "coverage": "partial",
+      "description": "Gives new employees self-service and assigns their training. Tasks for IT, facilities, and security often run elsewhere."
+    },
+    {
+      "id": "rel:personnel-action-processing-contributes-to-actions-correct-on-time",
+      "from": "eb:capability:personnel-action-processing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-correct-on-time"
+    },
+    {
+      "id": "rel:personnel-action-processing-contributes-to-employees-paid-correctly",
+      "from": "eb:capability:personnel-action-processing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:employees-paid-correctly"
+    },
+    {
+      "id": "rel:personnel-action-processing-satisfies-approve-by-effective-date",
+      "from": "eb:capability:personnel-action-processing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:approve-by-effective-date"
+    },
+    {
+      "id": "rel:personnel-action-processing-satisfies-notify-employees-of-actions",
+      "from": "eb:capability:personnel-action-processing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:notify-employees-of-actions"
+    },
+    {
+      "id": "rel:personnel-action-processing-candidate-pattern-core-hr-system",
+      "from": "eb:capability:personnel-action-processing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:pay-leave-administration-contributes-to-employees-paid-correctly",
+      "from": "eb:capability:pay-leave-administration",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:employees-paid-correctly"
+    },
+    {
+      "id": "rel:pay-leave-administration-satisfies-notice-before-pay-debt-collection",
+      "from": "eb:capability:pay-leave-administration",
+      "predicate": "satisfies",
+      "to": "eb:requirement:notice-before-pay-debt-collection"
+    },
+    {
+      "id": "rel:pay-leave-administration-candidate-pattern-federal-payroll-provider",
+      "from": "eb:capability:pay-leave-administration",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:federal-payroll-provider"
+    },
+    {
+      "id": "rel:pay-leave-administration-candidate-pattern-core-hr-system",
+      "from": "eb:capability:pay-leave-administration",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system",
+      "coverage": "partial",
+      "description": "Records time and attendance and sends personnel actions to payroll. Pay itself is calculated by the payroll provider."
+    },
+    {
+      "id": "rel:benefits-retirement-contributes-to-retirements-without-delay",
+      "from": "eb:capability:benefits-retirement",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:retirements-without-delay"
+    },
+    {
+      "id": "rel:benefits-retirement-satisfies-offer-enrollment-in-time",
+      "from": "eb:capability:benefits-retirement",
+      "predicate": "satisfies",
+      "to": "eb:requirement:offer-enrollment-in-time"
+    },
+    {
+      "id": "rel:benefits-retirement-satisfies-submit-retirements-online",
+      "from": "eb:capability:benefits-retirement",
+      "predicate": "satisfies",
+      "to": "eb:requirement:submit-retirements-online"
+    },
+    {
+      "id": "rel:benefits-retirement-candidate-pattern-online-retirement-application",
+      "from": "eb:capability:benefits-retirement",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:online-retirement-application"
+    },
+    {
+      "id": "rel:benefits-retirement-candidate-pattern-core-hr-system",
+      "from": "eb:capability:benefits-retirement",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system",
+      "coverage": "partial",
+      "description": "Employees enroll and update benefits through self-service. Retirement applications are prepared in OPM’s online system."
+    },
+    {
+      "id": "rel:performance-management-contributes-to-performance-managed",
+      "from": "eb:capability:performance-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:performance-managed"
+    },
+    {
+      "id": "rel:performance-management-contributes-to-actions-hold-up",
+      "from": "eb:capability:performance-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:performance-management-satisfies-communicate-performance-plans",
+      "from": "eb:capability:performance-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:communicate-performance-plans"
+    },
+    {
+      "id": "rel:performance-management-satisfies-rate-within-distribution",
+      "from": "eb:capability:performance-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:rate-within-distribution"
+    },
+    {
+      "id": "rel:performance-management-satisfies-certify-probationers",
+      "from": "eb:capability:performance-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:certify-probationers"
+    },
+    {
+      "id": "rel:performance-management-candidate-pattern-performance-appraisal-system",
+      "from": "eb:capability:performance-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:performance-appraisal-system"
+    },
+    {
+      "id": "rel:performance-management-candidate-pattern-workforce-analytics",
+      "from": "eb:capability:performance-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:workforce-analytics",
+      "coverage": "partial",
+      "description": "Shows plans and ratings due or overdue, and ratings against the cap, by office."
+    },
+    {
+      "id": "rel:employee-relations-conduct-contributes-to-actions-hold-up",
+      "from": "eb:capability:employee-relations-conduct",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:employee-relations-conduct-satisfies-notice-and-reply-before-adverse-action",
+      "from": "eb:capability:employee-relations-conduct",
+      "predicate": "satisfies",
+      "to": "eb:requirement:notice-and-reply-before-adverse-action"
+    },
+    {
+      "id": "rel:employee-relations-conduct-satisfies-opportunity-to-improve",
+      "from": "eb:capability:employee-relations-conduct",
+      "predicate": "satisfies",
+      "to": "eb:requirement:opportunity-to-improve"
+    },
+    {
+      "id": "rel:employee-relations-conduct-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:employee-relations-conduct",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Each matter tracked as its own case, with its notices, deadlines, evidence, decision, and any appeal."
+    },
+    {
+      "id": "rel:employee-relations-conduct-candidate-pattern-letters-from-case-data",
+      "from": "eb:capability:employee-relations-conduct",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "coverage": "partial",
+      "description": "Assembles proposal and decision letters from the case, for the manager and counsel to review."
+    },
+    {
+      "id": "rel:separations-reshaping-contributes-to-actions-correct-on-time",
+      "from": "eb:capability:separations-reshaping",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-correct-on-time"
+    },
+    {
+      "id": "rel:separations-reshaping-contributes-to-actions-hold-up",
+      "from": "eb:capability:separations-reshaping",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:separations-reshaping-satisfies-give-rif-notice",
+      "from": "eb:capability:separations-reshaping",
+      "predicate": "satisfies",
+      "to": "eb:requirement:give-rif-notice"
+    },
+    {
+      "id": "rel:separations-reshaping-candidate-pattern-core-hr-system",
+      "from": "eb:capability:separations-reshaping",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:core-hr-system",
+      "coverage": "partial",
+      "description": "Processes separation actions and sends final pay information to payroll. Retention registers for a reduction in force often need a separate tool."
+    },
+    {
+      "id": "rel:separations-reshaping-candidate-pattern-workforce-analytics",
+      "from": "eb:capability:separations-reshaping",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:workforce-analytics",
+      "coverage": "partial",
+      "description": "Builds retention registers from the core HR data, for HR specialists to check."
+    },
+    {
+      "id": "rel:personnel-records-reporting-contributes-to-workforce-data-public",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:workforce-data-public"
+    },
+    {
+      "id": "rel:personnel-records-reporting-contributes-to-actions-correct-on-time",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-correct-on-time"
+    },
+    {
+      "id": "rel:personnel-records-reporting-satisfies-keep-one-personnel-folder",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-one-personnel-folder"
+    },
+    {
+      "id": "rel:personnel-records-reporting-satisfies-report-workforce-data",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-workforce-data"
+    },
+    {
+      "id": "rel:personnel-records-reporting-candidate-pattern-eopf-and-ehri",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eopf-and-ehri"
+    },
+    {
+      "id": "rel:personnel-records-reporting-candidate-pattern-workforce-analytics",
+      "from": "eb:capability:personnel-records-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:workforce-analytics",
+      "coverage": "partial",
+      "description": "Checks the data before it’s sent and finds errors OPM returns."
+    },
+    {
+      "id": "rel:core-hr-system-depends-on-agency-sign-on",
+      "from": "eb:implementationPattern:core-hr-system",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on",
+      "description": "Employees and managers sign in through the agency, and HR roles follow its role groups."
+    },
+    {
+      "id": "rel:core-hr-system-works-with-federal-payroll-provider",
+      "from": "eb:implementationPattern:core-hr-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:federal-payroll-provider",
+      "description": "Personnel actions and approved time flow to payroll each pay period."
+    },
+    {
+      "id": "rel:core-hr-system-works-with-eopf-and-ehri",
+      "from": "eb:implementationPattern:core-hr-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:eopf-and-ehri",
+      "description": "Actions and documents reach the electronic personnel folder and OPM’s workforce data."
+    },
+    {
+      "id": "rel:core-hr-system-works-with-usa-staffing-hiring",
+      "from": "eb:implementationPattern:core-hr-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:usa-staffing-hiring",
+      "description": "Selections become new hire records and appointment actions."
+    },
+    {
+      "id": "rel:usa-staffing-hiring-works-with-pre-employment-connections",
+      "from": "eb:implementationPattern:usa-staffing-hiring",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:pre-employment-connections",
+      "description": "Each tentative offer starts onboarding and vetting."
+    },
+    {
+      "id": "rel:usa-staffing-hiring-works-with-workforce-analytics",
+      "from": "eb:implementationPattern:usa-staffing-hiring",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:workforce-analytics",
+      "description": "Time to hire and assessment use feed the agency’s reports."
+    },
+    {
+      "id": "rel:pre-employment-connections-works-with-core-hr-system",
+      "from": "eb:implementationPattern:pre-employment-connections",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:core-hr-system",
+      "description": "The completed onboarding becomes the appointment action and the employee record."
+    },
+    {
+      "id": "rel:pre-employment-connections-works-with-agency-sign-on",
+      "from": "eb:implementationPattern:pre-employment-connections",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:agency-sign-on",
+      "description": "Accounts and credentials are issued as the new employee joins."
+    },
+    {
+      "id": "rel:guided-onboarding-works-with-pre-employment-connections",
+      "from": "eb:implementationPattern:guided-onboarding",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:pre-employment-connections",
+      "description": "The journey picks up the vetting and credential steps that run before the first day."
+    },
+    {
+      "id": "rel:guided-onboarding-works-with-core-hr-system",
+      "from": "eb:implementationPattern:guided-onboarding",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:core-hr-system",
+      "description": "The new employee’s record, and their training, come from the core HR system."
+    },
+    {
+      "id": "rel:guided-onboarding-works-with-performance-appraisal-system",
+      "from": "eb:implementationPattern:guided-onboarding",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:performance-appraisal-system",
+      "description": "The first check-in starts the new employee’s performance plan."
+    },
+    {
+      "id": "rel:federal-payroll-provider-works-with-core-hr-system",
+      "from": "eb:implementationPattern:federal-payroll-provider",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:federal-payroll-provider-works-with-online-retirement-application",
+      "from": "eb:implementationPattern:federal-payroll-provider",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:online-retirement-application",
+      "description": "Payroll certifies pay and leave information on each retirement application."
+    },
+    {
+      "id": "rel:online-retirement-application-depends-on-eopf-and-ehri",
+      "from": "eb:implementationPattern:online-retirement-application",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:eopf-and-ehri",
+      "description": "Applications are prefilled from EHRI and eOPF data."
+    },
+    {
+      "id": "rel:eopf-and-ehri-works-with-records-in-business-systems",
+      "from": "eb:implementationPattern:eopf-and-ehri",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:records-in-business-systems",
+      "description": "Personnel records follow General Records Schedule 2.2."
+    },
+    {
+      "id": "rel:performance-appraisal-system-works-with-core-hr-system",
+      "from": "eb:implementationPattern:performance-appraisal-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:core-hr-system",
+      "description": "Ratings of record are saved on the employee’s record."
+    },
+    {
+      "id": "rel:workforce-analytics-works-with-core-hr-system",
+      "from": "eb:implementationPattern:workforce-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:merit-hiring-plan-resources-helps-with-administering-the-civilian-workforce",
+      "from": "eb:resource:merit-hiring-plan-resources",
+      "predicate": "helps_with",
+      "to": "eb:mission:administering-the-civilian-workforce"
+    },
+    {
+      "id": "rel:merit-hiring-plan-resources-helps-with-recruitment-hiring",
+      "from": "eb:resource:merit-hiring-plan-resources",
+      "predicate": "helps_with",
+      "to": "eb:capability:recruitment-hiring"
+    },
+    {
+      "id": "rel:merit-hiring-plan-resources-helps-with-usa-staffing-hiring-usa-staffing",
+      "from": "eb:resource:merit-hiring-plan-resources",
+      "predicate": "helps_with",
+      "to": "eb:solution:usa-staffing-hiring-usa-staffing"
+    },
+    {
+      "id": "rel:assessment-and-selection-helps-with-recruitment-hiring",
+      "from": "eb:resource:assessment-and-selection",
+      "predicate": "helps_with",
+      "to": "eb:capability:recruitment-hiring"
+    },
+    {
+      "id": "rel:assessment-and-selection-helps-with-assess-before-certifying",
+      "from": "eb:resource:assessment-and-selection",
+      "predicate": "helps_with",
+      "to": "eb:requirement:assess-before-certifying"
+    },
+    {
+      "id": "rel:classification-qualifications-helps-with-workforce-position-management",
+      "from": "eb:resource:classification-qualifications",
+      "predicate": "helps_with",
+      "to": "eb:capability:workforce-position-management"
+    },
+    {
+      "id": "rel:classification-qualifications-helps-with-classify-positions",
+      "from": "eb:resource:classification-qualifications",
+      "predicate": "helps_with",
+      "to": "eb:requirement:classify-positions"
+    },
+    {
+      "id": "rel:classification-qualifications-helps-with-hr-ai-drafting",
+      "from": "eb:resource:classification-qualifications",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:hr-ai-drafting"
+    },
+    {
+      "id": "rel:dod-onboarding-resource-portal-helps-with-new-employee-onboarding",
+      "from": "eb:resource:dod-onboarding-resource-portal",
+      "predicate": "helps_with",
+      "to": "eb:capability:new-employee-onboarding"
+    },
+    {
+      "id": "rel:dod-onboarding-resource-portal-helps-with-guided-onboarding",
+      "from": "eb:resource:dod-onboarding-resource-portal",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:guided-onboarding"
+    },
+    {
+      "id": "rel:guide-to-processing-personnel-actions-helps-with-personnel-action-processing",
+      "from": "eb:resource:guide-to-processing-personnel-actions",
+      "predicate": "helps_with",
+      "to": "eb:capability:personnel-action-processing"
+    },
+    {
+      "id": "rel:guide-to-processing-personnel-actions-helps-with-personnel-records-reporting",
+      "from": "eb:resource:guide-to-processing-personnel-actions",
+      "predicate": "helps_with",
+      "to": "eb:capability:personnel-records-reporting"
+    },
+    {
+      "id": "rel:ora-hr-specialist-guide-helps-with-benefits-retirement",
+      "from": "eb:resource:ora-hr-specialist-guide",
+      "predicate": "helps_with",
+      "to": "eb:capability:benefits-retirement"
+    },
+    {
+      "id": "rel:ora-hr-specialist-guide-helps-with-online-retirement-application",
+      "from": "eb:resource:ora-hr-specialist-guide",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:online-retirement-application"
+    },
+    {
+      "id": "rel:performance-management-resources-helps-with-performance-management",
+      "from": "eb:resource:performance-management-resources",
+      "predicate": "helps_with",
+      "to": "eb:capability:performance-management"
+    },
+    {
+      "id": "rel:employee-relations-resources-helps-with-employee-relations-conduct",
+      "from": "eb:resource:employee-relations-resources",
+      "predicate": "helps_with",
+      "to": "eb:capability:employee-relations-conduct"
+    },
+    {
+      "id": "rel:reductions-in-force-helps-with-separations-reshaping",
+      "from": "eb:resource:reductions-in-force",
+      "predicate": "helps_with",
+      "to": "eb:capability:separations-reshaping"
+    },
+    {
+      "id": "rel:federal-workforce-data-helps-with-personnel-records-reporting",
+      "from": "eb:resource:federal-workforce-data",
+      "predicate": "helps_with",
+      "to": "eb:capability:personnel-records-reporting"
+    },
+    {
+      "id": "rel:federal-workforce-data-helps-with-workforce-analytics",
+      "from": "eb:resource:federal-workforce-data",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:workforce-analytics"
+    },
+    {
+      "id": "rel:core-hr-system-federal-core-hcm-implements-core-hr-system",
+      "from": "eb:solution:core-hr-system-federal-core-hcm",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:core-hr-system-hr-shared-service-implements-core-hr-system",
+      "from": "eb:solution:core-hr-system-hr-shared-service",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:core-hr-system"
+    },
+    {
+      "id": "rel:usa-staffing-hiring-usa-staffing-implements-usa-staffing-hiring",
+      "from": "eb:solution:usa-staffing-hiring-usa-staffing",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:usa-staffing-hiring"
+    },
+    {
+      "id": "rel:usa-staffing-hiring-talent-acquisition-product-implements-usa-staffing-hiring",
+      "from": "eb:solution:usa-staffing-hiring-talent-acquisition-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:usa-staffing-hiring"
+    },
+    {
+      "id": "rel:pre-employment-connections-talent-acquisition-onboarding-implements-pre-employment-connections",
+      "from": "eb:solution:pre-employment-connections-talent-acquisition-onboarding",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:pre-employment-connections"
+    },
+    {
+      "id": "rel:guided-onboarding-core-hcm-implements-guided-onboarding",
+      "from": "eb:solution:guided-onboarding-core-hcm",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:guided-onboarding"
+    },
+    {
+      "id": "rel:guided-onboarding-service-platform-implements-guided-onboarding",
+      "from": "eb:solution:guided-onboarding-service-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:guided-onboarding"
+    },
+    {
+      "id": "rel:guided-onboarding-product-implements-guided-onboarding",
+      "from": "eb:solution:guided-onboarding-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:guided-onboarding"
+    },
+    {
+      "id": "rel:federal-payroll-provider-payroll-provider-implements-federal-payroll-provider",
+      "from": "eb:solution:federal-payroll-provider-payroll-provider",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:federal-payroll-provider"
+    },
+    {
+      "id": "rel:online-retirement-application-ora-implements-online-retirement-application",
+      "from": "eb:solution:online-retirement-application-ora",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:online-retirement-application"
+    },
+    {
+      "id": "rel:eopf-and-ehri-opm-systems-implements-eopf-and-ehri",
+      "from": "eb:solution:eopf-and-ehri-opm-systems",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:eopf-and-ehri"
+    },
+    {
+      "id": "rel:performance-appraisal-system-hr-provider-module-implements-performance-appraisal-system",
+      "from": "eb:solution:performance-appraisal-system-hr-provider-module",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:performance-appraisal-system"
+    },
+    {
+      "id": "rel:performance-appraisal-system-product-implements-performance-appraisal-system",
+      "from": "eb:solution:performance-appraisal-system-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:performance-appraisal-system"
+    },
+    {
+      "id": "rel:hr-ai-drafting-platform-implements-hr-ai-drafting",
+      "from": "eb:solution:hr-ai-drafting-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:hr-ai-drafting"
+    },
+    {
+      "id": "rel:workforce-analytics-build-implements-workforce-analytics",
+      "from": "eb:solution:workforce-analytics-build",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:workforce-analytics"
+    },
+    {
+      "id": "rel:case-management-contributes-to-actions-hold-up",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-pre-employment-connections",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:pre-employment-connections"
+    },
+    {
+      "id": "rel:records-management-contributes-to-actions-correct-on-time",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-correct-on-time"
+    },
+    {
+      "id": "rel:records-management-contributes-to-actions-hold-up",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:actions-hold-up"
+    },
+    {
+      "id": "rel:records-management-candidate-pattern-eopf-and-ehri",
+      "from": "eb:capability:records-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eopf-and-ehri"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-new-employees-start-well",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:new-employees-start-well"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-workforce-data-public",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:workforce-data-public"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:hr-results",
+      "title": "HR results discovery",
+      "questions": [
+        {
+          "id": "question:hr-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "positions-filled-on-time",
+              "label": "The agency fills the positions it needs on time"
+            },
+            {
+              "value": "hiring-on-merit",
+              "label": "People are hired on merit, with veterans’ preference"
+            },
+            {
+              "value": "new-employees-start-well",
+              "label": "New employees start well, vetted, equipped, and supported"
+            },
+            {
+              "value": "actions-correct-on-time",
+              "label": "Personnel actions are correct and take effect on time"
+            },
+            {
+              "value": "employees-paid-correctly",
+              "label": "Employees are paid correctly and on time"
+            },
+            {
+              "value": "retirements-without-delay",
+              "label": "Retiring employees get their annuity without delay"
+            },
+            {
+              "value": "performance-managed",
+              "label": "Employees know what’s expected and are rated on it"
+            },
+            {
+              "value": "actions-hold-up",
+              "label": "Discipline and removals are fair and hold up on appeal"
+            },
+            {
+              "value": "workforce-data-public",
+              "label": "The workforce’s data is open to view"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "positions-filled-on-time",
+              "elementId": "eb:outcome:positions-filled-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "hiring-on-merit",
+              "elementId": "eb:outcome:hiring-on-merit",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "new-employees-start-well",
+              "elementId": "eb:outcome:new-employees-start-well",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "actions-correct-on-time",
+              "elementId": "eb:outcome:actions-correct-on-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "employees-paid-correctly",
+              "elementId": "eb:outcome:employees-paid-correctly",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "retirements-without-delay",
+              "elementId": "eb:outcome:retirements-without-delay",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "performance-managed",
+              "elementId": "eb:outcome:performance-managed",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "actions-hold-up",
+              "elementId": "eb:outcome:actions-hold-up",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "workforce-data-public",
+              "elementId": "eb:outcome:workforce-data-public",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-tracked-measures",
+          "prompt": "Which of these does the office track during the year?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "time-to-hire",
+              "label": "Time to hire, to the initial offer"
+            },
+            {
+              "value": "assessments",
+              "label": "How hiring actions assess applicants, and certificates returned without a selection"
+            },
+            {
+              "value": "vetting",
+              "label": "How long vetting takes for new employees"
+            },
+            {
+              "value": "onboarding",
+              "label": "Day-one readiness, new employee training, and first-year departures"
+            },
+            {
+              "value": "actions",
+              "label": "Personnel actions processed late, and errors OPM returns"
+            },
+            {
+              "value": "pay-debts",
+              "label": "Overpayments and the pay debts they create"
+            },
+            {
+              "value": "retirements",
+              "label": "How long retirement applications take to reach OPM"
+            },
+            {
+              "value": "ratings",
+              "label": "Performance plans and ratings on time, and the share at the top levels"
+            },
+            {
+              "value": "appeals",
+              "label": "Adverse actions appealed, and how they turned out"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "time-to-hire",
+              "elementId": "eb:measure:time-to-initial-offer",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "assessments",
+              "elementId": "eb:measure:actions-with-technical-assessment",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "assessments",
+              "elementId": "eb:measure:certificates-without-selection",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "vetting",
+              "elementId": "eb:measure:vetting-timeliness",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "onboarding",
+              "elementId": "eb:measure:ready-on-day-one",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "onboarding",
+              "elementId": "eb:measure:new-employee-training-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "onboarding",
+              "elementId": "eb:measure:first-year-departures",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "actions",
+              "elementId": "eb:measure:retroactive-actions",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "actions",
+              "elementId": "eb:measure:ehri-errors",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "actions",
+              "elementId": "eb:measure:ehri-submissions-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "pay-debts",
+              "elementId": "eb:measure:pay-debts-established",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "retirements",
+              "elementId": "eb:measure:days-to-submit-retirement",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "ratings",
+              "elementId": "eb:measure:plans-and-ratings-on-time",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "ratings",
+              "elementId": "eb:measure:top-ratings-share",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "appeals",
+              "elementId": "eb:measure:actions-sustained-on-appeal",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-measure-sources",
+          "prompt": "Where do those figures come from today, and who puts them together?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the agency’s HR office and how the office tells how it’s doing. They ask about the office’s operations, never about individual employees, applicants, or cases. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:hr-operations",
+      "title": "HR operations discovery",
+      "questions": [
+        {
+          "id": "question:hr-core-system",
+          "prompt": "Where does the agency process personnel actions today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "shared-service",
+              "label": "An HR shared service provider’s system"
+            },
+            {
+              "value": "department",
+              "label": "The department’s own HR system"
+            },
+            {
+              "value": "agency-system",
+              "label": "A system the agency runs itself"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "shared-service",
+              "elementId": "eb:capability:personnel-action-processing",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            },
+            {
+              "answerValue": "department",
+              "elementId": "eb:capability:personnel-action-processing",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            },
+            {
+              "answerValue": "agency-system",
+              "elementId": "eb:capability:personnel-action-processing",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            },
+            {
+              "answerValue": "shared-service",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            },
+            {
+              "answerValue": "department",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            },
+            {
+              "answerValue": "agency-system",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Every agency is moving to the government-wide core HR system, so its data, connections, and staff need preparing for its wave."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-core-wave",
+          "prompt": "Does the office know when the agency moves to the government-wide core HR system?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Agencies were asked to pause their own core HR projects and prepare data and connections now, so knowing the wave shapes what to work on first."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-position-data",
+          "prompt": "Where does the office keep position data, such as each position’s classification, organization, and funding?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "core-system",
+              "label": "In the core HR system, as records of their own"
+            },
+            {
+              "value": "separate-tool",
+              "label": "In a separate position management tool"
+            },
+            {
+              "value": "spreadsheets",
+              "label": "In spreadsheets and documents"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "separate-tool",
+              "elementId": "eb:capability:workforce-position-management",
+              "interpretation": "Positions kept apart from the core record drift from it, and the staffing plan and approvals depend on them."
+            },
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:capability:workforce-position-management",
+              "interpretation": "Positions kept apart from the core record drift from it, and the staffing plan and approvals depend on them."
+            },
+            {
+              "answerValue": "separate-tool",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Positions kept apart from the core record drift from it, and the staffing plan and approvals depend on them."
+            },
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:implementationPattern:core-hr-system",
+              "interpretation": "Positions kept apart from the core record drift from it, and the staffing plan and approvals depend on them."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-vacancy-approvals",
+          "prompt": "How are vacancies approved by the Strategic Hiring Committee and tracked against the staffing plan?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "Requests and approvals in a system, tracked against the plan"
+            },
+            {
+              "value": "email",
+              "label": "By email and memos, tracked in spreadsheets"
+            },
+            {
+              "value": "not-yet",
+              "label": "The process is still being set up"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:workforce-position-management",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            },
+            {
+              "answerValue": "not-yet",
+              "elementId": "eb:capability:workforce-position-management",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:approve-each-vacancy",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            },
+            {
+              "answerValue": "not-yet",
+              "elementId": "eb:requirement:approve-each-vacancy",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:implementationPattern:workforce-analytics",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            },
+            {
+              "answerValue": "not-yet",
+              "elementId": "eb:implementationPattern:workforce-analytics",
+              "interpretation": "Approvals tracked by hand make it hard to see where each request stands and how hiring compares with the plan."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-assessments",
+          "prompt": "How do most hiring actions rank applicants today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "technical",
+              "label": "Technical or alternative assessments, such as USA Hire or structured interviews"
+            },
+            {
+              "value": "mixed",
+              "label": "Some technical assessments, some self-assessments"
+            },
+            {
+              "value": "self-assessment",
+              "label": "Mostly self-assessment questionnaires"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:recruitment-hiring",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            },
+            {
+              "answerValue": "self-assessment",
+              "elementId": "eb:capability:recruitment-hiring",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:requirement:assess-before-certifying",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            },
+            {
+              "answerValue": "self-assessment",
+              "elementId": "eb:requirement:assess-before-certifying",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:implementationPattern:usa-staffing-hiring",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            },
+            {
+              "answerValue": "self-assessment",
+              "elementId": "eb:implementationPattern:usa-staffing-hiring",
+              "interpretation": "The Merit Hiring Plan requires a technical or alternative assessment before the certificate and ends ranking by self-assessment."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-shared-certificates",
+          "prompt": "Does the office share certificates or talent pools across offices or agencies?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:recruitment-hiring",
+              "interpretation": "Sharing one assessment across several hires is among the quickest ways to cut time to hire."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:usa-staffing-hiring",
+              "interpretation": "Sharing one assessment across several hires is among the quickest ways to cut time to hire."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-pre-employment",
+          "prompt": "How do the steps between the tentative offer and the first day work today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "connected",
+              "label": "In a system connected to vetting, E-Verify, and credentials"
+            },
+            {
+              "value": "partly",
+              "label": "In a system, with vetting and credentials handled separately"
+            },
+            {
+              "value": "manual",
+              "label": "By email, PDFs, and spreadsheets"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "partly",
+              "elementId": "eb:capability:pre-employment-vetting",
+              "interpretation": "Start dates slip when vetting, credentials, and paperwork aren’t tracked together."
+            },
+            {
+              "answerValue": "manual",
+              "elementId": "eb:capability:pre-employment-vetting",
+              "interpretation": "Start dates slip when vetting, credentials, and paperwork aren’t tracked together."
+            },
+            {
+              "answerValue": "partly",
+              "elementId": "eb:implementationPattern:pre-employment-connections",
+              "interpretation": "Start dates slip when vetting, credentials, and paperwork aren’t tracked together."
+            },
+            {
+              "answerValue": "manual",
+              "elementId": "eb:implementationPattern:pre-employment-connections",
+              "interpretation": "Start dates slip when vetting, credentials, and paperwork aren’t tracked together."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-day-one",
+          "prompt": "How often are new employees’ equipment, accounts, and credential ready on their first day?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "always",
+              "label": "Almost always"
+            },
+            {
+              "value": "usually",
+              "label": "Usually, with a few gaps"
+            },
+            {
+              "value": "often-not",
+              "label": "Often not, especially for remote employees"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "usually",
+              "elementId": "eb:capability:new-employee-onboarding",
+              "interpretation": "A first day without equipment or accounts wastes the new employee’s time and sets the tone for what follows."
+            },
+            {
+              "answerValue": "often-not",
+              "elementId": "eb:capability:new-employee-onboarding",
+              "interpretation": "A first day without equipment or accounts wastes the new employee’s time and sets the tone for what follows."
+            },
+            {
+              "answerValue": "usually",
+              "elementId": "eb:implementationPattern:guided-onboarding",
+              "interpretation": "A first day without equipment or accounts wastes the new employee’s time and sets the tone for what follows."
+            },
+            {
+              "answerValue": "often-not",
+              "elementId": "eb:implementationPattern:guided-onboarding",
+              "interpretation": "A first day without equipment or accounts wastes the new employee’s time and sets the tone for what follows."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-sponsors",
+          "prompt": "Does each new employee get a sponsor who helps them settle in?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:new-employee-onboarding",
+              "interpretation": "A sponsor answers the everyday questions a supervisor may not think of, which helps new employees become effective and stay."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:guided-onboarding",
+              "interpretation": "A sponsor answers the everyday questions a supervisor may not think of, which helps new employees become effective and stay."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-new-employee-training",
+          "prompt": "Does the office track that new employees complete security, ethics, and No FEAR Act training by their deadlines?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:new-employee-onboarding",
+              "interpretation": "Each has a deadline counted from the start date or from system access, and they’re easy to miss without tracking."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:security-awareness-before-access",
+              "interpretation": "Each has a deadline counted from the start date or from system access, and they’re easy to miss without tracking."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:ethics-training-within-3-months",
+              "interpretation": "Each has a deadline counted from the start date or from system access, and they’re easy to miss without tracking."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:no-fear-training-within-90-days",
+              "interpretation": "Each has a deadline counted from the start date or from system access, and they’re easy to miss without tracking."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-first-year",
+          "prompt": "Does the office hear from new employees about their first months, or know how many leave in their first year?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "both",
+              "label": "Both, by office"
+            },
+            {
+              "value": "one",
+              "label": "One or the other"
+            },
+            {
+              "value": "neither",
+              "label": "Neither"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "one",
+              "elementId": "eb:outcome:new-employees-start-well",
+              "interpretation": "People who leave in their first year often say why in their first months, while there’s still time to act."
+            },
+            {
+              "answerValue": "neither",
+              "elementId": "eb:outcome:new-employees-start-well",
+              "interpretation": "People who leave in their first year often say why in their first months, while there’s still time to act."
+            },
+            {
+              "answerValue": "one",
+              "elementId": "eb:measure:first-year-departures",
+              "interpretation": "People who leave in their first year often say why in their first months, while there’s still time to act."
+            },
+            {
+              "answerValue": "neither",
+              "elementId": "eb:measure:first-year-departures",
+              "interpretation": "People who leave in their first year often say why in their first months, while there’s still time to act."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-action-errors",
+          "prompt": "Does the office regularly fix errors that OPM returns from its screening of the agency’s data?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:personnel-records-reporting",
+              "interpretation": "Errors left in the data reach retirement calculations and the public workforce figures."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:report-workforce-data",
+              "interpretation": "Errors left in the data reach retirement calculations and the public workforce figures."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:eopf-and-ehri",
+              "interpretation": "Errors left in the data reach retirement calculations and the public workforce figures."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-pay-errors",
+          "prompt": "What most often causes pay errors?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "late-actions",
+              "label": "Personnel actions processed late"
+            },
+            {
+              "value": "time",
+              "label": "Time and attendance errors"
+            },
+            {
+              "value": "coding",
+              "label": "Actions coded wrongly"
+            },
+            {
+              "value": "rare",
+              "label": "Pay errors are rare"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "late-actions",
+              "elementId": "eb:capability:personnel-action-processing",
+              "interpretation": "Actions that are late or coded wrongly reach payroll wrong, and become debts the employee has to repay."
+            },
+            {
+              "answerValue": "coding",
+              "elementId": "eb:capability:personnel-action-processing",
+              "interpretation": "Actions that are late or coded wrongly reach payroll wrong, and become debts the employee has to repay."
+            },
+            {
+              "answerValue": "late-actions",
+              "elementId": "eb:requirement:approve-by-effective-date",
+              "interpretation": "Actions that are late or coded wrongly reach payroll wrong, and become debts the employee has to repay."
+            },
+            {
+              "answerValue": "coding",
+              "elementId": "eb:requirement:approve-by-effective-date",
+              "interpretation": "Actions that are late or coded wrongly reach payroll wrong, and become debts the employee has to repay."
+            },
+            {
+              "answerValue": "time",
+              "elementId": "eb:capability:pay-leave-administration",
+              "interpretation": "Time and attendance errors are fixed best where time is approved, before payroll runs."
+            },
+            {
+              "answerValue": "time",
+              "elementId": "eb:implementationPattern:federal-payroll-provider",
+              "interpretation": "Time and attendance errors are fixed best where time is approved, before payroll runs."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-retirements",
+          "prompt": "Do HR specialists prepare every retirement application in OPM’s Online Retirement Application?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:benefits-retirement",
+              "interpretation": "OPM’s online system replaces the paper process, and applications prepared there reach OPM sooner and complete."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:submit-retirements-online",
+              "interpretation": "OPM’s online system replaces the paper process, and applications prepared there reach OPM sooner and complete."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:online-retirement-application",
+              "interpretation": "OPM’s online system replaces the paper process, and applications prepared there reach OPM sooner and complete."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-performance-tool",
+          "prompt": "Where are performance plans and ratings kept?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "online",
+              "label": "In an online performance tool"
+            },
+            {
+              "value": "documents",
+              "label": "In documents and email"
+            },
+            {
+              "value": "paper",
+              "label": "On paper forms"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:performance-management",
+              "interpretation": "Plans and ratings outside a system are hard to check against OPM’s distribution cap before they’re final."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:capability:performance-management",
+              "interpretation": "Plans and ratings outside a system are hard to check against OPM’s distribution cap before they’re final."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:performance-appraisal-system",
+              "interpretation": "Plans and ratings outside a system are hard to check against OPM’s distribution cap before they’re final."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:implementationPattern:performance-appraisal-system",
+              "interpretation": "Plans and ratings outside a system are hard to check against OPM’s distribution cap before they’re final."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-probation-tracking",
+          "prompt": "Does the office track each probationer’s end date and certification decision in a system?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:performance-management",
+              "interpretation": "Without a timely certification, the employee’s service ends with the probationary period."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:certify-probationers",
+              "interpretation": "Without a timely certification, the employee’s service ends with the probationary period."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-er-cases",
+          "prompt": "How are conduct and performance cases tracked?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "case-system",
+              "label": "In a case system, with deadlines and documents"
+            },
+            {
+              "value": "spreadsheet",
+              "label": "In a spreadsheet, with documents on a shared drive"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by specialist"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "spreadsheet",
+              "elementId": "eb:capability:employee-relations-conduct",
+              "interpretation": "Missed notice periods and scattered evidence are common reasons actions don’t hold up on appeal."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:employee-relations-conduct",
+              "interpretation": "Missed notice periods and scattered evidence are common reasons actions don’t hold up on appeal."
+            },
+            {
+              "answerValue": "spreadsheet",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Missed notice periods and scattered evidence are common reasons actions don’t hold up on appeal."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Missed notice periods and scattered evidence are common reasons actions don’t hold up on appeal."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-rif-registers",
+          "prompt": "How would the office build retention registers if it had a reduction in force?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "tool",
+              "label": "With a tool that applies OPM’s current rules from the core HR data"
+            },
+            {
+              "value": "spreadsheets",
+              "label": "In spreadsheets, from extracts"
+            },
+            {
+              "value": "not-sure",
+              "label": "Not sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:capability:separations-reshaping",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:capability:separations-reshaping",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            },
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:requirement:give-rif-notice",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:requirement:give-rif-notice",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            },
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:implementationPattern:workforce-analytics",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:implementationPattern:workforce-analytics",
+              "interpretation": "OPM’s rules changed in September 2026, and registers built by hand are where ranking errors creep in."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-ai-use",
+          "prompt": "Is AI used in HR work today, and for what?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "drafting",
+              "label": "To draft documents and answer policy questions"
+            },
+            {
+              "value": "decisions",
+              "label": "To help screen applicants, or suggest ratings or actions"
+            },
+            {
+              "value": "none",
+              "label": "Not yet"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "drafting",
+              "elementId": "eb:implementationPattern:hr-ai-drafting",
+              "interpretation": "Drafting help works best with OPM’s current guides as reference material and specialists checking each draft."
+            },
+            {
+              "answerValue": "decisions",
+              "elementId": "eb:implementationPattern:hr-ai-drafting",
+              "interpretation": "AI that helps decide hiring, pay, ratings, or discipline is presumed high-impact under OMB’s AI memo, with practices required before use."
+            }
+          ]
+        },
+        {
+          "id": "question:hr-yearly-actions",
+          "prompt": "About how many personnel actions does the office process in a year?",
+          "kind": "number"
+        },
+        {
+          "id": "question:hr-hardest-part",
+          "prompt": "What’s the hardest part of the office’s work today?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions about how the HR office runs its work today, from planning positions to separation and reporting. They ask about the office’s tools and steps, never about individual employees, applicants, or cases. Answers point to capabilities and example patterns worth exploring."
+    }
+  ]
+}

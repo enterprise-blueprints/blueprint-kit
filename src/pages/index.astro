@@ -5,23 +5,28 @@ import Base from '../layouts/Base.astro';
 import TypeBadge from '../components/TypeBadge.astro';
 import LibraryMark from '../components/LibraryMark.astro';
 import ResourceCard from '../kit/ResourceCard.astro';
-import { downloadUrl, elementsOfType, helpsWith, inUse, isOwn, missionBlueprint, ownPackages, release, scopeLabel, tagline, upstream, type LibraryElement } from '../lib/library';
+import { downloadUrl, elementsOfType, helpsWith, inUse, isOwn, missionBlueprint, ownPackages, related, release, scopeLabel, tagline, upstream, type LibraryElement } from '../lib/library';
 import { plural } from '../lib/format';
 import { href } from '../lib/paths';
 import { resourceKinds } from '../lib/vocabulary';
 import { site } from '../site';
 
-// Your resources, kind by kind, in the library's order of kinds.
+// Your solutions, such as your products, then your resources, kind by kind, in the library's order of kinds.
 const kinds = Object.keys(resourceKinds.groups);
-const offered = elementsOfType('resource')
-  .filter((r) => isOwn(r.package))
-  .sort((a, b) => kinds.indexOf(String(a.attributes?.kind)) - kinds.indexOf(String(b.attributes?.kind)));
+const offered = [
+  ...elementsOfType('solution').filter((s) => isOwn(s.package)),
+  ...elementsOfType('resource')
+    .filter((r) => isOwn(r.package))
+    .sort((a, b) => kinds.indexOf(String(a.attributes?.kind)) - kinds.indexOf(String(b.attributes?.kind))),
+];
+/** What one of them is about: what a resource helps with, or the patterns a solution implements. */
+const about = (e: LibraryElement) => (e.type === 'solution' ? related(e, 'implements', 'outgoing') : helpsWith(e).map((h) => h.element));
 
 // Your missions and the library's your packages build on, each with what's under it and how many of your resources help with any of it.
 const missions = elementsOfType('mission').filter((m) => inUse(m.package)).map((m) => {
   const b = missionBlueprint(m);
   const within = new Set<LibraryElement>([m, ...b.outcomes.map((o) => o.outcome), ...b.capabilities.map((c) => c.capability), ...b.requirements, ...b.patterns]);
-  const helping = offered.filter((r) => helpsWith(r).some((h) => within.has(h.element))).length;
+  const helping = offered.filter((r) => about(r).some((e) => within.has(e))).length;
   return { m, outcomes: b.outcomes.length, capabilities: b.capabilities.length, patterns: b.patterns.length, helping };
 });
 const own = missions.filter((x) => isOwn(x.m.package));
@@ -54,7 +59,7 @@ const catalog = new URL(href('catalog.json'), Astro.site).href;
       <div class="container">
         <div class="section-intro">
           <h2 id="offer-heading">What we offer</h2>
-          <p>Each one names the missions, capabilities, and patterns it helps with, so you can find it where it fits.</p>
+          <p>Each one names the missions, capabilities, and patterns it helps with, or the patterns it implements, so you can find it where it fits.</p>
         </div>
         <ul class="offer-grid">{offered.map((r) => <ResourceCard resource={r} />)}</ul>
       </div>

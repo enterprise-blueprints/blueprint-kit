@@ -126,9 +126,10 @@ different problem: your feed wants you to sign in.
 
 The sample's two packages:
 
-- **`offerings`** has five resources: a service, a demo, a product, a template, and a course. Each one
-  says which of the library's capabilities and patterns it helps with. The demo and the product each name
-  the one *way* of sourcing a pattern they're about.
+- **`offerings`** has a product, as a solution that implements one of the library's patterns, and four
+  resources: a service, a demo, a template, and a course. Each resource says which of the library's
+  capabilities and patterns it helps with; the demo and the course help with one of the library's
+  solutions, the one way of sourcing a pattern they're about.
 - **`local-audit`** adds a small mission of its own, a city or county audit office, with its own outcomes,
   a capability, and a requirement, and links to capabilities and patterns from the library's Inspector
   General and Common packages.
@@ -139,8 +140,8 @@ The sample's two packages:
 2. In each `source/<package>/package.yaml`, set your `packageId` (a reverse domain name you own, such as
    `com.yourfirm.offerings`), your `idPrefix` (a short word of your own, such as `yourfirm`; `eb` is the
    library's), your `publisher`, and your `license`.
-3. Replace the sample resources with your own, delete `source/local-audit/` if you don't need a mission of
-   your own, and delete `content/`, since it holds the sample's packages.
+3. Replace the sample solutions and resources with your own, delete `source/local-audit/` if you don't
+   need a mission of your own, and delete `content/`, since it holds the sample's packages.
 4. Run `pnpm content:build`, then `pnpm verify`.
 
 ## Your first resource
@@ -159,29 +160,59 @@ You can [add it in the browser](#edit-in-the-browser), or write it by hand in
     typicalLength: 2 weeks
   helps_with:
     - capability:records-management
-    - to: implementationPattern:records-in-business-systems
-      way: built-in
+    - solution:records-in-business-systems-built-in
 ```
 
 Then run `pnpm content:build` and `pnpm dev`, and it's on the home page, and on the page of everything it
 helps with.
 
 - **`kind`** is one of `video`, `course`, `guide`, `site`, `community`, `dataset`, `tool`, `template`,
-  `demo`, `service`, `product`, or `case-study`. The list is the library's, so every tool groups resources
-  the same way.
-- **`helps_with`** names what it helps with: missions, outcomes, capabilities, requirements, or patterns.
-  Find their keys on the library's pages, where each item shows its ID, such as
+  `demo`, `service`, or `case-study`. The list is the library's, so every tool groups resources the same
+  way. A product is a solution instead (below).
+- **`helps_with`** names what it helps with: missions, outcomes, capabilities, requirements, patterns, or
+  solutions. Find their keys on the library's pages, where each item shows its ID, such as
   `eb:capability:records-management`. Write it without the `eb:` and your package finds it in the
-  library's packages it builds on.
-- **`way`** names one way of sourcing a pattern, from the IDs on the pattern's page. A product goes on the
-  library's "configure a product" way, not as a way of its own, so the library's patterns stay examples
-  and yours sit beside them.
+  library's packages it builds on. Something about one way of sourcing a pattern helps with that
+  solution, such as `solution:records-in-business-systems-built-in`, from the pattern's page.
 - **`attributes`** holds anything else you want to say, such as a contract vehicle, an edition, or a
   format. It shows on the resource's page, and tools carry it along.
 - **`by`** says who made it, when that isn't you.
 
 To link to something in a library package your package doesn't build on yet, add that package's folder
 name to `dependencies` in `package.yaml`. The folders are under `library/packages/`.
+
+## Your products, as solutions
+
+A product of yours, or a way you build or run something, is a **solution** that implements one or more of
+the library's patterns, beside the library's own example solutions on each pattern's page. Write it in
+`source/offerings/solutions.yaml`:
+
+```yaml
+- id: example-case-manager
+  title: Example Case Manager
+  approach: product
+  url: https://yourfirm.example/products/case-manager
+  lastReviewedAt: 2026-11-05
+  description: A case management product for oversight offices.
+  attributes:
+    editions: Standard, Government Cloud
+    strengths:
+      - Comes configured for an Inspector General’s intake and referrals
+  implements: [ oversight-intake-case-tracking ]
+  depends_on:
+    - to: agency-sign-on
+      note: Staff sign in through the agency’s identity provider.
+```
+
+- **`approach`** is how it sources the pattern: `product`, `platform` (a platform the agency has),
+  `shared` (a service one agency runs for others), `combine`, or `build`.
+- **`implements`** names the patterns it sources, by their keys on the library's pages. One platform can
+  implement several.
+- **`depends_on`** names patterns it needs when it's the one chosen, such as sign-on.
+- **`attributes`** holds its own `strengths`, `fitsWhen`, and `watchFor`, which add to the pattern's, and
+  anything else, such as its editions.
+
+Tools that read the library, such as Solution Studio, offer it wherever its patterns are in play.
 
 ## Edit in the browser
 

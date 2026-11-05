@@ -8,12 +8,11 @@ import { join } from 'node:path';
 import { Document, isMap, isScalar, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
 import { compareVersions } from '../src/lib/format.ts';
 import { idFromTitle } from '../src/lib/format.ts';
-import { elementTypes, groupings, patternApproaches, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
+import { elementTypes, groupings, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 
 /** A link to an element, by its full ID, with what the link can say about itself. */
 export interface Link {
   to: string;
-  way?: string;
   coverage?: 'partial';
   note?: string;
 }
@@ -25,29 +24,19 @@ export interface MeasureFields {
   description: string;
 }
 
-/** What a pattern and each of its ways can say about themselves, one statement to an item. */
+/** What a pattern and each of its solutions can say about themselves, one statement to an item. */
 const STATEMENTS = ['strengths', 'fitsWhen', 'watchFor'] as const;
 
-/** One way to source a pattern. */
-export interface WayFields {
-  /** Absent on a new way, which takes one from its title. */
-  id?: string;
-  approach: string;
-  title: string;
-  description?: string;
-  strengths?: string[];
-  fitsWhen?: string[];
-  watchFor?: string[];
-}
-
-/** What a pattern says about itself, which it holds in its attributes. */
+/**
+ * What a pattern says about itself, which it holds in its attributes. A
+ * solution holds the statements too, without a layer or parts.
+ */
 export interface PatternFields {
-  layer: string;
+  layer?: string;
   parts?: string[];
   strengths?: string[];
   fitsWhen?: string[];
   watchFor?: string[];
-  ways: WayFields[];
 }
 
 /** An element as the editor's form shows it. */
@@ -184,7 +173,6 @@ export interface Target {
   folder: string;
   /** Whether it's one of your own, rather than the library's. */
   own: boolean;
-  ways: { id: string; title: string }[];
 }
 
 /** What each type's form holds: the fields written by name, in file order, and the links it edits each way. */
@@ -193,7 +181,8 @@ export const forms: Record<string, { values: string[]; links: string[]; incoming
   outcome: { values: ['theme'], links: [], incoming: ['seeks', 'contributes_to'] },
   capability: { values: ['stage'], links: ['contributes_to', 'candidate_pattern', 'satisfies'], incoming: [] },
   requirement: { values: ['kind'], links: [], incoming: ['satisfies'] },
-  implementationPattern: { values: [], links: ['depends_on', 'works_with'], incoming: ['candidate_pattern'] },
+  implementationPattern: { values: [], links: ['depends_on', 'works_with'], incoming: ['candidate_pattern', 'implements'] },
+  solution: { values: ['approach', 'url', 'by', 'lastReviewedAt'], links: ['implements', 'depends_on'], incoming: [] },
   resource: { values: ['kind', 'url', 'by', 'lastReviewedAt'], links: ['helps_with'], incoming: [] },
 };
 
@@ -249,11 +238,11 @@ export function capabilitiesProviding(root: string, libraryRelease: string, patt
 export function readTargets(root: string, libraryRelease: string): Target[] {
   return builtPackages(root, libraryRelease)
     .flatMap(({ name, own: isOwn, pkg }) => {
-      const target = (id: string, title: string, type: string, ways: { id: string; title: string }[] = []): Target => ({ id, title, type, typeLabel: elementTypes[type].label, packageTitle: pkg.title, folder: name, own: isOwn, ways });
+      const target = (id: string, title: string, type: string): Target => ({ id, title, type, typeLabel: elementTypes[type].label, packageTitle: pkg.title, folder: name, own: isOwn });
       return pkg.elements
         .filter((e) => predicates.helps_with.to.includes(e.type) && e.status !== 'deprecated')
         .flatMap((e) => [
-          target(e.id, e.title, e.type, Array.isArray(e.attributes?.ways) ? (e.attributes.ways as { id: string; title: string }[]).map((w) => ({ id: w.id, title: w.title })) : []),
+          target(e.id, e.title, e.type),
           // An outcome's measures aren't elements, but a discovery answer can point to one.
           ...(asList(e.attributes?.measures) as Raw[]).map((m) => target(`${e.id.split(':')[0]}:measure:${m.id}`, String(m.title), 'measure')),
         ]);
@@ -273,7 +262,6 @@ function linkOf(entry: unknown, predicate: string, packageName: string, targets:
   const to = String(raw.to);
   return {
     to: fullId(to.includes(':') ? to : `${predicates[predicate].to[0]}:${to}`, packageName, targets),
-    ...(raw.way ? { way: String(raw.way) } : {}),
     ...(raw.coverage ? { coverage: raw.coverage as 'partial' } : {}),
     ...(raw.note ? { note: String(raw.note) } : {}),
   };
@@ -296,17 +284,7 @@ function readIncoming(root: string, name: string, predicate: string, elementId: 
 const statementsIn = (raw: Raw, keys: readonly string[]) => Object.fromEntries(keys.filter((k) => raw[k] !== undefined).map((k) => [k, asList(raw[k]).map(String)]));
 
 function patternFrom(attributes: Raw): PatternFields {
-  return {
-    layer: String(attributes.layer ?? ''),
-    ...statementsIn(attributes, ['parts', ...STATEMENTS]),
-    ways: (asList(attributes.ways) as Raw[]).map((w) => ({
-      id: String(w.id),
-      approach: String(w.approach ?? ''),
-      title: String(w.title ?? ''),
-      ...(w.description ? { description: String(w.description) } : {}),
-      ...statementsIn(w, STATEMENTS),
-    })),
-  };
+  return { layer: String(attributes.layer ?? ''), ...statementsIn(attributes, ['parts', ...STATEMENTS]) };
 }
 
 function elementFrom(root: string, name: string, type: string, raw: Raw, targets: Target[]): EditorElement {
@@ -328,6 +306,7 @@ function elementFrom(root: string, name: string, type: string, raw: Raw, targets
     ...(type === 'mission' ? { tagline: String(attributes.tagline ?? ''), principles: asList(attributes.principles).map(String) } : {}),
     ...(type === 'outcome' ? { measures: (asList(raw.measures) as Raw[]).map((m) => ({ id: String(m.id), title: String(m.title ?? ''), description: String(m.description ?? '') })) } : {}),
     ...(type === 'implementationPattern' ? { pattern: patternFrom(attributes) } : {}),
+    ...(type === 'solution' ? { pattern: statementsIn(attributes, STATEMENTS) } : {}),
     ...(type !== 'resource' ? { sources: asList(raw.sources).map(String) } : {}),
     links: Object.fromEntries(form.links.map((p) => [p, asList(raw[p]).map((entry) => linkOf(entry, p, name, targets))])),
     incoming: Object.fromEntries(form.incoming.map((p) => [p, readIncoming(root, name, p, elementId, targets)])),
@@ -388,13 +367,12 @@ function check(input: ElementFields & { id?: string }, targets: Target[], before
     else if (capabilities.length > 1 && added.length) problems.push('A requirement belongs to one capability.');
     for (const target of targets.filter((t) => added.includes(t.id) && t.folder !== input.package)) problems.push(`${target.title} is in another package, and a requirement belongs to a capability in its own.`);
   }
-  if (type === 'implementationPattern') {
-    if (!patternLayers[input.pattern?.layer ?? '']) problems.push('Choose its layer.');
-    if (!input.pattern?.ways?.length) problems.push('Give it at least one way to source it.');
-    for (const way of input.pattern?.ways ?? []) {
-      if (!patternApproaches[way.approach]) problems.push('Choose an approach for each way.');
-      if (!way.title?.trim()) problems.push('Give each way a title.');
-    }
+  if (type === 'implementationPattern' && !patternLayers[input.pattern?.layer ?? '']) problems.push('Choose its layer.');
+  if (type === 'solution') {
+    if (!groupings.solution.groups[values.approach]) problems.push('Choose its approach.');
+    if (!input.links?.implements?.length) problems.push('Choose at least one pattern it implements.');
+    if (values.url?.trim() && !/^https?:\/\/\S+$/.test(values.url.trim())) problems.push('Give it a link that starts with http:// or https://.');
+    if (values.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(values.lastReviewedAt)) problems.push('Say when its link was last checked, as a date.');
   }
   for (const m of input.measures ?? []) if (!m.title?.trim() || !m.description?.trim()) problems.push('Give each measure a title and a description.');
 
@@ -407,9 +385,6 @@ function check(input: ElementFields & { id?: string }, targets: Target[], before
         if (!had(predicate, link.to)) problems.push(`Can't find ${link.to}.`);
       } else if (!predicates[predicate].to.includes(target.type)) problems.push(`${target.title} can't go there.`);
       else if (target.type === type && target.folder === input.package && keyOf(target.id) === input.id) problems.push('It can’t link to itself.');
-      // A need names a way of this pattern, the one that has the need. Anything else names a way of what it links to.
-      else if (predicate === 'depends_on' && link.way && !input.pattern?.ways?.some((w) => w.id === link.way)) problems.push(`The way that needs ${target.title} isn’t one of this pattern’s any more.`);
-      else if (predicate !== 'depends_on' && link.way && !target.ways.some((w) => w.id === link.way)) problems.push(`${target.title} has no way called ${link.way}.`);
     }
   }
   for (const predicate of form.incoming) {
@@ -421,17 +396,6 @@ function check(input: ElementFields & { id?: string }, targets: Target[], before
     }
   }
   if (problems.length) throw new EditError([...new Set(problems)].join('\n'));
-}
-
-/** Refuses taking away a way that a resource is about, which the resource has to let go of first. */
-function checkWaysInUse(root: string, input: ElementFields, before: Raw, elementId: string, targets: Target[]) {
-  const had = (asList((before.attributes as Raw | undefined)?.ways) as Raw[]).map((w) => ({ id: String(w.id), title: String(w.title) }));
-  const gone = had.filter((w) => !input.pattern?.ways.some((x) => x.id === w.id));
-  if (!gone.length) return;
-  const problems = readElements(root, targets)
-    .filter((e) => e.type === 'resource')
-    .flatMap((e) => (e.links?.helps_with ?? []).filter((l) => l.to === elementId && gone.some((w) => w.id === l.way)).map((l) => `“${e.title}” is about the way “${gone.find((w) => w.id === l.way)!.title}”, so change that resource before taking the way away.`));
-  if (problems.length) throw new EditError(problems.join('\n'));
 }
 
 /** The files one change touches, read once and written together, so it can be undone as a whole. */
@@ -493,7 +457,7 @@ function writtenTo(link: Link, predicate: string, packageName: string, targets: 
 
 /** The links as written, keeping an existing link's own form and any fields the form doesn't show. */
 function writtenLinks(existing: unknown[], links: Link[], predicate: string, packageName: string, targets: Target[]): unknown[] {
-  const fields = ['way', 'coverage', 'note'] as const;
+  const fields = ['coverage', 'note'] as const;
   return links.map((link) => {
     const before = existing.find((entry) => linkOf(entry, predicate, packageName, targets).to === link.to);
     const merged: Raw = typeof before === 'object' && before !== null ? { ...(before as Raw) } : { to: before ?? writtenTo(link, predicate, packageName, targets) };
@@ -644,31 +608,13 @@ function writtenMeasures(before: Raw | undefined, measures: MeasureFields[], tak
 
 const statementsOf = (list: string[] = []) => list.map((s) => s.trim()).filter(Boolean);
 
-/** Ways in the form's order, each keeping its ID, with a new one taking an ID from its title. */
-function writtenWays(before: Raw[], ways: WayFields[]) {
-  const used = before.map((w) => String(w.id));
-  return ways.map((w) => {
-    const existing = before.find((x) => String(x.id) === w.id);
-    const id = existing?.id ?? newId(w.title, used);
-    used.push(String(id));
-    const way: Raw = { ...(existing ?? { id }), approach: w.approach, title: w.title.trim() };
-    const fields: [string, unknown][] = [['description', w.description?.trim()], ...STATEMENTS.map((k): [string, string[]] => [k, statementsOf(w[k])])];
-    for (const [key, value] of fields) {
-      if (!value || !Object.keys(value).length) delete way[key];
-      else way[key] = value;
-    }
-    return way;
-  });
-}
-
-/** A pattern's layer, statements, and ways, set in its attributes. */
-function setPatternAttributes(doc: Document, map: YAMLMap, pattern: PatternFields) {
+/** A pattern's layer and statements, or a solution's statements, set in its attributes, which go when they're empty. */
+function setPatternAttributes(doc: Document, map: YAMLMap, pattern: PatternFields, type: string) {
   if (!isMap(map.get('attributes', true))) map.set('attributes', doc.createNode({}));
   const attributes = map.get('attributes', true) as unknown as YAMLMap;
-  const before = asList((attributes.toJSON() as Raw).ways) as Raw[];
-  setField(doc, attributes, 'layer', pattern.layer);
-  for (const key of ['parts', ...STATEMENTS] as const) setField(doc, attributes, key, statementsOf(pattern[key]));
-  setField(doc, attributes, 'ways', writtenWays(before, pattern.ways));
+  if (type === 'implementationPattern') setField(doc, attributes, 'layer', pattern.layer);
+  for (const key of type === 'implementationPattern' ? (['parts', ...STATEMENTS] as const) : STATEMENTS) setField(doc, attributes, key, statementsOf(pattern[key]));
+  if (!attributes.items.length) map.delete('attributes');
 }
 
 /**
@@ -693,7 +639,6 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
 
   const id = input.id ?? idFor(input.chosenId, input.title, readElements(root, targets).filter((e) => e.type === type).map((e) => e.id));
   const elementId = fullIdOf(root, input.package, type, id);
-  if (type === 'implementationPattern' && before) checkWaysInUse(root, input, before, elementId, targets);
   let map: YAMLMap;
   if (at >= 0) map = seq.items[at] as YAMLMap;
   else {
@@ -724,7 +669,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
     const taken = itemsIn(root, input.package, fileOf('outcome')).flatMap((o) => (asList(o.measures) as Raw[]).map((m) => String(m.id)));
     setField(doc, map, 'measures', writtenMeasures(before, input.measures ?? [], taken));
   }
-  if (type === 'implementationPattern') setPatternAttributes(doc, map, input.pattern!);
+  if (type === 'implementationPattern' || type === 'solution') setPatternAttributes(doc, map, input.pattern ?? {}, type);
   for (const predicate of form.links) {
     setField(doc, map, predicate, writtenLinks(asList(before?.[predicate]), input.links?.[predicate] ?? [], predicate, input.package, targets));
   }

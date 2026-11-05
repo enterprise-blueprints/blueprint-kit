@@ -1,0 +1,4244 @@
+{
+  "schemaVersion": "0.7.0",
+  "packageId": "org.enterprise-blueprints.federal-benefits",
+  "idPrefix": "eb",
+  "version": "0.16.0",
+  "title": "Benefits and Eligibility — Deciding Claims and Paying Federal Benefits",
+  "description": "U.S. federal benefits blueprint: one mission with the outcomes it seeks and ways to measure them, eleven capabilities from program rules through reporting with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for benefits results and for benefits operations. It covers offices that decide people’s eligibility and pay them directly, following the laws that reach across programs and using Social Security and veterans’ benefits as worked examples, and builds on Common Capabilities for case management, records, identity and access, data protection, and security logging.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-11-05",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies that decide eligibility and pay benefits directly to people"
+  ],
+  "tags": [
+    "benefits",
+    "eligibility",
+    "claims",
+    "payment-integrity",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.16.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:apa-5-usc-555",
+      "title": "5 U.S.C. § 555 — Ancillary matters (Administrative Procedure Act)",
+      "url": "https://www.govinfo.gov/link/uscode/5/555?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies conclude a matter presented to them within a reasonable time (§ 555(b)), and give prompt notice when they deny a written application in whole or in part, with a brief statement of the grounds unless the denial affirms an earlier one or explains itself (§ 555(e))."
+    },
+    {
+      "id": "src:goldberg-v-kelly",
+      "title": "Goldberg v. Kelly, 397 U.S. 254 (1970)",
+      "url": "https://www.law.cornell.edu/supremecourt/text/397/254",
+      "kind": "official-reference",
+      "publicationDate": "1970-03-23",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Stopping welfare benefits calls for a hearing first, with timely and adequate notice of the reasons, a chance to present arguments and evidence, a chance to have a lawyer, a decision maker who didn’t take part in the decision under review, and a decision resting on the rules and evidence from the hearing."
+    },
+    {
+      "id": "src:mathews-v-eldridge",
+      "title": "Mathews v. Eldridge, 424 U.S. 319 (1976)",
+      "url": "https://www.law.cornell.edu/supremecourt/text/424/319",
+      "kind": "official-reference",
+      "publicationDate": "1976-02-24",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Stopping Social Security disability benefits doesn’t call for an evidentiary hearing first. How much process is due depends on the person’s interest, the risk of error and the value of more safeguards, and the government’s interest."
+    },
+    {
+      "id": "src:privacy-act",
+      "title": "5 U.S.C. § 552a — Records maintained on individuals (Privacy Act of 1974, with the Computer Matching and Privacy Protection Act)",
+      "url": "https://www.govinfo.gov/link/uscode/5/552a?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies tell each person they ask for information the authority for asking, whether answering is required, the purpose, the routine uses, and what happens if the person doesn’t answer (§ 552a(e)(3)). A matching program needs a written agreement, in effect for up to 18 months and renewable for up to one more year (§ 552a(o)). An agency can’t suspend, end, reduce, or finally deny a benefit because of a match until it has verified the information, told the person what it found, and given them the time set by law to contest it, or 30 days if none is set (§ 552a(p))."
+    },
+    {
+      "id": "src:paperwork-reduction-44-usc-3506",
+      "title": "44 U.S.C. § 3506 — Federal agency responsibilities (Paperwork Reduction Act)",
+      "url": "https://www.govinfo.gov/link/uscode/44/3506?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Before a form goes to OMB, the agency gives 60 days’ public notice and certifies that the collection is needed, doesn’t duplicate information the agency can reasonably get elsewhere, reduces burden where it can, and uses plain language (§ 3506(c)). Each form shows its control number, purpose, estimated burden, and whether answering is voluntary, required for a benefit, or mandatory."
+    },
+    {
+      "id": "src:plain-writing-act",
+      "title": "Plain Writing Act of 2010, Public Law 111-274",
+      "url": "https://www.govinfo.gov/link/plaw/111/public/274?link-type=html",
+      "kind": "official-reference",
+      "publicationDate": "2010-10-13",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies use plain writing in every covered document they issue or substantially revise, including letters, forms, notices, and instructions needed to get a federal benefit or service."
+    },
+    {
+      "id": "src:idea-act",
+      "title": "21st Century Integrated Digital Experience Act (21st Century IDEA), Public Law 115-336",
+      "url": "https://www.govinfo.gov/link/plaw/115/public/336?link-type=html",
+      "kind": "official-reference",
+      "publicationDate": "2018-12-20",
+      "lastReviewedAt": "2026-11-04",
+      "note": "New and redesigned public websites and digital services are accessible, secure, designed around users’ needs, and work on mobile devices (§ 3). Paper forms have a digital version, and agencies keep an accessible way for people who can’t use digital services (§ 4)."
+    },
+    {
+      "id": "src:rehabilitation-act-504",
+      "title": "29 U.S.C. § 794 — Nondiscrimination under Federal grants and programs (Section 504 of the Rehabilitation Act)",
+      "url": "https://www.govinfo.gov/link/uscode/29/794?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "No qualified person with a disability may, because of the disability, be excluded from, denied the benefits of, or discriminated against under any program or activity conducted by an executive agency."
+    },
+    {
+      "id": "src:section-508-standards",
+      "title": "U.S. Access Board — Revised Section 508 Standards, 36 CFR Part 1194",
+      "url": "https://www.access-board.gov/ict/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Public-facing content conforms to WCAG 2.0 Level AA (E205.4). So does official communication that isn’t public-facing, including adjudication decisions, notices about benefits, acknowledgments of receipt, and templates and forms (E205.3)."
+    },
+    {
+      "id": "src:nist-sp-800-63-4",
+      "title": "NIST SP 800-63-4 — Digital Identity Guidelines",
+      "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+      "kind": "official-reference",
+      "publicationDate": "2025-07-31",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Requirements for identity proofing, authentication, and federation for people using government systems over a network."
+    },
+    {
+      "id": "src:login-gov",
+      "title": "Login.gov — Developer guide overview",
+      "url": "https://developers.login.gov/overview/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "A government sign-in and identity verification service that agency applications connect to with OpenID Connect or SAML, under an interagency agreement. The application keeps its own authorization and roles."
+    },
+    {
+      "id": "src:payment-integrity-31-usc-3352",
+      "title": "31 U.S.C. § 3352 — Estimates of improper payments and reports on actions to reduce improper payments",
+      "url": "https://www.govinfo.gov/link/uscode/31/3352?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Part of the Payment Integrity Information Act. Agencies review each program at least once every 3 fiscal years for risk of significant improper payments, which means more than $10,000,000 and 1.5 percent of program outlays, or more than $100,000,000. For programs at risk they estimate improper payments, counting payments they can’t confirm for lack of documentation, and report causes and actions."
+    },
+    {
+      "id": "src:do-not-pay-31-usc-3354",
+      "title": "31 U.S.C. § 3354 — Improving the Do Not Pay Initiative",
+      "url": "https://www.govinfo.gov/link/uscode/31/3354?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies review their prepayment procedures and check eligibility before releasing federal funds, using databases that include death records, SAM exclusions, Treasury’s Debt Check, and Social Security’s data on people who are incarcerated."
+    },
+    {
+      "id": "src:do-not-pay",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — Do Not Pay products",
+      "url": "https://fiscal.treasury.gov/payment-integrity/do-not-pay-dnp/products",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Do Not Pay Connect is an API for screening inside an agency’s own workflow, the Web Portal offers searches, batch matches, and monitoring alerts, and Treasury Payment Verification screens Treasury-disbursed payments automatically."
+    },
+    {
+      "id": "src:fraud-controls-31-usc-3357",
+      "title": "31 U.S.C. § 3357 — Financial and administrative controls relating to fraud and improper payments",
+      "url": "https://www.govinfo.gov/link/uscode/31/3357?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies evaluate fraud risks, use a risk-based approach to design controls, collect and analyze data on fraud they detect, and use monitoring, audits, and investigations to improve how they prevent and respond to it."
+    },
+    {
+      "id": "src:gao-fraud-risk-framework",
+      "title": "GAO-15-593SP — A Framework for Managing Fraud Risks in Federal Programs",
+      "url": "https://www.gao.gov/products/gao-15-593sp",
+      "kind": "official-reference",
+      "publicationDate": "2015-07-28",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Leading practices for program managers to prevent, detect, and respond to fraud, with an emphasis on prevention."
+    },
+    {
+      "id": "src:payment-accuracy",
+      "title": "PaymentAccuracy.gov",
+      "url": "https://www.paymentaccuracy.gov/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies’ reported improper payment rates, recoveries, dollar amounts, and root causes."
+    },
+    {
+      "id": "src:eft-31-cfr-208",
+      "title": "31 CFR Part 208 — Management of Federal Agency Disbursements",
+      "url": "https://www.law.cornell.edu/cfr/text/31/part-208",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Federal payments are made by electronic funds transfer (§ 208.3), with listed waivers, such as for a person whose mental impairment or remote location makes an account a hardship (§ 208.4). A person who receives a federal payment can open a Treasury-sponsored account (§ 208.6)."
+    },
+    {
+      "id": "src:eo-14247",
+      "title": "Executive Order 14247 — Modernizing Payments To and From America’s Bank Account (March 25, 2025)",
+      "url": "https://www.govinfo.gov/content/pkg/DCPD-202500396/pdf/DCPD-202500396.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-03-25",
+      "lastReviewedAt": "2026-11-04",
+      "note": "From September 30, 2025, to the extent the law permits, Treasury stops issuing paper checks, including for benefits, and agencies enroll recipients in electronic payments (§ 3). People who qualify for an exception, such as having no access to banking services, get another way to be paid (§ 4), and agencies make sure those affected have adequate support (§ 5)."
+    },
+    {
+      "id": "src:treasury-payment-systems",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — Payment Automation Manager FAQs",
+      "url": "https://fiscal.treasury.gov/payments-from-government/payment-automation-manager-pam/faqs",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies send payment requests in Treasury’s Standard Payment Request format, keyed into the Secure Payment System or sent as a bulk file, and certify their summary through the Secure Payment System."
+    },
+    {
+      "id": "src:offset-31-usc-3716",
+      "title": "31 U.S.C. § 3716 — Administrative offset",
+      "url": "https://www.govinfo.gov/link/uscode/31/3716?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Before offsetting a debt, an agency gives written notice of the debt, its intent, and the person’s rights, a chance to see the records, a chance for agency review, and a chance to agree on repayment (§ 3716(a)). Agencies tell Treasury about debts over 120 days delinquent (§ 3716(c)(6)). The first $9,000 of federal benefit payments in a 12-month period is exempt from offset (§ 3716(c)(3)(A)(ii))."
+    },
+    {
+      "id": "src:treasury-offset-program",
+      "title": "U.S. Department of the Treasury, Bureau of the Fiscal Service — Treasury Offset Program",
+      "url": "https://fiscal.treasury.gov/top/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Matches delinquent debts owed to agencies against federal payments to the same people, and withholds payments to cover the debt where the law permits."
+    },
+    {
+      "id": "src:ssn-fraud-prevention-act",
+      "title": "Social Security Number Fraud Prevention Act of 2017, Public Law 115-59",
+      "url": "https://www.govinfo.gov/link/plaw/115/public/59?link-type=html",
+      "kind": "official-reference",
+      "publicationDate": "2017-09-15",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Agencies don’t put a person’s Social Security number on a document sent by mail unless the agency head finds it necessary, and agency rules cover partial redaction and keeping the number from showing on the outside of a package."
+    },
+    {
+      "id": "src:m-25-21",
+      "title": "OMB Memorandum M-25-21 — Accelerating Federal Use of AI through Innovation, Governance, and Public Trust (April 3, 2025)",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-04-03",
+      "lastReviewedAt": "2026-11-04",
+      "note": "AI that serves as a principal basis for decisions on applying for or getting critical federal benefits, on continued eligibility, or on detecting fraudulent use of government services is presumed to be high-impact (§ 6). High-impact uses need human oversight and accountability, and people affected get timely human review and a chance to appeal, which can extend an appeals process already in place (§ 4(b))."
+    },
+    {
+      "id": "src:a11-section-280",
+      "title": "OMB Circular A-11, Section 280 — Managing Customer Experience and Improving Service Delivery (2025)",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/08/s280.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "High Impact Service Providers each year designate at least one priority service, plan improvements, and collect post-transaction customer feedback, which is submitted quarterly and shared publicly."
+    },
+    {
+      "id": "src:high-impact-service-providers",
+      "title": "Performance.gov — High Impact Service Providers",
+      "url": "https://www.performance.gov/cx/hisps/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "OMB’s current list, which includes the Social Security Administration, the Veterans Benefits Administration, and the Office of Personnel Management."
+    },
+    {
+      "id": "src:acus-2021-10",
+      "title": "Administrative Conference of the United States — Recommendation 2021-10, Quality Assurance Systems in Agency Adjudication",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2022-01-12/pdf/2022-00463.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2022-01-12",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Quality assurance is an internal review that finds and remedies problems in individual decisions and across a program. It looks at fairness, accuracy, consistency, and timeliness, and stays separate from appeals. Analytics and AI tools support its staff’s judgment and don’t replace it."
+    },
+    {
+      "id": "src:save-system-notice",
+      "title": "DHS/USCIS-004 Systematic Alien Verification for Entitlements (SAVE) Program — System of Records Notice (May 27, 2020)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2020-05-27/pdf/2020-11390.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2020-05-27",
+      "lastReviewedAt": "2026-11-04",
+      "note": "SAVE is a fee-based service that helps benefit-granting agencies determine citizenship and immigration status. The agency that asks makes its own benefit decision."
+    },
+    {
+      "id": "src:ssa-review-process",
+      "title": "20 CFR § 404.900 — Administrative review process (Social Security)",
+      "url": "https://www.law.cornell.edu/cfr/text/20/404.900",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "The steps are the initial determination, reconsideration, a hearing before an administrative law judge, Appeals Council review, and federal court. A person who doesn’t ask in time loses further review unless they show good cause."
+    },
+    {
+      "id": "src:ssa-reconsideration",
+      "title": "20 CFR § 404.909 — How to request reconsideration (Social Security)",
+      "url": "https://www.law.cornell.edu/cfr/text/20/404.909",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "A request is due within 60 days after the person receives notice, which 20 CFR § 404.901 takes to be 5 days after the date on the notice unless they show otherwise. Good cause can extend the time."
+    },
+    {
+      "id": "src:ssa-filing-date",
+      "title": "20 CFR § 404.630 — Use of date of written statement as application filing date (Social Security)",
+      "url": "https://www.law.cornell.edu/cfr/text/20/404.630",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "A written statement of intent to claim benefits sets the filing date, if the application follows within 6 months after the notice Social Security sends about filing it."
+    },
+    {
+      "id": "src:ssa-continued-benefits",
+      "title": "20 CFR § 404.1597a — Continued benefits pending appeal of a medical cessation determination (Social Security)",
+      "url": "https://www.law.cornell.edu/cfr/text/20/404.1597a",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "A person appealing the end of disability benefits can ask for them to continue, within 10 days after receiving the notice, through a hearing decision. If the decision stands they’re generally asked to repay them, and can ask for a waiver."
+    },
+    {
+      "id": "src:ssa-42-usc-405",
+      "title": "42 U.S.C. § 405 — Evidence, procedure, and certification for payments (Social Security)",
+      "url": "https://www.law.cornell.edu/uscode/text/42/405",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "An unfavorable disability decision comes with a statement of the case in understandable language, discussing the evidence and giving the reasons (§ 405(b)(1)). Benefits can go to a representative payee when that serves the person’s interest, and the certification is promptly revoked if benefits are misused (§ 405(j))."
+    },
+    {
+      "id": "src:ssa-payees",
+      "title": "20 CFR § 404.2010 — When payment will be made to a representative payee (Social Security)",
+      "url": "https://www.law.cornell.edu/cfr/text/20/404.2010",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Benefits go to a representative payee for an adult who is legally incompetent or mentally or physically unable to manage them, and generally for a beneficiary under 18."
+    },
+    {
+      "id": "src:ssa-overpayments-42-usc-404",
+      "title": "42 U.S.C. § 404 — Overpayments and underpayments (Social Security)",
+      "url": "https://www.law.cornell.edu/uscode/text/42/404",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Recovery isn’t allowed from a person without fault if it would defeat the law’s purpose or go against equity and good conscience. In deciding fault, the agency considers the person’s physical, mental, educational, and language limitations (§ 404(b))."
+    },
+    {
+      "id": "src:ssa-disability-reviews-42-usc-421",
+      "title": "42 U.S.C. § 421 — Disability determinations (Social Security)",
+      "url": "https://www.law.cornell.edu/uscode/text/42/421",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "A disability case is reviewed for continuing eligibility at least once every 3 years, unless the disability has been found to be permanent (§ 421(i))."
+    },
+    {
+      "id": "src:va-duty-to-assist",
+      "title": "38 U.S.C. § 5103A — Duty to assist claimants (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/uscode/text/38/5103A",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "VA makes reasonable efforts to get the evidence a claim needs, with at least two requests for private records, and tells the claimant which records it couldn’t get and that it will decide on what it has. For disability compensation it gets federal records until they’re found or further effort would be futile, and provides a medical exam or opinion when the decision needs one."
+    },
+    {
+      "id": "src:va-decision-notices",
+      "title": "38 U.S.C. § 5104 — Decisions and notices of decisions (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/uscode/text/38/5104",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Each notice names the issues decided, summarizes the evidence and the law, identifies favorable findings, says what wasn’t met in a denial, and explains how to get the evidence used and what would be needed for a grant or the next higher level."
+    },
+    {
+      "id": "src:va-review-options",
+      "title": "38 U.S.C. § 5104C — Options following decision by agency of original jurisdiction (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/uscode/text/38/5104C",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Within one year after a decision, a claimant can ask for a higher-level review, file a supplemental claim, or file a notice of disagreement with the Board of Veterans’ Appeals."
+    },
+    {
+      "id": "src:va-procedural-rights",
+      "title": "38 CFR § 3.103 — Procedural due process and other rights (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/cfr/text/38/3.103",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Before an adverse action, a beneficiary generally gets notice and 60 days to send evidence, with listed exceptions. Claimants can have a representative of their choice at every stage, and a hearing on a proposed adverse action comes before staff who took no part in proposing it."
+    },
+    {
+      "id": "src:va-intent-to-file",
+      "title": "38 CFR § 3.155 — How to file a claim (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/cfr/text/38/3.155",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "An intent to file, by a saved online application, a signed form, or a statement to a designated employee, holds the claim’s date if a complete claim arrives within one year."
+    },
+    {
+      "id": "src:va-overpayment-waiver",
+      "title": "38 U.S.C. § 5302 — Waiver of recovery of claims by the United States (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/uscode/text/38/5302",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "VA waives recovery that would be against equity and good conscience, on a request made within one year of the notice of the debt, unless there’s an indication of fraud, misrepresentation, or bad faith."
+    },
+    {
+      "id": "src:va-fiduciaries",
+      "title": "38 U.S.C. § 5502 — Payments to and supervision of fiduciaries (Veterans’ benefits)",
+      "url": "https://www.law.cornell.edu/uscode/text/38/5502",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "VA can pay a beneficiary’s benefits to a fiduciary when that serves the beneficiary’s interest, and fiduciaries account for how they’ve used the payments."
+    },
+    {
+      "id": "src:vba-claims-data",
+      "title": "Veterans Benefits Administration — Detailed Claims Data",
+      "url": "https://www.benefits.va.gov/reports/detailed_claims_data.asp",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Updated weekly with the Monday Morning Workload Report. It gives the claims inventory, the backlog of claims pending more than 125 days, and issue-based and claim-based accuracy over 3 and 12 months."
+    },
+    {
+      "id": "src:ssa-performance",
+      "title": "Social Security Administration — Social Security performance",
+      "url": "https://www.ssa.gov/ssa-performance",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Monthly figures for average processing time and pending cases, for initial disability claims, reconsiderations, and hearings."
+    },
+    {
+      "id": "src:usagov-benefit-finder",
+      "title": "USAGov — Benefit finder",
+      "url": "https://www.usa.gov/benefit-finder",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-04",
+      "note": "Helps people explore government benefits they may qualify for, by category, and learn how to apply."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:deciding-paying-federal-benefits",
+      "type": "mission",
+      "title": "Benefits and Eligibility",
+      "description": "Help people learn what they may qualify for, take in their claims, gather the evidence, decide eligibility fairly and without long waits, explain each decision, pay the right amount to the right person, keep eligibility current, correct mistakes, and show the public how the program is doing.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555",
+        "src:goldberg-v-kelly",
+        "src:payment-integrity-31-usc-3352"
+      ],
+      "attributes": {
+        "tagline": "Deciding claims and paying benefits",
+        "sector": "public-sector",
+        "scope": "US-federal-benefits",
+        "principles": [
+          "Each claim is one record from the first contact to the final decision, and each benefit is one record while it’s paid",
+          "People give a fact once, and the office reuses it instead of asking again",
+          "The program’s rules are written down, versioned, and tested, so the same facts get the same decision",
+          "A data match prompts a check, and staff confirm it before anything changes for the person",
+          "AI and analytics help staff find and weigh evidence, and staff decide",
+          "Every decision says why, in plain language, and how to ask for a review",
+          "Online is the easiest way in, and never the only way"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:qualified-people-receive-benefits",
+      "type": "outcome",
+      "title": "People who qualify receive what they’re due",
+      "description": "People can find out what they may qualify for and how to claim it, and those who qualify get the benefit, from the earliest date the law allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usagov-benefit-finder",
+        "src:ssa-filing-date",
+        "src:va-intent-to-file"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "estimated-participation",
+            "title": "Likely eligible people receiving the benefit",
+            "description": "The estimated share of people likely to qualify who receive the benefit, where the office can estimate it. The office sets its own target."
+          },
+          {
+            "id": "filing-dates-protected",
+            "title": "Claims with an earlier date protected",
+            "description": "The share of claims that kept an earlier filing date, through a statement of intent to file, compared with those that could have. A low share can mean people don’t know the option exists. The office sets its own target.",
+            "sourceIds": [
+              "src:ssa-filing-date",
+              "src:va-intent-to-file"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:claiming-takes-little-effort",
+      "type": "outcome",
+      "title": "Claiming a benefit takes no more effort than it needs",
+      "description": "Forms ask only what the office needs and can’t get elsewhere, notices are written in plain language, and people can see where their claim stands.",
+      "status": "reference",
+      "sourceIds": [
+        "src:paperwork-reduction-44-usc-3506",
+        "src:plain-writing-act",
+        "src:idea-act",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "customer-feedback-scores",
+            "title": "Post-transaction customer feedback",
+            "description": "What people say after finishing a claim or other service, on OMB’s standard questions. High Impact Service Providers submit these results each quarter for publication.",
+            "sourceIds": [
+              "src:a11-section-280",
+              "src:high-impact-service-providers"
+            ]
+          },
+          {
+            "id": "claims-filed-online",
+            "title": "Claims filed online",
+            "description": "The share of claims filed online, alongside how many of those were finished without a call or a visit. The office sets its own target.",
+            "sourceIds": [
+              "src:idea-act"
+            ]
+          }
+        ],
+        "theme": "easy-to-use"
+      }
+    },
+    {
+      "id": "eb:outcome:everyone-can-claim",
+      "type": "outcome",
+      "title": "Everyone can claim and be served, however they’re able",
+      "description": "People with disabilities, people without internet access, and people who need help can claim benefits and read what the office sends them.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rehabilitation-act-504",
+        "src:section-508-standards",
+        "src:idea-act"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "accessibility-barriers-fixed",
+            "title": "Accessibility barriers fixed",
+            "description": "The share of reported barriers in the office’s sites, forms, and notices that were fixed within the office’s own target.",
+            "sourceIds": [
+              "src:rehabilitation-act-504",
+              "src:section-508-standards"
+            ]
+          },
+          {
+            "id": "time-to-decide-by-channel",
+            "title": "Time to decide, by way of filing",
+            "description": "Average days to decide claims filed online, by phone, in person, and on paper. A wide gap can mean some people are getting slower service.",
+            "sourceIds": [
+              "src:idea-act"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:decisions-without-long-waits",
+      "type": "outcome",
+      "title": "Decisions come without long waits",
+      "description": "Claims are decided within a reasonable time, and the office knows how long people are waiting and which claims have waited longest.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555",
+        "src:vba-claims-data",
+        "src:ssa-performance"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "average-days-to-decide",
+            "title": "Average days to decide a claim",
+            "description": "The average time from a claim’s filing date to its decision. Social Security publishes this each month for initial disability claims.",
+            "sourceIds": [
+              "src:ssa-performance"
+            ]
+          },
+          {
+            "id": "claims-past-target",
+            "title": "Claims waiting past the office’s target",
+            "description": "The number of claims pending longer than the office’s target. The Veterans Benefits Administration publishes this each week as its backlog, claims pending more than 125 days.",
+            "sourceIds": [
+              "src:vba-claims-data"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:decisions-accurate-consistent",
+      "type": "outcome",
+      "title": "Decisions are accurate and consistent",
+      "description": "People with the same facts get the same decision, whichever staff member handles the claim, and a quality review finds problems in individual decisions and across the program.",
+      "status": "reference",
+      "sourceIds": [
+        "src:acus-2021-10",
+        "src:vba-claims-data"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "decision-accuracy",
+            "title": "Decision accuracy",
+            "description": "The share of sampled decisions found correct by quality review. The Veterans Benefits Administration publishes this each week, by claim and by issue.",
+            "sourceIds": [
+              "src:vba-claims-data",
+              "src:acus-2021-10"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:fair-timely-review",
+      "type": "outcome",
+      "title": "People can challenge a decision and get a fair, timely review",
+      "description": "Each notice says how to ask for a review and by when, someone who didn’t make the decision reviews it, and the person is told what happened and why.",
+      "status": "reference",
+      "sourceIds": [
+        "src:goldberg-v-kelly",
+        "src:ssa-review-process",
+        "src:va-review-options",
+        "src:va-procedural-rights"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "average-days-to-review",
+            "title": "Average days to finish a review",
+            "description": "The average time from a request for review to its decision, at each level. Social Security publishes this each month for reconsiderations and hearings.",
+            "sourceIds": [
+              "src:ssa-performance"
+            ]
+          },
+          {
+            "id": "decisions-changed-on-review",
+            "title": "Decisions changed on review",
+            "description": "The share of reviewed decisions that were changed, and why. A high share can point to a problem with first decisions, or with the evidence gathered for them.",
+            "sourceIds": [
+              "src:acus-2021-10"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:benefits-paid-correctly",
+      "type": "outcome",
+      "title": "Benefits are paid on time, in the right amount, to the right person",
+      "description": "Payments go out electronically on schedule, checks before payment stop what shouldn’t be paid, and someone responsible manages the money for people who can’t manage it themselves.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eft-31-cfr-208",
+        "src:eo-14247",
+        "src:do-not-pay-31-usc-3354",
+        "src:payment-integrity-31-usc-3352",
+        "src:payment-accuracy"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "benefit-improper-payment-rate",
+            "title": "Improper payment rate",
+            "description": "For programs at risk of significant improper payments, the estimated share of payments that were improper or couldn’t be confirmed for lack of documentation. Agencies report it each year, and PaymentAccuracy.gov publishes it.",
+            "sourceIds": [
+              "src:payment-integrity-31-usc-3352",
+              "src:payment-accuracy"
+            ]
+          },
+          {
+            "id": "payments-made-electronically",
+            "title": "Payments made electronically",
+            "description": "The share of benefit payments made by electronic funds transfer, and how many people have a waiver or an exception.",
+            "sourceIds": [
+              "src:eft-31-cfr-208",
+              "src:eo-14247"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:overpayments-handled-fairly",
+      "type": "outcome",
+      "title": "Overpayments are found early and recovered fairly",
+      "description": "The office finds overpayments soon, explains them clearly, decides requests to waive them, and recovers what it should with the protections the law gives.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-overpayments-42-usc-404",
+        "src:va-overpayment-waiver",
+        "src:offset-31-usc-3716",
+        "src:payment-accuracy"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "benefit-overpayments-recovered",
+            "title": "Overpayments recovered",
+            "description": "The amount of overpayments recovered, compared with the amount identified for recovery.",
+            "sourceIds": [
+              "src:payment-integrity-31-usc-3352",
+              "src:payment-accuracy"
+            ]
+          },
+          {
+            "id": "waiver-requests-decided",
+            "title": "Time to decide a waiver request",
+            "description": "The average time from a request to waive an overpayment to its decision. The office sets its own target.",
+            "sourceIds": [
+              "src:ssa-overpayments-42-usc-404",
+              "src:va-overpayment-waiver"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:program-performance-public",
+      "type": "outcome",
+      "title": "The public can see how the program is doing",
+      "description": "The office publishes its workloads, waits, accuracy, and improper payments on a schedule, in terms people can understand.",
+      "status": "reference",
+      "sourceIds": [
+        "src:vba-claims-data",
+        "src:ssa-performance",
+        "src:payment-accuracy",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "figures-published-on-schedule",
+            "title": "Performance figures published on schedule",
+            "description": "The share of the office’s planned updates, such as a weekly or monthly workload report, published when due.",
+            "sourceIds": [
+              "src:vba-claims-data",
+              "src:ssa-performance"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:capability:program-rules-forms",
+      "type": "capability",
+      "title": "Program Rules & Forms",
+      "description": "Ability to turn the program’s laws and regulations into written rules, procedures, and forms, keep each version with the dates it applied, and ask people only for what the office needs.",
+      "status": "reference",
+      "sourceIds": [
+        "src:paperwork-reduction-44-usc-3506",
+        "src:privacy-act"
+      ],
+      "applicabilityNotes": "Each program’s statute and regulations set who qualifies and how much they get. An office applies many versions at once, since a claim is often decided on the rules in force on an earlier date.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:public-guidance",
+      "type": "capability",
+      "title": "Public Guidance & Access",
+      "description": "Ability to help people learn what they may qualify for and how to claim it, in plain language, on the USAGov benefit finder and the office’s own channels, and to keep what the office offers open to people with disabilities.",
+      "status": "reference",
+      "sourceIds": [
+        "src:usagov-benefit-finder",
+        "src:plain-writing-act",
+        "src:rehabilitation-act-504",
+        "src:section-508-standards"
+      ],
+      "applicabilityNotes": "Offices often rely on partners such as veterans service organizations, community groups, and benefits counselors to reach people. Many questions arrive at a contact center, which the Contact Center mission covers.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:application-intake",
+      "type": "capability",
+      "title": "Application & Claim Intake",
+      "description": "Ability to take in claims online, by phone, in person, and on paper, protect the date a person first asked, record who represents them, and start a single record for each claim.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act",
+        "src:ssa-filing-date",
+        "src:va-intent-to-file",
+        "src:va-procedural-rights"
+      ],
+      "applicabilityNotes": "Some programs let a statement of intent hold the filing date, and each sets its own time to finish. Who can represent a person, and whether they can charge, varies by program.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:evidence-development",
+      "type": "capability",
+      "title": "Evidence Gathering",
+      "description": "Ability to work out what a claim still needs, ask for it from the person, other agencies, and doctors, follow up, and tell the person what couldn’t be found.",
+      "status": "reference",
+      "sourceIds": [
+        "src:va-duty-to-assist"
+      ],
+      "applicabilityNotes": "VA has a duty to assist set out in law, with specific steps. Other programs put more of the work on the claimant, and may rely on state agencies or contracted examiners for medical evidence.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:identity-eligibility-checks",
+      "type": "capability",
+      "title": "Identity & Eligibility Checks",
+      "description": "Ability to confirm who a person is, check the facts of a claim against trusted data such as Do Not Pay and other agencies’ records, keep the agreements those matches need, and confirm what a match shows before acting on it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-63-4",
+        "src:do-not-pay-31-usc-3354",
+        "src:do-not-pay",
+        "src:privacy-act",
+        "src:save-system-notice"
+      ],
+      "applicabilityNotes": "Which data a program can use depends on its statute and on agreements with the agencies that hold the data. Identity checks should fit the risk of each service, so viewing a letter may need less than changing a bank account.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:determinations-notices",
+      "type": "capability",
+      "title": "Determinations & Notices",
+      "description": "Ability to apply the rules in force to the facts of a claim, work out the amount and start date, record the reasons, and send a plain-language notice with the decision and the person’s rights.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555",
+        "src:va-decision-notices",
+        "src:ssa-42-usc-405",
+        "src:ssn-fraud-prevention-act",
+        "src:m-25-21"
+      ],
+      "applicabilityNotes": "Few programs have a fixed deadline for a decision, so most offices set their own target. Medical decisions may be made by state agencies under federal rules. Some simple claims can be decided automatically, but AI that’s a principal basis for a decision is presumed to be high-impact.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:benefit-payment",
+      "type": "capability",
+      "title": "Benefit Payment & Payees",
+      "description": "Ability to set up and change how each person is paid, send certified payments through Treasury on schedule, protect payment details from being changed by someone else, and appoint and oversee people who manage benefits for others.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eft-31-cfr-208",
+        "src:eo-14247",
+        "src:treasury-payment-systems",
+        "src:ssa-42-usc-405",
+        "src:ssa-payees",
+        "src:va-fiduciaries"
+      ],
+      "applicabilityNotes": "Treasury disburses most federal benefits, and a few agencies have their own disbursing authority. Social Security calls those who manage benefits representative payees, and VA calls them fiduciaries.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:continuing-eligibility",
+      "type": "capability",
+      "title": "Continuing Eligibility & Changes",
+      "description": "Ability to take in changes people report, review ongoing benefits on the program’s schedule, act on what data matches show, and give notice before stopping or reducing a benefit.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-disability-reviews-42-usc-421",
+        "src:goldberg-v-kelly",
+        "src:mathews-v-eldridge",
+        "src:va-procedural-rights",
+        "src:privacy-act"
+      ],
+      "applicabilityNotes": "Programs differ in how often they review eligibility, and in what process is due before a benefit changes. Means-tested benefits generally need closer attention to income and resources than earned ones.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:reviews-appeals",
+      "type": "capability",
+      "title": "Reviews & Appeals",
+      "description": "Ability to take in requests for review, assign them to someone who wasn’t involved, keep benefits going where the program allows, give the person access to the record, and carry out the result.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-review-process",
+        "src:ssa-reconsideration",
+        "src:ssa-continued-benefits",
+        "src:va-review-options",
+        "src:va-procedural-rights",
+        "src:goldberg-v-kelly"
+      ],
+      "applicabilityNotes": "Each program sets its own levels of review and deadlines. Some end in a hearing before an administrative law judge, or a separate board, that keeps its own system and may be independent of the office.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:overpayment-recovery",
+      "type": "capability",
+      "title": "Overpayments & Debt Recovery",
+      "description": "Ability to work out and explain an overpayment, take and decide waiver requests and appeals, set up repayment, and send debts that remain to Treasury, with the protections the law gives.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-overpayments-42-usc-404",
+        "src:va-overpayment-waiver",
+        "src:offset-31-usc-3716",
+        "src:treasury-offset-program"
+      ],
+      "applicabilityNotes": "Each program sets its own waiver standard and how much it withholds from ongoing payments. Means-tested benefits can be exempt from offset at the request of the agency that runs them.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:quality-integrity-reporting",
+      "type": "capability",
+      "title": "Quality, Integrity & Reporting",
+      "description": "Ability to review the quality of decisions, estimate improper payments, manage fraud risks, collect feedback from people served, and report workloads, waits, and results to leaders and the public.",
+      "status": "reference",
+      "sourceIds": [
+        "src:acus-2021-10",
+        "src:payment-integrity-31-usc-3352",
+        "src:fraud-controls-31-usc-3357",
+        "src:gao-fraud-risk-framework",
+        "src:a11-section-280",
+        "src:payment-accuracy"
+      ],
+      "applicabilityNotes": "Suspected fraud goes to the agency’s Office of Inspector General, which the Office of Inspector General mission covers. Improper payment estimates are required only for programs at risk of significant improper payments.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:ask-only-what-is-needed",
+      "type": "requirement",
+      "title": "Ask only for what’s needed, and say why",
+      "description": "Before a form goes to OMB, give 60 days’ public notice and certify that it’s needed and doesn’t ask for what the office can reasonably get elsewhere. Tell each person the authority for asking, whether answering is required, how the information will be used, and what happens if they don’t answer.",
+      "status": "reference",
+      "sourceIds": [
+        "src:paperwork-reduction-44-usc-3506",
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:write-benefit-documents-plainly",
+      "type": "requirement",
+      "title": "Write forms, letters, and notices in plain language",
+      "description": "Use plain writing in every letter, form, notice, and instruction people need to get a benefit, whenever one is issued or substantially revised.",
+      "status": "reference",
+      "sourceIds": [
+        "src:plain-writing-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-services-accessible",
+      "type": "requirement",
+      "title": "Keep the program open to people with disabilities",
+      "description": "Don’t exclude anyone from the program because of a disability. Make public content, and also decisions, benefit notices, receipts, and forms sent to people, conform to WCAG 2.0 Level AA.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rehabilitation-act-504",
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:offer-digital-and-other-ways",
+      "type": "requirement",
+      "title": "Offer a digital way to claim, and keep another",
+      "description": "Provide each form in a digital version that’s secure and works on mobile devices, and keep an accessible way for people who can’t use digital services.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:protect-filing-date",
+      "type": "requirement",
+      "title": "Protect the date a person first asks",
+      "description": "Where the program allows it, let a statement of intent to claim hold the filing date while the person finishes. Social Security holds it for 6 months after its notice about filing, and VA for one year.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-filing-date",
+        "src:va-intent-to-file"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:accept-representatives",
+      "type": "requirement",
+      "title": "Work with the representative a person chooses",
+      "description": "Let a claimant be represented by someone of their choice, within the program’s rules for who can represent, and record the representative on the claim. VA allows this at every stage.",
+      "status": "reference",
+      "sourceIds": [
+        "src:va-procedural-rights",
+        "src:goldberg-v-kelly"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:help-gather-evidence",
+      "type": "requirement",
+      "title": "Help people get the evidence their claim needs",
+      "description": "Where the program gives a duty to assist, make reasonable efforts to get the records a claim needs, and say which records couldn’t be found. VA makes at least two requests for private records, and provides a medical exam or opinion when the decision needs one.",
+      "status": "reference",
+      "sourceIds": [
+        "src:va-duty-to-assist"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:prove-identity-to-fit-risk",
+      "type": "requirement",
+      "title": "Confirm who people are, to fit the risk",
+      "description": "Choose identity proofing and sign-in that fit what a person can do in each service, following NIST SP 800-63-4, and provide another way for people who can’t complete it online.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-63-4",
+        "src:idea-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:check-before-paying",
+      "type": "requirement",
+      "title": "Check eligibility before paying",
+      "description": "Review prepayment procedures, and use Do Not Pay’s databases, including death records and Social Security’s data on people who are incarcerated, to check eligibility before releasing funds.",
+      "status": "reference",
+      "sourceIds": [
+        "src:do-not-pay-31-usc-3354",
+        "src:do-not-pay"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-matching-agreements",
+      "type": "requirement",
+      "title": "Keep a written agreement for each data match",
+      "description": "Put each computer matching program under a written agreement covering its purpose, records, notice, verification, retention, and security, in effect for up to 18 months and renewable for up to one more year. Do Not Pay has its own provisions, so check which apply.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act",
+        "src:do-not-pay-31-usc-3354"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:verify-match-before-acting",
+      "type": "requirement",
+      "title": "Verify a match before acting on it",
+      "description": "Don’t suspend, end, reduce, or finally deny a benefit because of a match until the information is verified, the person has been told what was found, and the time to contest it has passed, which is 30 days unless a law or regulation sets another.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:decide-in-reasonable-time",
+      "type": "requirement",
+      "title": "Decide each claim within a reasonable time",
+      "description": "Move each claim to a decision within a reasonable time, and set a target the office can be measured against, since most programs’ laws set no fixed deadline.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:explain-each-decision",
+      "type": "requirement",
+      "title": "Explain each decision in writing",
+      "description": "Give prompt written notice of each denial, with the grounds. VA’s notices name the issues, summarize the evidence and law, and identify favorable findings and what wasn’t met, and Social Security’s unfavorable disability decisions discuss the evidence in understandable language.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555",
+        "src:va-decision-notices",
+        "src:ssa-42-usc-405"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-ssn-off-mail",
+      "type": "requirement",
+      "title": "Keep Social Security numbers off mailed documents",
+      "description": "Leave a person’s Social Security number off anything mailed unless the agency head has found it necessary, then redact it where feasible and keep it from showing on the outside of the envelope.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssn-fraud-prevention-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-people-deciding",
+      "type": "requirement",
+      "title": "Keep staff responsible for AI-assisted decisions",
+      "description": "Treat AI that’s a principal basis for an eligibility, continued eligibility, or fraud decision as high-impact. Keep human oversight and accountability, and give people affected timely human review and a chance to appeal.",
+      "status": "reference",
+      "sourceIds": [
+        "src:m-25-21"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:pay-electronically",
+      "type": "requirement",
+      "title": "Pay benefits electronically",
+      "description": "Pay by electronic funds transfer, enroll people in it, and offer a Treasury-sponsored account. Give people who qualify for a waiver or an exception, such as those without access to banking services, another way to be paid.",
+      "status": "reference",
+      "sourceIds": [
+        "src:eft-31-cfr-208",
+        "src:eo-14247"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:oversee-payees",
+      "type": "requirement",
+      "title": "Appoint and oversee people who manage benefits for others",
+      "description": "Pay a representative payee or fiduciary only when that serves the beneficiary’s interest, have them account for how they’ve used the money, and move the payments promptly if they’re misused.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-42-usc-405",
+        "src:ssa-payees",
+        "src:va-fiduciaries"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:review-eligibility-on-schedule",
+      "type": "requirement",
+      "title": "Review continuing eligibility on the program’s schedule",
+      "description": "Review ongoing benefits as the program requires. Social Security reviews a disability case at least once every 3 years, unless the disability has been found to be permanent.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-disability-reviews-42-usc-421"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:give-notice-before-cutting",
+      "type": "requirement",
+      "title": "Give notice before stopping or reducing a benefit",
+      "description": "Tell the person the reasons and give them a chance to respond before an action against their benefit, in the form due process calls for in that program. VA generally gives 60 days to send evidence.",
+      "status": "reference",
+      "sourceIds": [
+        "src:goldberg-v-kelly",
+        "src:mathews-v-eldridge",
+        "src:va-procedural-rights"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:state-review-rights",
+      "type": "requirement",
+      "title": "Say how to ask for a review, and by when",
+      "description": "Put the review options and deadlines in each decision notice. Social Security allows 60 days after the notice is received, taken to be 5 days after its date, and VA allows one year for its three options.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-review-process",
+        "src:ssa-reconsideration",
+        "src:va-review-options"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:use-independent-reviewers",
+      "type": "requirement",
+      "title": "Have someone new review a decision",
+      "description": "Assign each review to someone who took no part in the decision, and base the result on the rules and the evidence on record.",
+      "status": "reference",
+      "sourceIds": [
+        "src:goldberg-v-kelly",
+        "src:va-procedural-rights"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:continue-benefits-during-appeal",
+      "type": "requirement",
+      "title": "Continue benefits during an appeal where the program allows",
+      "description": "Tell people when they can ask for payments to continue, and that they may have to repay them. For the end of Social Security disability benefits, the request is due within 10 days after the notice is received.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-continued-benefits"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:decide-waiver-requests",
+      "type": "requirement",
+      "title": "Decide requests to waive an overpayment",
+      "description": "Tell people they can ask for a waiver, and decide on the program’s standard. Social Security considers fault, including physical, mental, educational, and language limitations, and VA takes requests within one year of the notice of the debt.",
+      "status": "reference",
+      "sourceIds": [
+        "src:ssa-overpayments-42-usc-404",
+        "src:va-overpayment-waiver"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:give-notice-before-offset",
+      "type": "requirement",
+      "title": "Give debtors their rights before offset",
+      "description": "Before offsetting a debt, give written notice of the debt, the intent to offset, and the person’s rights, with a chance to see the records, ask for agency review, and agree on repayment. The first $9,000 of federal benefit payments in a 12-month period is exempt.",
+      "status": "reference",
+      "sourceIds": [
+        "src:offset-31-usc-3716"
+      ],
+      "attributes": {
+        "kind": "fairness-due-process"
+      }
+    },
+    {
+      "id": "eb:requirement:report-delinquent-debts",
+      "type": "requirement",
+      "title": "Tell Treasury about delinquent debts",
+      "description": "Notify Treasury of past-due, legally enforceable debts over 120 days delinquent, so they can go to the Treasury Offset Program.",
+      "status": "reference",
+      "sourceIds": [
+        "src:offset-31-usc-3716",
+        "src:treasury-offset-program"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:estimate-benefit-improper-payments",
+      "type": "requirement",
+      "title": "Estimate and report improper payments",
+      "description": "Review each program at least once every 3 fiscal years for risk of significant improper payments. For those at risk, estimate them, count payments that lack documentation, and report the causes and what’s being done.",
+      "status": "reference",
+      "sourceIds": [
+        "src:payment-integrity-31-usc-3352",
+        "src:payment-accuracy"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:manage-fraud-risk",
+      "type": "requirement",
+      "title": "Manage the program’s fraud risks",
+      "description": "Evaluate fraud risks, design controls to fit them, and use data on detected fraud and the results of audits and investigations to improve prevention.",
+      "status": "reference",
+      "sourceIds": [
+        "src:fraud-controls-31-usc-3357",
+        "src:gao-fraud-risk-framework"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:review-decision-quality",
+      "type": "requirement",
+      "title": "Review the quality of decisions, apart from appeals",
+      "description": "Run a quality review that looks at fairness, accuracy, consistency, and timeliness, finds problems across the program as well as in single decisions, and keeps reviewers free of pressure from those they review.",
+      "status": "reference",
+      "sourceIds": [
+        "src:acus-2021-10"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:collect-service-feedback",
+      "type": "requirement",
+      "title": "Collect feedback after each service",
+      "description": "If the office is a High Impact Service Provider, designate at least one priority service each year, plan improvements, and collect post-transaction feedback to submit each quarter.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:high-impact-service-providers"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:benefits-claims-system",
+      "type": "implementationPattern",
+      "title": "Benefits Claims System",
+      "description": "An example architecture: one claims system that carries each claim from intake through evidence, checks, decision, and notice, then holds the benefit while it’s paid, with its changes, reviews, and payee.",
+      "status": "reference",
+      "sourceIds": [
+        "src:apa-5-usc-555",
+        "src:va-decision-notices",
+        "src:acus-2021-10"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "One record for each person, with their claims, benefits, and representative",
+          "Work queues that send each claim to the right staff, with its deadlines and target dates",
+          "Checklists of what each claim still needs, with requests and follow-ups",
+          "Recorded decisions, with the rules applied, the evidence weighed, and who decided",
+          "Each benefit’s amount, start date, payment details, and payee",
+          "Changes, scheduled reviews, and requests for review, tied to the benefit they affect",
+          "A history of who did what, which quality reviewers and reviewers on appeal can read"
+        ],
+        "strengths": [
+          "People and staff see the same status for each claim",
+          "A decision and its reasons stay with the claim through any review",
+          "Workload and wait figures come from the work itself"
+        ],
+        "fitsWhen": [
+          "The office handles many claims with similar steps",
+          "Its current tools are an aging system with paper or side spreadsheets around it"
+        ],
+        "watchFor": [
+          "Moving open claims and years of benefit history out of an old system needs careful planning",
+          "Old systems often hold rules no one has written down",
+          "Replacing everything at once is risky, so plan to move one benefit or step at a time"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:benefits-online-account",
+      "type": "implementationPattern",
+      "title": "Online Benefits Account",
+      "description": "An example architecture: one online account where people apply, save and come back, send documents, see where their claim stands, read their notices, report changes, and ask for a review, with the same steps open to their representatives.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act",
+        "src:section-508-standards",
+        "src:plain-writing-act"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "Applications that can be saved and finished later, with a saved start holding the filing date where the program allows",
+          "Questions that show only what applies, and fill in what the office already knows",
+          "Claim status in plain words, with what happens next and about how long it takes",
+          "Document upload from a phone or a computer",
+          "Notices to read online, with a choice of mail as well",
+          "Self-service changes, such as an address or bank account, with extra checks on the riskiest ones",
+          "Access for representatives and payees, under their own sign-in"
+        ],
+        "strengths": [
+          "People can see where things stand without calling",
+          "Online claims arrive complete and ready to work",
+          "Fewer status calls leave staff more time for people who need help"
+        ],
+        "fitsWhen": [
+          "Many people claim on paper or phone calls just to ask where their claim stands",
+          "The claims system can share status and take in claims through APIs"
+        ],
+        "watchFor": [
+          "Online is the easiest way in, never the only way, so staff need to see what people did there",
+          "Testing with real claimants, including people with disabilities, is what makes it work",
+          "Bank account changes attract fraud, so those steps need the strongest checks"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:eligibility-rules-service",
+      "type": "implementationPattern",
+      "title": "Eligibility Rules Service",
+      "description": "An example architecture: the program’s eligibility and payment rules kept in one service, separate from the claims system, written so program staff can read them, versioned by date, and tested against known cases.",
+      "status": "reference",
+      "sourceIds": [
+        "src:acus-2021-10",
+        "src:apa-5-usc-555"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "Rules written in a form program staff can read and check against the law",
+          "Versions by effective date, so a claim uses the rules in force for its dates",
+          "A set of test cases with known answers, run before any change goes live",
+          "An answer that shows which rules applied and why, for the decision record",
+          "The same rules available to the claims system, the online account, and estimators"
+        ],
+        "strengths": [
+          "The same facts get the same answer, wherever they’re entered",
+          "A change in the law is made once, and can be tested before it applies",
+          "The reasons behind an answer can go into the notice"
+        ],
+        "fitsWhen": [
+          "The program’s rules are complex, or change often",
+          "Today the rules are buried in old code, or in what experienced staff know"
+        ],
+        "watchFor": [
+          "Writing down rules from an old system takes longer than it looks",
+          "Rules that call for judgment, such as weighing medical evidence, stay with staff",
+          "Someone in the program must own each rule, not just the technical team"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:claim-evidence-folder",
+      "type": "implementationPattern",
+      "title": "Electronic Claim Evidence Folder",
+      "description": "An example architecture: every document for a claim, from uploads, scanned mail, other agencies, and doctors, kept in one electronic folder, labeled by type and date, where staff, reviewers, and the person can reach it.",
+      "status": "reference",
+      "sourceIds": [
+        "src:va-duty-to-assist",
+        "src:va-decision-notices",
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "A central place that scans incoming mail, and sends the originals on to be kept or destroyed on schedule",
+          "Uploads from the online account and representatives",
+          "Records received from other agencies and medical providers, electronically where possible",
+          "Labels for each document’s type, date, and source, added automatically and checked by staff",
+          "Search across a long file, with duplicates set aside",
+          "Access by role, with each view recorded"
+        ],
+        "strengths": [
+          "Staff in any location can work a claim right away",
+          "Nothing waits on a paper file moving between offices",
+          "Reviewers and appeals see the same evidence the first decision used"
+        ],
+        "fitsWhen": [
+          "Claims still depend on paper files, or evidence is scattered across systems",
+          "Files are long, such as medical records built up over years"
+        ],
+        "watchFor": [
+          "Scanning quality matters, since a poor image can hide evidence",
+          "Evidence folders hold sensitive health information, so limit who can see what",
+          "Records schedules apply, including to the paper after it’s scanned"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:public-sign-in",
+      "type": "implementationPattern",
+      "title": "Public Sign-In and Identity Verification",
+      "description": "An example architecture: people sign in through a government sign-in service that verifies identity to the level each service needs, while the office’s systems decide what each person can see and do.",
+      "status": "reference",
+      "sourceIds": [
+        "src:nist-sp-800-63-4",
+        "src:login-gov",
+        "src:idea-act"
+      ],
+      "attributes": {
+        "layer": "security-identity",
+        "parts": [
+          "Sign-in with multi-factor authentication",
+          "Identity verification to the level each service needs, following NIST SP 800-63-4",
+          "The office’s own link between a verified person and their records",
+          "Stronger checks for risky actions, such as changing a bank account",
+          "Another way to confirm identity, in person or by phone, for people who can’t finish online",
+          "Signs of account takeover sent to the office’s fraud and security staff"
+        ],
+        "strengths": [
+          "People use one sign-in across government services",
+          "The office doesn’t have to run identity checks itself",
+          "Identity checks can match the risk of each service"
+        ],
+        "fitsWhen": [
+          "The office offers services that show personal information or change a payment",
+          "Its current sign-in is old, or weak against account takeover"
+        ],
+        "watchFor": [
+          "Remote identity verification doesn’t work for everyone, so the other way needs real capacity",
+          "Linking a verified person to the right record needs care, especially for common names",
+          "Moving people from an old sign-in takes time and clear messages"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:eligibility-data-exchanges",
+      "type": "implementationPattern",
+      "title": "Eligibility Data Exchanges",
+      "description": "An example architecture: connections to trusted data, such as Do Not Pay and other agencies’ records, that run at set points in a claim, save what came back to the claim, and send anything that needs a person’s attention to staff.",
+      "status": "reference",
+      "sourceIds": [
+        "src:do-not-pay",
+        "src:do-not-pay-31-usc-3354",
+        "src:privacy-act",
+        "src:save-system-notice"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "Do Not Pay Connect, an API for screening inside the claims system",
+          "Connections to other agencies for facts such as earnings, deaths, and service records",
+          "DHS’s SAVE service, for programs whose rules depend on immigration status",
+          "Checks that run at the claim’s start, before payment, and on a schedule while the benefit is paid",
+          "Each result saved with the claim, with its source and date",
+          "A queue for matches staff need to confirm, with the notice and response time tracked",
+          "A list of each matching agreement, with its expiration date and an owner"
+        ],
+        "strengths": [
+          "Facts come from the source, so people are asked for less",
+          "Problems are caught before payment instead of after",
+          "Results are on record if a decision is reviewed"
+        ],
+        "fitsWhen": [
+          "The office checks facts by hand, or against files that arrive months late",
+          "Its improper payments come from information it could have had sooner"
+        ],
+        "watchFor": [
+          "A match isn’t a finding, so staff verify it before anything changes for the person",
+          "Matching agreements take months, and last only 18 months plus a renewal, so start early and watch the dates",
+          "Data from other agencies can be wrong or out of date, so people need a way to correct it"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:payments-through-treasury",
+      "type": "implementationPattern",
+      "title": "Payments through Treasury",
+      "description": "An example architecture: the claims system produces each payment cycle’s file in Treasury’s standard format, the agency’s certifying officers certify it through the Secure Payment System, and Treasury pays by direct deposit or a Treasury-sponsored account.",
+      "status": "reference",
+      "sourceIds": [
+        "src:treasury-payment-systems",
+        "src:eft-31-cfr-208",
+        "src:eo-14247",
+        "src:do-not-pay"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A payment file in Treasury’s Standard Payment Request format, built from each benefit’s amount and payment details",
+          "Checks before release, such as totals against the last cycle and large or unusual changes",
+          "Certification through the Secure Payment System, by staff other than those who prepared the file",
+          "Treasury’s own screening of payments before they go out",
+          "Returned and failed payments brought back to the benefit record, with follow-up",
+          "Payment totals reconciled to the agency’s financial system"
+        ],
+        "strengths": [
+          "Treasury carries out the payments for the office",
+          "Each payment can be traced back to a decision",
+          "Electronic payments are safer and faster than checks"
+        ],
+        "fitsWhen": [
+          "The office pays benefits on a regular cycle",
+          "Treasury disburses its payments"
+        ],
+        "watchFor": [
+          "Once certified, payments can’t easily be held back, so checks come first",
+          "Bank account changes just before a payment date deserve a closer look",
+          "People without bank accounts, and those with waivers, need a way that works for them"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:overpayment-tracking",
+      "type": "implementationPattern",
+      "title": "Overpayment Tracking and Recovery",
+      "description": "An example architecture: each overpayment tracked as a debt tied to the benefit it came from, from the first notice through waiver requests, appeals, repayment, and any referral to Treasury.",
+      "status": "reference",
+      "sourceIds": [
+        "src:offset-31-usc-3716",
+        "src:treasury-offset-program",
+        "src:ssa-overpayments-42-usc-404",
+        "src:va-overpayment-waiver"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "A debt record showing how the overpayment arose and how the amount was worked out",
+          "Notices that explain the debt, the person’s rights, and the dates that apply",
+          "Waiver requests and appeals, with collection paused while the rules call for it",
+          "Repayment plans and withholding from ongoing payments",
+          "A count of days delinquent, and referral to the Treasury Offset Program when a debt is over 120 days",
+          "Amounts recovered, reconciled to the agency’s financial system"
+        ],
+        "strengths": [
+          "People get one clear explanation of what they owe and why",
+          "Collection doesn’t run ahead of a waiver request or an appeal",
+          "The office can see how much it’s owed, and why overpayments happen"
+        ],
+        "fitsWhen": [
+          "Overpayments are handled by letters and spreadsheets, or apart from the claim",
+          "People are often surprised by a debt, or get conflicting notices"
+        ],
+        "watchFor": [
+          "An overpayment can be years old by the time it’s found, so finding it early matters most",
+          "Automatic withholding can hurt, so check that notices and waiver steps come first",
+          "Debts belong in the agency’s financial records too, so agree which system is the source"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:ai-evidence-summaries",
+      "type": "implementationPattern",
+      "title": "AI Summaries of Claim Evidence",
+      "description": "An example architecture: AI reads the documents in a claim’s evidence folder, finds what bears on each issue, and gives staff a summary that points to its sources, and staff decide.",
+      "status": "reference",
+      "sourceIds": [
+        "src:m-25-21",
+        "src:acus-2021-10"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Text read from scanned and uploaded documents",
+          "A summary of the evidence on each issue in the claim, with a link to each page it came from",
+          "A list of what seems to be missing, for staff to request",
+          "Staff checks on each summary before they rely on it",
+          "Testing before use, and sampling afterward, comparing summaries with the documents",
+          "A record of what the AI produced and what staff did with it"
+        ],
+        "strengths": [
+          "Staff find what matters in a long file sooner",
+          "Every point can be checked against its source page",
+          "Staff spend their time weighing evidence instead of hunting for it"
+        ],
+        "fitsWhen": [
+          "Files are long, and most of the time goes to reading them",
+          "The evidence is in an electronic folder, with good scans"
+        ],
+        "watchFor": [
+          "A summary can miss or misstate something, so staff check it against the source",
+          "If AI output becomes a principal basis for decisions, it’s presumed to be high-impact, with the practices that brings",
+          "Staff can come to lean on summaries, so sample for that too",
+          "Summaries point to evidence and never recommend an outcome"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:payment-risk-analytics",
+      "type": "implementationPattern",
+      "title": "Payment Risk Analytics",
+      "description": "An example architecture: an analytics workspace that brings together claims, payments, match results, and past findings to point quality reviews and fraud work at the highest risks, and staff decide what to do.",
+      "status": "reference",
+      "sourceIds": [
+        "src:fraud-controls-31-usc-3357",
+        "src:gao-fraud-risk-framework",
+        "src:m-25-21",
+        "src:payment-integrity-31-usc-3352"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Regular feeds from the claims, payment, and sign-in systems",
+          "Flags for patterns worth a closer look, such as many claims paying into one account",
+          "Suggested samples for quality review and fraud work, which staff accept or change",
+          "Root causes of past overpayments and improper payments",
+          "A record of what was flagged, what staff decided, and what came of it",
+          "Regular checks for whether flags fall unfairly on some groups of people"
+        ],
+        "strengths": [
+          "Reviews go where the risk is",
+          "Problems can be stopped before more payments go out",
+          "Results show which risk signals are worth keeping"
+        ],
+        "fitsWhen": [
+          "The office pays too many people to review each one closely",
+          "Claims and payment data can be brought together regularly"
+        ],
+        "watchFor": [
+          "A flag isn’t a finding, and staff decide every step that affects a person",
+          "AI used to detect fraudulent use of services is presumed to be high-impact when it’s a principal basis for action",
+          "Wrong flags can delay or stop benefits people depend on, so keep track of false alarms"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:benefits-workload-reporting",
+      "type": "implementationPattern",
+      "title": "Benefits Workload and Performance Reporting",
+      "description": "An example architecture: workload, wait, accuracy, and payment figures built on a schedule from the claims system’s own data, for managers each day and the public each week or month.",
+      "status": "reference",
+      "sourceIds": [
+        "src:vba-claims-data",
+        "src:ssa-performance",
+        "src:a11-section-280",
+        "src:payment-accuracy"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "A regular copy of claims, payments, and reviews, kept out of the way of daily work",
+          "Agreed definitions, such as when a claim starts and what counts as waiting too long",
+          "Dashboards for managers on claims pending, ages, and where work is stuck",
+          "Quality review results, and feedback from people served",
+          "A public report on a set schedule, with downloadable data"
+        ],
+        "strengths": [
+          "Managers and the public see the same numbers",
+          "Trouble shows early, while there’s still time to move staff",
+          "Figures come from the work, so no one has to gather them by hand"
+        ],
+        "fitsWhen": [
+          "Reports are put together by hand, or differ by who made them",
+          "The office wants to publish its figures regularly"
+        ],
+        "watchFor": [
+          "A single target can push staff toward easy claims, so look at the oldest and hardest too",
+          "Changing a definition changes the trend, so say so when it happens",
+          "Small groups in public data can identify people, so check before publishing"
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:usagov-benefit-finder-tool",
+      "type": "resource",
+      "title": "USAGov Benefit Finder",
+      "description": "The government’s tool for exploring benefits by category, such as disabilities, retirement, and military and veterans. Useful to point people to, and to see how a program’s benefits are described.",
+      "status": "reference",
+      "attributes": {
+        "kind": "tool",
+        "url": "https://www.usa.gov/benefit-finder",
+        "by": "USAGov",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:digital-government-hub-benefits",
+      "type": "resource",
+      "title": "Digital Government Hub — Benefits",
+      "description": "A reference library on delivering public benefits, sorted by stage of the journey, such as outreach, applying and enrolling, eligibility, payments, and renewal. Much of it comes from state programs, and the lessons carry over to federal ones.",
+      "status": "reference",
+      "attributes": {
+        "kind": "site",
+        "url": "https://digitalgovernmenthub.org/benefits/",
+        "by": "Beeck Center for Social Impact + Innovation, Georgetown University",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:plain-language-guides",
+      "type": "resource",
+      "title": "Plain language guide series",
+      "description": "Guides to writing clearly for the public, with the principles of plain language and how the Plain Writing Act applies. Useful for rewriting notices and forms.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://digital.gov/guides/plain-language",
+        "by": "Digital.gov",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:gao-fraud-risk-framework-guide",
+      "type": "resource",
+      "title": "A Framework for Managing Fraud Risks in Federal Programs",
+      "description": "GAO’s leading practices for program managers on preventing, detecting, and responding to fraud, from 2015. Auditors and oversight bodies still use it as the yardstick.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.gao.gov/products/gao-15-593sp",
+        "by": "U.S. Government Accountability Office",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:do-not-pay-products",
+      "type": "resource",
+      "title": "Do Not Pay products",
+      "description": "What Do Not Pay offers, from the API that fits into a claims system to the Web Portal for searches and batch matches. A good first stop for comparing the two.",
+      "status": "reference",
+      "attributes": {
+        "kind": "site",
+        "url": "https://fiscal.treasury.gov/payment-integrity/do-not-pay-dnp/products",
+        "by": "U.S. Department of the Treasury, Bureau of the Fiscal Service",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:login-gov-developer-guide",
+      "type": "resource",
+      "title": "Login.gov developer guide",
+      "description": "How an agency’s application connects to Login.gov, what each service level verifies, and how to try it in the sandbox before signing an agreement.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://developers.login.gov/overview/",
+        "by": "U.S. General Services Administration",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:vba-detailed-claims-data",
+      "type": "resource",
+      "title": "VBA Detailed Claims Data",
+      "description": "A weekly public report of claims pending, the backlog, and decision accuracy, with downloadable workload files. A working example of a benefits office publishing its figures on a schedule.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://www.benefits.va.gov/reports/detailed_claims_data.asp",
+        "by": "Veterans Benefits Administration",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:resource:payment-accuracy-data",
+      "type": "resource",
+      "title": "PaymentAccuracy.gov",
+      "description": "Agencies’ reported improper payment rates, amounts, root causes, and recoveries. Useful for comparing a program with others and seeing what causes improper payments.",
+      "status": "reference",
+      "attributes": {
+        "kind": "dataset",
+        "url": "https://www.paymentaccuracy.gov/",
+        "by": "U.S. Office of Management and Budget",
+        "lastReviewedAt": "2026-11-04"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-claims-system-product",
+      "type": "solution",
+      "title": "A benefits administration product",
+      "description": "A product made for benefits or claims work, configured for the program’s rules and run by the agency.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Common steps, such as work queues and letters, come ready"
+        ],
+        "fitsWhen": [
+          "The program’s steps are close to those the product expects"
+        ],
+        "watchFor": [
+          "Rules specific to the program can mean heavy configuration",
+          "Another product to buy, secure, and keep up"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-claims-system-agency-platform",
+      "type": "solution",
+      "title": "The agency’s shared case platform",
+      "description": "Claims, steps, and work queues built on the agency’s shared case platform.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Uses licenses, skills, and security approvals the agency already has",
+          "Claims can share a platform with the agency’s other case work"
+        ],
+        "fitsWhen": [
+          "The agency already runs a case platform with staff who know it"
+        ],
+        "watchFor": [
+          "Very high claim volumes need testing early",
+          "Paying benefits for years is different from closing a case, so plan how the benefit record works"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-claims-system-custom-build",
+      "type": "solution",
+      "title": "A claims system built for the program",
+      "description": "The agency’s own system, built in small releases around the program’s rules, usually replacing an old system one piece at a time.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Fits programs too large or unusual for a product",
+          "The agency can change it as the law changes"
+        ],
+        "fitsWhen": [
+          "The program is very large, and has digital staff to keep the system going"
+        ],
+        "watchFor": [
+          "It needs a lasting team, not just a project",
+          "Parts of the old and new systems will run side by side for years"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-online-account-product-portal",
+      "type": "solution",
+      "title": "The portal in a benefits product",
+      "description": "The public portal that comes with the benefits administration product, configured and branded for the program.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Comes connected to the claims system"
+        ],
+        "fitsWhen": [
+          "The office has chosen a benefits product with a portal that meets its needs"
+        ],
+        "watchFor": [
+          "Check it against accessibility standards and with real users before relying on it"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-online-account-agency-built",
+      "type": "solution",
+      "title": "An account the agency builds",
+      "description": "The agency’s own site, using its design system and calling the claims system through APIs.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Can be shaped around what claimants need, and tested as it’s built",
+          "Can sit alongside the agency’s other online services"
+        ],
+        "fitsWhen": [
+          "The agency has digital staff, and serves many people across several programs"
+        ],
+        "watchFor": [
+          "It needs a lasting team",
+          "It depends on the claims system having good APIs"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:eligibility-rules-service-rules-product",
+      "type": "solution",
+      "title": "A business rules product",
+      "description": "A rules product that holds the program’s rules, with tools for writing, versioning, and testing them.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Tools for writing and testing rules come ready"
+        ],
+        "fitsWhen": [
+          "The agency has staff to learn the product and many rules to manage"
+        ],
+        "watchFor": [
+          "The rules can end up tied to the product’s format"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:eligibility-rules-service-rules-as-code",
+      "type": "solution",
+      "title": "Rules kept as tested code",
+      "description": "Rules written as code in a shared repository, with program staff reviewing each change and tests running on every one.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Changes are visible, reviewed, and tested like any other code",
+          "Nothing extra to license"
+        ],
+        "fitsWhen": [
+          "The agency has developers working closely with program staff"
+        ],
+        "watchFor": [
+          "Program staff need a way to read the rules that doesn’t require reading code"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:claim-evidence-folder-content-product",
+      "type": "solution",
+      "title": "A content management product",
+      "description": "A document or content management product, with scanning and labeling, connected to the claims system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Scanning, search, and retention come ready"
+        ],
+        "fitsWhen": [
+          "The office receives a large volume of paper"
+        ],
+        "watchFor": [
+          "Connections to the claims system take work"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:claim-evidence-folder-scanning-service",
+      "type": "solution",
+      "title": "A scanning service and the agency’s document store",
+      "description": "A contracted mail and scanning center sends labeled images to the agency’s document store, which the claims system reads.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The office doesn’t run its own scanning",
+          "Volume can rise and fall with the contract"
+        ],
+        "fitsWhen": [
+          "The agency has a document store, and wants to hand off the mail work"
+        ],
+        "watchFor": [
+          "The contract needs quality standards and turnaround times the office can check"
+        ],
+        "approach": "combine"
+      }
+    },
+    {
+      "id": "eb:solution:public-sign-in-login-gov",
+      "type": "solution",
+      "title": "Login.gov",
+      "description": "The government’s shared sign-in and identity verification service, connected to the office’s applications over OpenID Connect or SAML under an interagency agreement.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "People may already have an account",
+          "The office doesn’t run the sign-in or verification itself"
+        ],
+        "fitsWhen": [
+          "Its service levels meet the office’s needs"
+        ],
+        "watchFor": [
+          "The level of identity assurance the office needs may call for facial matching, which some people won’t want or can’t use"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:public-sign-in-agency-identity-service",
+      "type": "solution",
+      "title": "The agency’s own public identity service",
+      "description": "An identity service the agency runs for the public, with an identity verification provider behind it.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The agency controls the experience and the verification steps"
+        ],
+        "fitsWhen": [
+          "The agency has many public services, and needs that a shared service doesn’t meet"
+        ],
+        "watchFor": [
+          "Running it, securing it, and keeping up with fraud are lasting work"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:eligibility-data-exchanges-api-connections",
+      "type": "solution",
+      "title": "API connections from the claims system",
+      "description": "The claims system calls each data source as a claim moves along, using Do Not Pay Connect and other agencies’ APIs.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Results arrive during the work, while they can still help"
+        ],
+        "fitsWhen": [
+          "The claims system can call APIs, and the data sources offer them"
+        ],
+        "watchFor": [
+          "Each connection needs its own security review and agreement"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:eligibility-data-exchanges-scheduled-batch",
+      "type": "solution",
+      "title": "Scheduled batch matches",
+      "description": "The office sends files on a schedule, and matches come back through the Do Not Pay Web Portal or file exchanges for staff to work.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Works with older systems that can’t call APIs",
+          "A good place to start"
+        ],
+        "fitsWhen": [
+          "The claims system is old, or the source only offers files"
+        ],
+        "watchFor": [
+          "Results arrive after the moment they’d help most"
+        ],
+        "approach": "combine"
+      }
+    },
+    {
+      "id": "eb:solution:payments-through-treasury-bulk-files",
+      "type": "solution",
+      "title": "Bulk payment files from the claims system",
+      "description": "The claims system sends files directly to Treasury, with a summary certified through the Secure Payment System.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Handles very large payment cycles"
+        ],
+        "fitsWhen": [
+          "The office makes many payments each cycle"
+        ],
+        "watchFor": [
+          "File formats change from time to time, so plan for updates"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:payments-through-treasury-through-financial-system",
+      "type": "solution",
+      "title": "Through the agency’s financial system",
+      "description": "The claims system sends approved payments to the agency’s financial system, which schedules them with Treasury.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Accounting entries and payment happen together"
+        ],
+        "fitsWhen": [
+          "Payments are fewer, or the agency handles all its payments this way"
+        ],
+        "watchFor": [
+          "Failed and returned payments have further to travel back to the claim"
+        ],
+        "approach": "combine"
+      }
+    },
+    {
+      "id": "eb:solution:overpayment-tracking-claims-system-module",
+      "type": "solution",
+      "title": "A debt module in the claims system",
+      "description": "Overpayments tracked as part of the benefits claims system, with amounts sent to the financial system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The debt sits next to the benefit and its history"
+        ],
+        "fitsWhen": [
+          "The claims system can hold debts and their steps"
+        ],
+        "watchFor": [
+          "Debts still need to reach the agency’s financial records"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:overpayment-tracking-financial-system-receivables",
+      "type": "solution",
+      "title": "Receivables in the agency’s financial system",
+      "description": "The agency’s financial system holds the debt and does the collection, with waiver and appeal steps in the claims system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Uses the debt tools and reports finance staff already have"
+        ],
+        "fitsWhen": [
+          "The agency’s financial system already handles debts and Treasury referrals"
+        ],
+        "watchFor": [
+          "The two systems must agree on when collection pauses"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:ai-evidence-summaries-agency-ai-service",
+      "type": "solution",
+      "title": "The agency’s approved AI service",
+      "description": "A summarizing tool built on the AI service the agency has already approved for sensitive information.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Uses security approvals the agency already has"
+        ],
+        "fitsWhen": [
+          "The agency has an AI service approved for this kind of information"
+        ],
+        "watchFor": [
+          "It takes testing with the program’s own documents and staff"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:ai-evidence-summaries-product-feature",
+      "type": "solution",
+      "title": "An AI feature in the claims or document product",
+      "description": "A summarizing feature that comes with the office’s claims or document product.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Sits where staff already work"
+        ],
+        "fitsWhen": [
+          "The product’s feature does well in testing on the program’s files"
+        ],
+        "watchFor": [
+          "Ask how it’s been tested, and what happens to the information"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:payment-risk-analytics-analytics-workspace",
+      "type": "solution",
+      "title": "An analytics workspace",
+      "description": "The agency’s analytics tools, with the program’s data brought together for a small team of analysts.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Analysts can change what they look for as fraud changes"
+        ],
+        "fitsWhen": [
+          "The agency has analysts and a data platform"
+        ],
+        "watchFor": [
+          "Flags need a clear path to the staff who act on them"
+        ],
+        "approach": "build"
+      }
+    },
+    {
+      "id": "eb:solution:payment-risk-analytics-fraud-product",
+      "type": "solution",
+      "title": "A fraud analytics product",
+      "description": "A product made for detecting payment fraud, fed from the program’s data.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Comes with common fraud patterns"
+        ],
+        "fitsWhen": [
+          "The office has little analytics staff, and common fraud risks"
+        ],
+        "watchFor": [
+          "Ask how scores are made, since staff must be able to explain why something was flagged"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-workload-reporting-reporting-in-system",
+      "type": "solution",
+      "title": "The reports in the claims system",
+      "description": "The reports and dashboards that come with the claims system.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Little to build"
+        ],
+        "fitsWhen": [
+          "One system holds most of the office’s work"
+        ],
+        "watchFor": [
+          "Figures from other systems, such as payments, need bringing in"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:benefits-workload-reporting-agency-analytics",
+      "type": "solution",
+      "title": "The agency’s analytics platform",
+      "description": "Data from the claims and payment systems brought into the agency’s analytics platform, with dashboards and public reports built there.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Can combine several systems and years of history"
+        ],
+        "fitsWhen": [
+          "Work is spread across systems, or the agency already has an analytics platform"
+        ],
+        "watchFor": [
+          "Someone has to own the definitions, or the numbers will drift"
+        ],
+        "approach": "platform"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-qualified-people-receive-benefits",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:qualified-people-receive-benefits"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-claiming-takes-little-effort",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-everyone-can-claim",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:everyone-can-claim"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-decisions-without-long-waits",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:decisions-without-long-waits"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-decisions-accurate-consistent",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-fair-timely-review",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-benefits-paid-correctly",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-overpayments-handled-fairly",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:overpayments-handled-fairly"
+    },
+    {
+      "id": "rel:deciding-paying-federal-benefits-seeks-program-performance-public",
+      "from": "eb:mission:deciding-paying-federal-benefits",
+      "predicate": "seeks",
+      "to": "eb:outcome:program-performance-public"
+    },
+    {
+      "id": "rel:program-rules-forms-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:program-rules-forms",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:program-rules-forms-contributes-to-claiming-takes-little-effort",
+      "from": "eb:capability:program-rules-forms",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:program-rules-forms-satisfies-ask-only-what-is-needed",
+      "from": "eb:capability:program-rules-forms",
+      "predicate": "satisfies",
+      "to": "eb:requirement:ask-only-what-is-needed"
+    },
+    {
+      "id": "rel:program-rules-forms-candidate-pattern-eligibility-rules-service",
+      "from": "eb:capability:program-rules-forms",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eligibility-rules-service",
+      "coverage": "partial",
+      "description": "Keeps the rules and their versions. Forms and procedures are written and approved elsewhere."
+    },
+    {
+      "id": "rel:public-guidance-contributes-to-qualified-people-receive-benefits",
+      "from": "eb:capability:public-guidance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:qualified-people-receive-benefits"
+    },
+    {
+      "id": "rel:public-guidance-contributes-to-everyone-can-claim",
+      "from": "eb:capability:public-guidance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:everyone-can-claim"
+    },
+    {
+      "id": "rel:public-guidance-contributes-to-claiming-takes-little-effort",
+      "from": "eb:capability:public-guidance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:public-guidance-satisfies-write-benefit-documents-plainly",
+      "from": "eb:capability:public-guidance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:write-benefit-documents-plainly"
+    },
+    {
+      "id": "rel:public-guidance-satisfies-keep-services-accessible",
+      "from": "eb:capability:public-guidance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-services-accessible"
+    },
+    {
+      "id": "rel:public-guidance-candidate-pattern-benefits-online-account",
+      "from": "eb:capability:public-guidance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-online-account",
+      "coverage": "partial",
+      "description": "Gives people a place to read about their own benefits. General guidance also goes out through the office’s website, partners, and staff."
+    },
+    {
+      "id": "rel:application-intake-contributes-to-qualified-people-receive-benefits",
+      "from": "eb:capability:application-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:qualified-people-receive-benefits"
+    },
+    {
+      "id": "rel:application-intake-contributes-to-claiming-takes-little-effort",
+      "from": "eb:capability:application-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:application-intake-contributes-to-everyone-can-claim",
+      "from": "eb:capability:application-intake",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:everyone-can-claim"
+    },
+    {
+      "id": "rel:application-intake-satisfies-offer-digital-and-other-ways",
+      "from": "eb:capability:application-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:offer-digital-and-other-ways"
+    },
+    {
+      "id": "rel:application-intake-satisfies-protect-filing-date",
+      "from": "eb:capability:application-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:protect-filing-date"
+    },
+    {
+      "id": "rel:application-intake-satisfies-accept-representatives",
+      "from": "eb:capability:application-intake",
+      "predicate": "satisfies",
+      "to": "eb:requirement:accept-representatives"
+    },
+    {
+      "id": "rel:application-intake-candidate-pattern-benefits-online-account",
+      "from": "eb:capability:application-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-online-account"
+    },
+    {
+      "id": "rel:application-intake-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:application-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:application-intake-candidate-pattern-claim-evidence-folder",
+      "from": "eb:capability:application-intake",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:claim-evidence-folder",
+      "coverage": "partial",
+      "description": "Brings mailed claims and documents into the claim. The claim itself starts in the claims system."
+    },
+    {
+      "id": "rel:evidence-development-contributes-to-decisions-without-long-waits",
+      "from": "eb:capability:evidence-development",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-without-long-waits"
+    },
+    {
+      "id": "rel:evidence-development-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:evidence-development",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:evidence-development-contributes-to-qualified-people-receive-benefits",
+      "from": "eb:capability:evidence-development",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:qualified-people-receive-benefits"
+    },
+    {
+      "id": "rel:evidence-development-satisfies-help-gather-evidence",
+      "from": "eb:capability:evidence-development",
+      "predicate": "satisfies",
+      "to": "eb:requirement:help-gather-evidence"
+    },
+    {
+      "id": "rel:evidence-development-candidate-pattern-claim-evidence-folder",
+      "from": "eb:capability:evidence-development",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:claim-evidence-folder"
+    },
+    {
+      "id": "rel:evidence-development-candidate-pattern-ai-evidence-summaries",
+      "from": "eb:capability:evidence-development",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-evidence-summaries",
+      "coverage": "partial",
+      "description": "Helps staff find what matters in a long file. Asking for evidence and following up stay in the claims system."
+    },
+    {
+      "id": "rel:evidence-development-candidate-pattern-eligibility-data-exchanges",
+      "from": "eb:capability:evidence-development",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eligibility-data-exchanges",
+      "coverage": "partial",
+      "description": "Brings in what other agencies hold. Evidence from doctors and from the person arrives by other routes."
+    },
+    {
+      "id": "rel:identity-eligibility-checks-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-satisfies-prove-identity-to-fit-risk",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "satisfies",
+      "to": "eb:requirement:prove-identity-to-fit-risk"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-satisfies-check-before-paying",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "satisfies",
+      "to": "eb:requirement:check-before-paying"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-satisfies-keep-matching-agreements",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-matching-agreements"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-satisfies-verify-match-before-acting",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "satisfies",
+      "to": "eb:requirement:verify-match-before-acting"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-candidate-pattern-eligibility-data-exchanges",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eligibility-data-exchanges"
+    },
+    {
+      "id": "rel:identity-eligibility-checks-candidate-pattern-public-sign-in",
+      "from": "eb:capability:identity-eligibility-checks",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:public-sign-in",
+      "coverage": "partial",
+      "description": "Confirms who’s signing in online. People who claim by phone, by mail, or in person need other checks."
+    },
+    {
+      "id": "rel:determinations-notices-contributes-to-decisions-without-long-waits",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-without-long-waits"
+    },
+    {
+      "id": "rel:determinations-notices-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:determinations-notices-contributes-to-fair-timely-review",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:determinations-notices-satisfies-decide-in-reasonable-time",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "satisfies",
+      "to": "eb:requirement:decide-in-reasonable-time"
+    },
+    {
+      "id": "rel:determinations-notices-satisfies-explain-each-decision",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "satisfies",
+      "to": "eb:requirement:explain-each-decision"
+    },
+    {
+      "id": "rel:determinations-notices-satisfies-keep-ssn-off-mail",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-ssn-off-mail"
+    },
+    {
+      "id": "rel:determinations-notices-satisfies-keep-people-deciding",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-people-deciding"
+    },
+    {
+      "id": "rel:determinations-notices-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:determinations-notices-candidate-pattern-eligibility-rules-service",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eligibility-rules-service",
+      "coverage": "partial",
+      "description": "Works out what the rules give for a set of facts. Weighing evidence and deciding stay with staff."
+    },
+    {
+      "id": "rel:determinations-notices-candidate-pattern-letters-from-case-data",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "coverage": "partial",
+      "description": "Drafts the notice from the claim. The decision itself is recorded in the claims system."
+    },
+    {
+      "id": "rel:determinations-notices-candidate-pattern-ai-evidence-summaries",
+      "from": "eb:capability:determinations-notices",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-evidence-summaries",
+      "coverage": "partial",
+      "description": "Prepares a summary for the person deciding. It doesn’t recommend an outcome."
+    },
+    {
+      "id": "rel:benefit-payment-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:benefit-payment",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:benefit-payment-satisfies-pay-electronically",
+      "from": "eb:capability:benefit-payment",
+      "predicate": "satisfies",
+      "to": "eb:requirement:pay-electronically"
+    },
+    {
+      "id": "rel:benefit-payment-satisfies-oversee-payees",
+      "from": "eb:capability:benefit-payment",
+      "predicate": "satisfies",
+      "to": "eb:requirement:oversee-payees"
+    },
+    {
+      "id": "rel:benefit-payment-candidate-pattern-payments-through-treasury",
+      "from": "eb:capability:benefit-payment",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:payments-through-treasury"
+    },
+    {
+      "id": "rel:benefit-payment-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:benefit-payment",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "coverage": "partial",
+      "description": "Holds each person’s payment details and any payee. Payments go through Treasury."
+    },
+    {
+      "id": "rel:continuing-eligibility-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:continuing-eligibility-contributes-to-overpayments-handled-fairly",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:overpayments-handled-fairly"
+    },
+    {
+      "id": "rel:continuing-eligibility-contributes-to-fair-timely-review",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:continuing-eligibility-satisfies-review-eligibility-on-schedule",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-eligibility-on-schedule"
+    },
+    {
+      "id": "rel:continuing-eligibility-satisfies-give-notice-before-cutting",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "satisfies",
+      "to": "eb:requirement:give-notice-before-cutting"
+    },
+    {
+      "id": "rel:continuing-eligibility-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:continuing-eligibility-candidate-pattern-eligibility-data-exchanges",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:eligibility-data-exchanges",
+      "coverage": "partial",
+      "description": "Flags changes such as a death or new income. Staff confirm them and take any action."
+    },
+    {
+      "id": "rel:continuing-eligibility-candidate-pattern-benefits-online-account",
+      "from": "eb:capability:continuing-eligibility",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-online-account",
+      "coverage": "partial",
+      "description": "Lets people report changes themselves. Reviews and notices happen in the claims system."
+    },
+    {
+      "id": "rel:reviews-appeals-contributes-to-fair-timely-review",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:reviews-appeals-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:reviews-appeals-satisfies-state-review-rights",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "satisfies",
+      "to": "eb:requirement:state-review-rights"
+    },
+    {
+      "id": "rel:reviews-appeals-satisfies-use-independent-reviewers",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "satisfies",
+      "to": "eb:requirement:use-independent-reviewers"
+    },
+    {
+      "id": "rel:reviews-appeals-satisfies-continue-benefits-during-appeal",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "satisfies",
+      "to": "eb:requirement:continue-benefits-during-appeal"
+    },
+    {
+      "id": "rel:reviews-appeals-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "coverage": "partial",
+      "description": "Tracks reviews inside the office. Hearings before a judge or a board usually have a system of their own."
+    },
+    {
+      "id": "rel:reviews-appeals-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:reviews-appeals",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "coverage": "partial",
+      "description": "Can run an appeals office’s docket, with the claim’s file brought over from the claims system."
+    },
+    {
+      "id": "rel:overpayment-recovery-contributes-to-overpayments-handled-fairly",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:overpayments-handled-fairly"
+    },
+    {
+      "id": "rel:overpayment-recovery-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:overpayment-recovery-satisfies-decide-waiver-requests",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "satisfies",
+      "to": "eb:requirement:decide-waiver-requests"
+    },
+    {
+      "id": "rel:overpayment-recovery-satisfies-give-notice-before-offset",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "satisfies",
+      "to": "eb:requirement:give-notice-before-offset"
+    },
+    {
+      "id": "rel:overpayment-recovery-satisfies-report-delinquent-debts",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-delinquent-debts"
+    },
+    {
+      "id": "rel:overpayment-recovery-candidate-pattern-overpayment-tracking",
+      "from": "eb:capability:overpayment-recovery",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:overpayment-tracking"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-contributes-to-program-performance-public",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:program-performance-public"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-contributes-to-overpayments-handled-fairly",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:overpayments-handled-fairly"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-satisfies-estimate-benefit-improper-payments",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:estimate-benefit-improper-payments"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-satisfies-manage-fraud-risk",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:manage-fraud-risk"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-satisfies-review-decision-quality",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-decision-quality"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-satisfies-collect-service-feedback",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:collect-service-feedback"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-candidate-pattern-benefits-workload-reporting",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-workload-reporting"
+    },
+    {
+      "id": "rel:quality-integrity-reporting-candidate-pattern-payment-risk-analytics",
+      "from": "eb:capability:quality-integrity-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:payment-risk-analytics",
+      "coverage": "partial",
+      "description": "Points quality reviews and fraud work at the highest risks. Staff do the reviews, and estimates follow their own sampling plan."
+    },
+    {
+      "id": "rel:benefits-claims-system-works-with-eligibility-rules-service",
+      "from": "eb:implementationPattern:benefits-claims-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:eligibility-rules-service",
+      "description": "The claims system asks the rules service what the rules give for a set of facts."
+    },
+    {
+      "id": "rel:benefits-claims-system-works-with-claim-evidence-folder",
+      "from": "eb:implementationPattern:benefits-claims-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:claim-evidence-folder",
+      "description": "Each claim opens onto its documents in the evidence folder."
+    },
+    {
+      "id": "rel:benefits-claims-system-works-with-letters-from-case-data",
+      "from": "eb:implementationPattern:benefits-claims-system",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "description": "Notices are drafted from the claim and saved back to it."
+    },
+    {
+      "id": "rel:benefits-online-account-works-with-public-sign-in",
+      "from": "eb:implementationPattern:benefits-online-account",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:public-sign-in",
+      "description": "People sign in through the sign-in service before seeing anything of their own."
+    },
+    {
+      "id": "rel:benefits-online-account-works-with-benefits-claims-system",
+      "from": "eb:implementationPattern:benefits-online-account",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "Claims, status, and changes pass between the account and the claims system."
+    },
+    {
+      "id": "rel:eligibility-rules-service-works-with-benefits-claims-system",
+      "from": "eb:implementationPattern:eligibility-rules-service",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "The claims system records the rules’ answer with the decision."
+    },
+    {
+      "id": "rel:claim-evidence-folder-works-with-ai-evidence-summaries",
+      "from": "eb:implementationPattern:claim-evidence-folder",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:ai-evidence-summaries",
+      "description": "Summaries read from the labeled documents in the folder."
+    },
+    {
+      "id": "rel:public-sign-in-works-with-benefits-online-account",
+      "from": "eb:implementationPattern:public-sign-in",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-online-account",
+      "description": "The online account relies on the sign-in service to know who’s there."
+    },
+    {
+      "id": "rel:eligibility-data-exchanges-works-with-payment-risk-analytics",
+      "from": "eb:implementationPattern:eligibility-data-exchanges",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:payment-risk-analytics",
+      "description": "Match results feed the risk analytics."
+    },
+    {
+      "id": "rel:eligibility-data-exchanges-works-with-benefits-claims-system",
+      "from": "eb:implementationPattern:eligibility-data-exchanges",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "Results are saved to the claim, and confirmed matches become work for staff."
+    },
+    {
+      "id": "rel:payments-through-treasury-works-with-benefits-claims-system",
+      "from": "eb:implementationPattern:payments-through-treasury",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "Each payment starts from a benefit’s amount and payment details in the claims system."
+    },
+    {
+      "id": "rel:overpayment-tracking-works-with-letters-from-case-data",
+      "from": "eb:implementationPattern:overpayment-tracking",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:letters-from-case-data",
+      "description": "Overpayment notices are drafted from the debt record."
+    },
+    {
+      "id": "rel:ai-evidence-summaries-works-with-claim-evidence-folder",
+      "from": "eb:implementationPattern:ai-evidence-summaries",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:claim-evidence-folder",
+      "description": "Summaries link back to the documents in the folder."
+    },
+    {
+      "id": "rel:payment-risk-analytics-works-with-eligibility-data-exchanges",
+      "from": "eb:implementationPattern:payment-risk-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:eligibility-data-exchanges",
+      "description": "Match results are one of the analytics’ main feeds."
+    },
+    {
+      "id": "rel:payment-risk-analytics-works-with-benefits-workload-reporting",
+      "from": "eb:implementationPattern:payment-risk-analytics",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-workload-reporting",
+      "description": "Both draw on the same data from the claims system."
+    },
+    {
+      "id": "rel:benefits-workload-reporting-works-with-benefits-claims-system",
+      "from": "eb:implementationPattern:benefits-workload-reporting",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "The figures come from the claims system’s data."
+    },
+    {
+      "id": "rel:usagov-benefit-finder-tool-helps-with-public-guidance",
+      "from": "eb:resource:usagov-benefit-finder-tool",
+      "predicate": "helps_with",
+      "to": "eb:capability:public-guidance"
+    },
+    {
+      "id": "rel:usagov-benefit-finder-tool-helps-with-qualified-people-receive-benefits",
+      "from": "eb:resource:usagov-benefit-finder-tool",
+      "predicate": "helps_with",
+      "to": "eb:outcome:qualified-people-receive-benefits"
+    },
+    {
+      "id": "rel:digital-government-hub-benefits-helps-with-application-intake",
+      "from": "eb:resource:digital-government-hub-benefits",
+      "predicate": "helps_with",
+      "to": "eb:capability:application-intake"
+    },
+    {
+      "id": "rel:digital-government-hub-benefits-helps-with-claiming-takes-little-effort",
+      "from": "eb:resource:digital-government-hub-benefits",
+      "predicate": "helps_with",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:digital-government-hub-benefits-helps-with-benefits-online-account",
+      "from": "eb:resource:digital-government-hub-benefits",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:benefits-online-account"
+    },
+    {
+      "id": "rel:plain-language-guides-helps-with-write-benefit-documents-plainly",
+      "from": "eb:resource:plain-language-guides",
+      "predicate": "helps_with",
+      "to": "eb:requirement:write-benefit-documents-plainly"
+    },
+    {
+      "id": "rel:plain-language-guides-helps-with-determinations-notices",
+      "from": "eb:resource:plain-language-guides",
+      "predicate": "helps_with",
+      "to": "eb:capability:determinations-notices"
+    },
+    {
+      "id": "rel:gao-fraud-risk-framework-guide-helps-with-manage-fraud-risk",
+      "from": "eb:resource:gao-fraud-risk-framework-guide",
+      "predicate": "helps_with",
+      "to": "eb:requirement:manage-fraud-risk"
+    },
+    {
+      "id": "rel:gao-fraud-risk-framework-guide-helps-with-payment-risk-analytics",
+      "from": "eb:resource:gao-fraud-risk-framework-guide",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:payment-risk-analytics"
+    },
+    {
+      "id": "rel:do-not-pay-products-helps-with-identity-eligibility-checks",
+      "from": "eb:resource:do-not-pay-products",
+      "predicate": "helps_with",
+      "to": "eb:capability:identity-eligibility-checks"
+    },
+    {
+      "id": "rel:do-not-pay-products-helps-with-eligibility-data-exchanges",
+      "from": "eb:resource:do-not-pay-products",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:eligibility-data-exchanges"
+    },
+    {
+      "id": "rel:login-gov-developer-guide-helps-with-public-sign-in-login-gov",
+      "from": "eb:resource:login-gov-developer-guide",
+      "predicate": "helps_with",
+      "to": "eb:solution:public-sign-in-login-gov"
+    },
+    {
+      "id": "rel:vba-detailed-claims-data-helps-with-program-performance-public",
+      "from": "eb:resource:vba-detailed-claims-data",
+      "predicate": "helps_with",
+      "to": "eb:outcome:program-performance-public"
+    },
+    {
+      "id": "rel:vba-detailed-claims-data-helps-with-benefits-workload-reporting",
+      "from": "eb:resource:vba-detailed-claims-data",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:benefits-workload-reporting"
+    },
+    {
+      "id": "rel:payment-accuracy-data-helps-with-quality-integrity-reporting",
+      "from": "eb:resource:payment-accuracy-data",
+      "predicate": "helps_with",
+      "to": "eb:capability:quality-integrity-reporting"
+    },
+    {
+      "id": "rel:payment-accuracy-data-helps-with-benefits-paid-correctly",
+      "from": "eb:resource:payment-accuracy-data",
+      "predicate": "helps_with",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:benefits-claims-system-product-implements-benefits-claims-system",
+      "from": "eb:solution:benefits-claims-system-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:benefits-claims-system-agency-platform-implements-benefits-claims-system",
+      "from": "eb:solution:benefits-claims-system-agency-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:benefits-claims-system-agency-platform-depends-on-shared-case-platform",
+      "from": "eb:solution:benefits-claims-system-agency-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "Claims and their steps are the shared platform, set up for the program."
+    },
+    {
+      "id": "rel:benefits-claims-system-custom-build-implements-benefits-claims-system",
+      "from": "eb:solution:benefits-claims-system-custom-build",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:benefits-online-account-product-portal-implements-benefits-online-account",
+      "from": "eb:solution:benefits-online-account-product-portal",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-online-account"
+    },
+    {
+      "id": "rel:benefits-online-account-agency-built-implements-benefits-online-account",
+      "from": "eb:solution:benefits-online-account-agency-built",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-online-account"
+    },
+    {
+      "id": "rel:eligibility-rules-service-rules-product-implements-eligibility-rules-service",
+      "from": "eb:solution:eligibility-rules-service-rules-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:eligibility-rules-service"
+    },
+    {
+      "id": "rel:eligibility-rules-service-rules-as-code-implements-eligibility-rules-service",
+      "from": "eb:solution:eligibility-rules-service-rules-as-code",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:eligibility-rules-service"
+    },
+    {
+      "id": "rel:claim-evidence-folder-content-product-implements-claim-evidence-folder",
+      "from": "eb:solution:claim-evidence-folder-content-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:claim-evidence-folder"
+    },
+    {
+      "id": "rel:claim-evidence-folder-scanning-service-implements-claim-evidence-folder",
+      "from": "eb:solution:claim-evidence-folder-scanning-service",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:claim-evidence-folder"
+    },
+    {
+      "id": "rel:public-sign-in-login-gov-implements-public-sign-in",
+      "from": "eb:solution:public-sign-in-login-gov",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:public-sign-in"
+    },
+    {
+      "id": "rel:public-sign-in-agency-identity-service-implements-public-sign-in",
+      "from": "eb:solution:public-sign-in-agency-identity-service",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:public-sign-in"
+    },
+    {
+      "id": "rel:eligibility-data-exchanges-api-connections-implements-eligibility-data-exchanges",
+      "from": "eb:solution:eligibility-data-exchanges-api-connections",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:eligibility-data-exchanges"
+    },
+    {
+      "id": "rel:eligibility-data-exchanges-scheduled-batch-implements-eligibility-data-exchanges",
+      "from": "eb:solution:eligibility-data-exchanges-scheduled-batch",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:eligibility-data-exchanges"
+    },
+    {
+      "id": "rel:payments-through-treasury-bulk-files-implements-payments-through-treasury",
+      "from": "eb:solution:payments-through-treasury-bulk-files",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:payments-through-treasury"
+    },
+    {
+      "id": "rel:payments-through-treasury-through-financial-system-implements-payments-through-treasury",
+      "from": "eb:solution:payments-through-treasury-through-financial-system",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:payments-through-treasury"
+    },
+    {
+      "id": "rel:overpayment-tracking-claims-system-module-implements-overpayment-tracking",
+      "from": "eb:solution:overpayment-tracking-claims-system-module",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:overpayment-tracking"
+    },
+    {
+      "id": "rel:overpayment-tracking-claims-system-module-depends-on-benefits-claims-system",
+      "from": "eb:solution:overpayment-tracking-claims-system-module",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:benefits-claims-system",
+      "description": "The debt module is part of the claims system."
+    },
+    {
+      "id": "rel:overpayment-tracking-financial-system-receivables-implements-overpayment-tracking",
+      "from": "eb:solution:overpayment-tracking-financial-system-receivables",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:overpayment-tracking"
+    },
+    {
+      "id": "rel:ai-evidence-summaries-agency-ai-service-implements-ai-evidence-summaries",
+      "from": "eb:solution:ai-evidence-summaries-agency-ai-service",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:ai-evidence-summaries"
+    },
+    {
+      "id": "rel:ai-evidence-summaries-product-feature-implements-ai-evidence-summaries",
+      "from": "eb:solution:ai-evidence-summaries-product-feature",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:ai-evidence-summaries"
+    },
+    {
+      "id": "rel:payment-risk-analytics-analytics-workspace-implements-payment-risk-analytics",
+      "from": "eb:solution:payment-risk-analytics-analytics-workspace",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:payment-risk-analytics"
+    },
+    {
+      "id": "rel:payment-risk-analytics-fraud-product-implements-payment-risk-analytics",
+      "from": "eb:solution:payment-risk-analytics-fraud-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:payment-risk-analytics"
+    },
+    {
+      "id": "rel:benefits-workload-reporting-reporting-in-system-implements-benefits-workload-reporting",
+      "from": "eb:solution:benefits-workload-reporting-reporting-in-system",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-workload-reporting"
+    },
+    {
+      "id": "rel:benefits-workload-reporting-agency-analytics-implements-benefits-workload-reporting",
+      "from": "eb:solution:benefits-workload-reporting-agency-analytics",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:benefits-workload-reporting"
+    },
+    {
+      "id": "rel:case-management-contributes-to-decisions-without-long-waits",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-without-long-waits"
+    },
+    {
+      "id": "rel:case-management-contributes-to-fair-timely-review",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-benefits-claims-system",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:benefits-claims-system"
+    },
+    {
+      "id": "rel:records-management-contributes-to-fair-timely-review",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:fair-timely-review"
+    },
+    {
+      "id": "rel:records-management-contributes-to-decisions-accurate-consistent",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:decisions-accurate-consistent"
+    },
+    {
+      "id": "rel:records-management-candidate-pattern-claim-evidence-folder",
+      "from": "eb:capability:records-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:claim-evidence-folder",
+      "coverage": "partial",
+      "description": "Keeps each claim’s evidence on schedule. Other records need their schedules applied where they’re kept."
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-claiming-takes-little-effort",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:claiming-takes-little-effort"
+    },
+    {
+      "id": "rel:security-logging-monitoring-contributes-to-benefits-paid-correctly",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:benefits-paid-correctly"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:benefits-results",
+      "title": "Benefits results discovery",
+      "questions": [
+        {
+          "id": "question:benefits-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "qualified-people-receive-benefits",
+              "label": "People who qualify receive what they’re due"
+            },
+            {
+              "value": "claiming-takes-little-effort",
+              "label": "Claiming a benefit takes no more effort than it needs"
+            },
+            {
+              "value": "everyone-can-claim",
+              "label": "Everyone can claim and be served, however they’re able"
+            },
+            {
+              "value": "decisions-without-long-waits",
+              "label": "Decisions come without long waits"
+            },
+            {
+              "value": "decisions-accurate-consistent",
+              "label": "Decisions are accurate and consistent"
+            },
+            {
+              "value": "fair-timely-review",
+              "label": "People can challenge a decision and get a fair, timely review"
+            },
+            {
+              "value": "benefits-paid-correctly",
+              "label": "Benefits are paid on time, in the right amount, to the right person"
+            },
+            {
+              "value": "overpayments-handled-fairly",
+              "label": "Overpayments are found early and recovered fairly"
+            },
+            {
+              "value": "program-performance-public",
+              "label": "The public can see how the program is doing"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "qualified-people-receive-benefits",
+              "elementId": "eb:outcome:qualified-people-receive-benefits",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "claiming-takes-little-effort",
+              "elementId": "eb:outcome:claiming-takes-little-effort",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "everyone-can-claim",
+              "elementId": "eb:outcome:everyone-can-claim",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "decisions-without-long-waits",
+              "elementId": "eb:outcome:decisions-without-long-waits",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "decisions-accurate-consistent",
+              "elementId": "eb:outcome:decisions-accurate-consistent",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "fair-timely-review",
+              "elementId": "eb:outcome:fair-timely-review",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "benefits-paid-correctly",
+              "elementId": "eb:outcome:benefits-paid-correctly",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "overpayments-handled-fairly",
+              "elementId": "eb:outcome:overpayments-handled-fairly",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "program-performance-public",
+              "elementId": "eb:outcome:program-performance-public",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-tracked-measures",
+          "prompt": "Which of these does the office track during the year?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "days-to-decide",
+              "label": "How long claims take to decide"
+            },
+            {
+              "value": "past-target",
+              "label": "How many claims are waiting past a target"
+            },
+            {
+              "value": "accuracy",
+              "label": "How accurate decisions are"
+            },
+            {
+              "value": "days-to-review",
+              "label": "How long reviews and appeals take"
+            },
+            {
+              "value": "improper-payments",
+              "label": "Improper payments found and recovered"
+            },
+            {
+              "value": "feedback",
+              "label": "What people say after a service"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "days-to-decide",
+              "elementId": "eb:measure:average-days-to-decide",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "past-target",
+              "elementId": "eb:measure:claims-past-target",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "accuracy",
+              "elementId": "eb:measure:decision-accuracy",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "days-to-review",
+              "elementId": "eb:measure:average-days-to-review",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "improper-payments",
+              "elementId": "eb:measure:benefit-improper-payment-rate",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "improper-payments",
+              "elementId": "eb:measure:benefit-overpayments-recovered",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "feedback",
+              "elementId": "eb:measure:customer-feedback-scores",
+              "interpretation": "The office tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-figures-source",
+          "prompt": "Where do the office’s figures come from today, and how much of that is put together by hand?",
+          "kind": "text"
+        },
+        {
+          "id": "question:benefits-figures-published",
+          "prompt": "Does the office publish its workloads and waits on a regular schedule?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:outcome:program-performance-public",
+              "interpretation": "Figures published on a schedule tell the public how the program is doing, and keep the office’s own definitions steady."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:benefits-workload-reporting",
+              "interpretation": "Figures published on a schedule tell the public how the program is doing, and keep the office’s own definitions steady."
+            }
+          ]
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the benefit program and how the office tells how it’s doing. They ask about the program’s operations, never about individual claims, claimants, or beneficiaries. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:benefits-operations",
+      "title": "Benefits operations discovery",
+      "questions": [
+        {
+          "id": "question:benefits-rules-kept",
+          "prompt": "Where are the program’s rules written down in a form staff and systems use?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "rules-service",
+              "label": "In one place that’s versioned and tested"
+            },
+            {
+              "value": "manuals",
+              "label": "In manuals, with the system’s code following them"
+            },
+            {
+              "value": "in-code",
+              "label": "Mostly in an old system, and in what experienced staff know"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "manuals",
+              "elementId": "eb:capability:program-rules-forms",
+              "interpretation": "Rules that live in several places drift apart, and a change in the law is slow and risky to carry out."
+            },
+            {
+              "answerValue": "in-code",
+              "elementId": "eb:capability:program-rules-forms",
+              "interpretation": "Rules that live in several places drift apart, and a change in the law is slow and risky to carry out."
+            },
+            {
+              "answerValue": "manuals",
+              "elementId": "eb:implementationPattern:eligibility-rules-service",
+              "interpretation": "Rules that live in several places drift apart, and a change in the law is slow and risky to carry out."
+            },
+            {
+              "answerValue": "in-code",
+              "elementId": "eb:implementationPattern:eligibility-rules-service",
+              "interpretation": "Rules that live in several places drift apart, and a change in the law is slow and risky to carry out."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-finding-out",
+          "prompt": "How do people usually find out what they may qualify for?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "website",
+              "label": "The office’s website or the USAGov benefit finder"
+            },
+            {
+              "value": "partners",
+              "label": "Partners, such as advocates and community groups"
+            },
+            {
+              "value": "staff",
+              "label": "Calls or visits to the office"
+            },
+            {
+              "value": "not-sure",
+              "label": "The office isn’t sure"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:capability:public-guidance",
+              "interpretation": "Without knowing how people find the program, it’s hard to tell who’s being missed."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:measure:estimated-participation",
+              "interpretation": "Without knowing how people find the program, it’s hard to tell who’s being missed."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-accessibility-testing",
+          "prompt": "Are forms, notices, and online services tested with people with disabilities?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:keep-services-accessible",
+              "interpretation": "Notices and forms have to be usable as well as online services, and testing is how problems are found."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:public-guidance",
+              "interpretation": "Notices and forms have to be usable as well as online services, and testing is how problems are found."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-claim-channels",
+          "prompt": "How do most claims arrive?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "online",
+              "label": "Online, into the claims system"
+            },
+            {
+              "value": "staff-entered",
+              "label": "By phone or in person, entered by staff"
+            },
+            {
+              "value": "paper",
+              "label": "On paper, by mail or fax"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "paper",
+              "elementId": "eb:capability:application-intake",
+              "interpretation": "Paper claims take longer to reach anyone, and often arrive incomplete."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:implementationPattern:claim-evidence-folder",
+              "interpretation": "Paper claims take longer to reach anyone, and often arrive incomplete."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:implementationPattern:benefits-online-account",
+              "interpretation": "Paper claims take longer to reach anyone, and often arrive incomplete."
+            },
+            {
+              "answerValue": "staff-entered",
+              "elementId": "eb:capability:application-intake",
+              "interpretation": "An online option can take routine claims off staff, and leave them time for people who need help."
+            },
+            {
+              "answerValue": "staff-entered",
+              "elementId": "eb:implementationPattern:benefits-online-account",
+              "interpretation": "An online option can take routine claims off staff, and leave them time for people who need help."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-filing-date",
+          "prompt": "Can someone hold their filing date while they finish a claim?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "easily",
+              "label": "Yes, and it’s easy to do online or by phone"
+            },
+            {
+              "value": "by-form",
+              "label": "Yes, but it takes a separate form or a call"
+            },
+            {
+              "value": "not-available",
+              "label": "The program doesn’t offer it"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "by-form",
+              "elementId": "eb:requirement:protect-filing-date",
+              "interpretation": "A saved online application can hold the date without another step, where the program allows it."
+            },
+            {
+              "answerValue": "by-form",
+              "elementId": "eb:implementationPattern:benefits-online-account",
+              "interpretation": "A saved online application can hold the date without another step, where the program allows it."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-claim-status",
+          "prompt": "How do people find out where their claim stands?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "online",
+              "label": "Online, in plain words"
+            },
+            {
+              "value": "phone",
+              "label": "By calling"
+            },
+            {
+              "value": "wait",
+              "label": "They mostly wait for a letter"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "phone",
+              "elementId": "eb:outcome:claiming-takes-little-effort",
+              "interpretation": "Not knowing where a claim stands drives calls, and it’s one of the main worries for people waiting."
+            },
+            {
+              "answerValue": "wait",
+              "elementId": "eb:outcome:claiming-takes-little-effort",
+              "interpretation": "Not knowing where a claim stands drives calls, and it’s one of the main worries for people waiting."
+            },
+            {
+              "answerValue": "phone",
+              "elementId": "eb:implementationPattern:benefits-online-account",
+              "interpretation": "Not knowing where a claim stands drives calls, and it’s one of the main worries for people waiting."
+            },
+            {
+              "answerValue": "wait",
+              "elementId": "eb:implementationPattern:benefits-online-account",
+              "interpretation": "Not knowing where a claim stands drives calls, and it’s one of the main worries for people waiting."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-evidence-kept",
+          "prompt": "How are a claim’s documents kept?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "electronic",
+              "label": "In one electronic folder for each claim"
+            },
+            {
+              "value": "mixed",
+              "label": "Partly electronic, partly on paper"
+            },
+            {
+              "value": "paper",
+              "label": "Mostly in paper files"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:capability:evidence-development",
+              "interpretation": "Paper files slow every step and limit who can work a claim."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:capability:evidence-development",
+              "interpretation": "Paper files slow every step and limit who can work a claim."
+            },
+            {
+              "answerValue": "mixed",
+              "elementId": "eb:implementationPattern:claim-evidence-folder",
+              "interpretation": "Paper files slow every step and limit who can work a claim."
+            },
+            {
+              "answerValue": "paper",
+              "elementId": "eb:implementationPattern:claim-evidence-folder",
+              "interpretation": "Paper files slow every step and limit who can work a claim."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-evidence-time",
+          "prompt": "How much of a claim’s time goes to waiting for or reading evidence?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "little",
+              "label": "Little, since most evidence arrives quickly and is short"
+            },
+            {
+              "value": "waiting",
+              "label": "A lot, waiting for records from others"
+            },
+            {
+              "value": "reading",
+              "label": "A lot, reading long files"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "waiting",
+              "elementId": "eb:capability:evidence-development",
+              "interpretation": "Electronic exchanges with those who hold the records can cut the wait."
+            },
+            {
+              "answerValue": "waiting",
+              "elementId": "eb:implementationPattern:eligibility-data-exchanges",
+              "interpretation": "Electronic exchanges with those who hold the records can cut the wait."
+            },
+            {
+              "answerValue": "reading",
+              "elementId": "eb:capability:evidence-development",
+              "interpretation": "Summaries that point to their sources can help staff find what matters, and staff still decide."
+            },
+            {
+              "answerValue": "reading",
+              "elementId": "eb:implementationPattern:ai-evidence-summaries",
+              "interpretation": "Summaries that point to their sources can help staff find what matters, and staff still decide."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-eligibility-checks",
+          "prompt": "How does the office check the facts of a claim against other data?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "automatic",
+              "label": "Automatically, during the claim"
+            },
+            {
+              "value": "batch",
+              "label": "With batch matches on a schedule"
+            },
+            {
+              "value": "by-hand",
+              "label": "By hand, as staff think it’s needed"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "batch",
+              "elementId": "eb:capability:identity-eligibility-checks",
+              "interpretation": "Checks made during the claim catch problems before payment and ask less of people."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:capability:identity-eligibility-checks",
+              "interpretation": "Checks made during the claim catch problems before payment and ask less of people."
+            },
+            {
+              "answerValue": "batch",
+              "elementId": "eb:implementationPattern:eligibility-data-exchanges",
+              "interpretation": "Checks made during the claim catch problems before payment and ask less of people."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:implementationPattern:eligibility-data-exchanges",
+              "interpretation": "Checks made during the claim catch problems before payment and ask less of people."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-match-verification",
+          "prompt": "When a data match suggests a change, does the office have a set way to confirm it and give notice before acting?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:verify-match-before-acting",
+              "interpretation": "The law generally calls for verification, notice, and time to respond before a match changes a benefit."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:identity-eligibility-checks",
+              "interpretation": "The law generally calls for verification, notice, and time to respond before a match changes a benefit."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-online-identity",
+          "prompt": "How do people prove who they are online?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "shared",
+              "label": "A government sign-in service"
+            },
+            {
+              "value": "own",
+              "label": "The agency’s own sign-in"
+            },
+            {
+              "value": "none",
+              "label": "The office has no online services that need it"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "own",
+              "elementId": "eb:capability:identity-eligibility-checks",
+              "interpretation": "A shared service can take on identity checks and sign-in, and people may already have an account."
+            },
+            {
+              "answerValue": "none",
+              "elementId": "eb:capability:identity-eligibility-checks",
+              "interpretation": "A shared service can take on identity checks and sign-in, and people may already have an account."
+            },
+            {
+              "answerValue": "own",
+              "elementId": "eb:implementationPattern:public-sign-in",
+              "interpretation": "A shared service can take on identity checks and sign-in, and people may already have an account."
+            },
+            {
+              "answerValue": "none",
+              "elementId": "eb:implementationPattern:public-sign-in",
+              "interpretation": "A shared service can take on identity checks and sign-in, and people may already have an account."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-decision-consistency",
+          "prompt": "How does the office make sure the same facts get the same decision?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "review-and-rules",
+              "label": "Tested rules and a regular quality review"
+            },
+            {
+              "value": "review",
+              "label": "A regular quality review"
+            },
+            {
+              "value": "supervisors",
+              "label": "Supervisors check what they can"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "review",
+              "elementId": "eb:capability:determinations-notices",
+              "interpretation": "Rules kept in one place give the same answer for the same facts, wherever they’re entered."
+            },
+            {
+              "answerValue": "supervisors",
+              "elementId": "eb:capability:determinations-notices",
+              "interpretation": "Rules kept in one place give the same answer for the same facts, wherever they’re entered."
+            },
+            {
+              "answerValue": "review",
+              "elementId": "eb:implementationPattern:eligibility-rules-service",
+              "interpretation": "Rules kept in one place give the same answer for the same facts, wherever they’re entered."
+            },
+            {
+              "answerValue": "supervisors",
+              "elementId": "eb:implementationPattern:eligibility-rules-service",
+              "interpretation": "Rules kept in one place give the same answer for the same facts, wherever they’re entered."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-notices",
+          "prompt": "How are decision notices written?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "templates",
+              "label": "From tested plain-language templates, filled in from the claim"
+            },
+            {
+              "value": "staff-written",
+              "label": "Staff write or edit most of them"
+            },
+            {
+              "value": "old-letters",
+              "label": "From old templates no one has reviewed lately"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "staff-written",
+              "elementId": "eb:requirement:explain-each-decision",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            },
+            {
+              "answerValue": "old-letters",
+              "elementId": "eb:requirement:explain-each-decision",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            },
+            {
+              "answerValue": "staff-written",
+              "elementId": "eb:capability:determinations-notices",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            },
+            {
+              "answerValue": "old-letters",
+              "elementId": "eb:capability:determinations-notices",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            },
+            {
+              "answerValue": "staff-written",
+              "elementId": "eb:implementationPattern:letters-from-case-data",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            },
+            {
+              "answerValue": "old-letters",
+              "elementId": "eb:implementationPattern:letters-from-case-data",
+              "interpretation": "A notice has to say why, in plain language, and say what the person can do next."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-payment-channel",
+          "prompt": "How do payments reach people today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "treasury-eft",
+              "label": "Electronically through Treasury, for nearly everyone"
+            },
+            {
+              "value": "some-checks",
+              "label": "Electronically, with a real share of paper checks"
+            },
+            {
+              "value": "other",
+              "label": "Some other way"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "some-checks",
+              "elementId": "eb:capability:benefit-payment",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            },
+            {
+              "answerValue": "other",
+              "elementId": "eb:capability:benefit-payment",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            },
+            {
+              "answerValue": "some-checks",
+              "elementId": "eb:requirement:pay-electronically",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            },
+            {
+              "answerValue": "other",
+              "elementId": "eb:requirement:pay-electronically",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            },
+            {
+              "answerValue": "some-checks",
+              "elementId": "eb:implementationPattern:payments-through-treasury",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            },
+            {
+              "answerValue": "other",
+              "elementId": "eb:implementationPattern:payments-through-treasury",
+              "interpretation": "Paper checks are being phased out, and people without bank accounts need another way that works."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-bank-changes",
+          "prompt": "Are changes to a person’s bank account checked more closely than other changes?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:benefit-payment",
+              "interpretation": "Redirecting a payment is a common way to steal benefits, so these changes need the strongest checks."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:public-sign-in",
+              "interpretation": "Redirecting a payment is a common way to steal benefits, so these changes need the strongest checks."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-payees",
+          "prompt": "How does the office keep track of people who manage benefits for others?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "in-system",
+              "label": "In the claims system, with reports and follow-up"
+            },
+            {
+              "value": "separate",
+              "label": "In a separate system or spreadsheet"
+            },
+            {
+              "value": "not-applicable",
+              "label": "The program doesn’t use them"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "separate",
+              "elementId": "eb:requirement:oversee-payees",
+              "interpretation": "People who depend on a payee are the least able to tell the office when something goes wrong."
+            },
+            {
+              "answerValue": "separate",
+              "elementId": "eb:capability:benefit-payment",
+              "interpretation": "People who depend on a payee are the least able to tell the office when something goes wrong."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-changes-reviews",
+          "prompt": "How does the office learn that someone’s situation has changed?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "self-report",
+              "label": "People tell the office"
+            },
+            {
+              "value": "data-matches",
+              "label": "Data matches"
+            },
+            {
+              "value": "scheduled-reviews",
+              "label": "Scheduled reviews"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "self-report",
+              "elementId": "eb:capability:continuing-eligibility",
+              "interpretation": "Relying on people to report changes is a common cause of overpayments."
+            },
+            {
+              "answerValue": "self-report",
+              "elementId": "eb:implementationPattern:eligibility-data-exchanges",
+              "interpretation": "Relying on people to report changes is a common cause of overpayments."
+            },
+            {
+              "answerValue": "scheduled-reviews",
+              "elementId": "eb:capability:continuing-eligibility",
+              "interpretation": "Reviews need staff and time, and falling behind on them builds up later overpayments."
+            },
+            {
+              "answerValue": "scheduled-reviews",
+              "elementId": "eb:requirement:review-eligibility-on-schedule",
+              "interpretation": "Reviews need staff and time, and falling behind on them builds up later overpayments."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-review-tracking",
+          "prompt": "Are requests for review tracked in the same system as the original claim?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:reviews-appeals",
+              "interpretation": "Reviewers need the claim’s record, and the first decision makers need to hear what reviews find."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:shared-case-platform",
+              "interpretation": "Reviewers need the claim’s record, and the first decision makers need to hear what reviews find."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-overpayment-handling",
+          "prompt": "How are overpayments handled?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "one-record",
+              "label": "In one record, from the first notice through recovery"
+            },
+            {
+              "value": "two-systems",
+              "label": "Split between the claims and financial systems, kept in step"
+            },
+            {
+              "value": "by-hand",
+              "label": "Mostly by letters and spreadsheets"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:capability:overpayment-recovery",
+              "interpretation": "Collection can run ahead of a waiver request when no one record shows where things stand."
+            },
+            {
+              "answerValue": "by-hand",
+              "elementId": "eb:implementationPattern:overpayment-tracking",
+              "interpretation": "Collection can run ahead of a waiver request when no one record shows where things stand."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-collection-pause",
+          "prompt": "Does collection pause automatically while a waiver request or appeal is open, where the rules call for it?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:decide-waiver-requests",
+              "interpretation": "Collecting while a request is open can do real harm to someone who shouldn’t have to repay."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:measure:waiver-requests-decided",
+              "interpretation": "Collecting while a request is open can do real harm to someone who shouldn’t have to repay."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-quality-review",
+          "prompt": "Does the office review a sample of decisions for quality, apart from appeals?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:review-decision-quality",
+              "interpretation": "Appeals only show the decisions people challenge, and a quality review shows problems across the program."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:quality-integrity-reporting",
+              "interpretation": "Appeals only show the decisions people challenge, and a quality review shows problems across the program."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-fraud-risk",
+          "prompt": "Does the program have a current assessment of its fraud risks?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:manage-fraud-risk",
+              "interpretation": "Controls that fit the program’s real risks start with knowing what they are."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:payment-risk-analytics",
+              "interpretation": "Controls that fit the program’s real risks start with knowing what they are."
+            }
+          ]
+        },
+        {
+          "id": "question:benefits-ai-use",
+          "prompt": "Is the office using or planning AI in claims, eligibility, or fraud work?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "using",
+              "label": "Yes, in use now"
+            },
+            {
+              "value": "planning",
+              "label": "Yes, being planned"
+            },
+            {
+              "value": "no-plans",
+              "label": "No plans now"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "using",
+              "elementId": "eb:requirement:keep-people-deciding",
+              "interpretation": "AI that’s a principal basis for these decisions is presumed to be high-impact, so the practices that brings are worth planning for early."
+            },
+            {
+              "answerValue": "planning",
+              "elementId": "eb:requirement:keep-people-deciding",
+              "interpretation": "AI that’s a principal basis for these decisions is presumed to be high-impact, so the practices that brings are worth planning for early."
+            },
+            {
+              "answerValue": "using",
+              "elementId": "eb:implementationPattern:ai-evidence-summaries",
+              "interpretation": "AI that’s a principal basis for these decisions is presumed to be high-impact, so the practices that brings are worth planning for early."
+            },
+            {
+              "answerValue": "planning",
+              "elementId": "eb:implementationPattern:ai-evidence-summaries",
+              "interpretation": "AI that’s a principal basis for these decisions is presumed to be high-impact, so the practices that brings are worth planning for early."
+            }
+          ]
+        }
+      ],
+      "description": "Questions about how the office runs the program today. They ask about the program’s operations, never about individual claims, claimants, or beneficiaries. Some answers point to capabilities and patterns worth exploring."
+    }
+  ]
+}

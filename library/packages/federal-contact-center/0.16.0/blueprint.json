@@ -1,0 +1,2937 @@
+{
+  "schemaVersion": "0.7.0",
+  "packageId": "org.enterprise-blueprints.federal-contact-center",
+  "idPrefix": "eb",
+  "version": "0.16.0",
+  "title": "Contact Center — Helping the Public by Phone, Chat, Email, and the Web",
+  "description": "U.S. federal contact center blueprint: one mission with the outcomes it seeks and ways to measure them, ten capabilities from planning the service to reporting on it, with their reference requirements, example implementation patterns with their tradeoffs, and discovery question sets for contact center results and for contact center operations. It follows the Government Service Delivery Improvement Act, OMB Circular A-11 Section 280, the 21st Century IDEA, and Sections 504 and 508 of the Rehabilitation Act, and builds on Common Capabilities for case management, records, identity and access, data protection, and security logging.",
+  "publisher": {
+    "name": "Enterprise Blueprints (independent reference project)",
+    "url": "https://enterprise-blueprints.github.io"
+  },
+  "license": "MIT",
+  "publishedAt": "2026-11-05",
+  "domain": "public-sector",
+  "jurisdictions": [
+    "United States — federal agencies that answer the public by phone, chat, email, and the web"
+  ],
+  "tags": [
+    "contact-center",
+    "customer-experience",
+    "service-delivery",
+    "accessibility",
+    "reference-architecture"
+  ],
+  "dependencies": [
+    {
+      "packageId": "org.enterprise-blueprints.common",
+      "version": "0.16.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "src:gsdi-5-usc-321-324",
+      "title": "5 U.S.C. §§ 321–324 — Government service delivery (Government Service Delivery Improvement Act)",
+      "url": "https://www.govinfo.gov/link/uscode/5/322?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Enacted in Public Law 118-231. OMB’s Federal Government Service Delivery Lead sets governmentwide standards for service delivery that weigh ease, efficiency, transparency, accessibility, fairness, burden, and duration, including wait and processing times, and collects and reports data on service delivery (§ 322). Each agency head names a senior official who coordinates service delivery improvements across the agency’s channels and uses that data to improve them (§ 323)."
+    },
+    {
+      "id": "src:a11-section-280",
+      "title": "OMB Circular A-11 (2025), Section 280 — Managing Customer Experience and Improving Service Delivery",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/08/s280.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Carries out the Government Service Delivery Improvement Act. High Impact Service Providers designate priority services each year, deploy at least one post-transaction customer feedback survey for each, following OMB’s question wording and response choices, and submit the data to OMB by the final business day of January, April, July, and October for publication (§§ 280.4–280.6). Surveys are approved under the Paperwork Reduction Act through a Section 280 umbrella clearance (§ 280.7)."
+    },
+    {
+      "id": "src:cx-feedback-handbook",
+      "title": "Performance.gov — Customer feedback data handbook",
+      "url": "https://www.performance.gov/cx/data/handbook/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The Section 280 survey: a trust question, such as “This interaction increased my trust in [agency],” and drivers people choose from, including effectiveness (“My issue was resolved”), ease (“It was easy to find what I needed”), efficiency, transparency, fairness, and employee helpfulness. Trust is the share of positive answers, with a benchmark of 75 percent or higher, and results are published on performance.gov."
+    },
+    {
+      "id": "src:idea-act",
+      "title": "21st Century Integrated Digital Experience Act (21st Century IDEA), Public Law 115-336",
+      "url": "https://www.govinfo.gov/link/plaw/115/public/336?link-type=html",
+      "kind": "official-reference",
+      "publicationDate": "2018-12-20",
+      "lastReviewedAt": "2026-11-02",
+      "note": "New or redesigned websites and digital services are, to the greatest extent practicable, accessible under Section 508, consistent, searchable, secure, designed around user needs, and usable on mobile devices (§ 3). Agencies make services available digitally, and maintain an accessible way to complete digital services in person, on paper, or by other means, so people aren’t kept from them (§ 4)."
+    },
+    {
+      "id": "src:rehabilitation-act-504",
+      "title": "29 U.S.C. § 794 — Nondiscrimination under Federal grants and programs (Section 504 of the Rehabilitation Act)",
+      "url": "https://www.govinfo.gov/link/uscode/29/794?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "No qualified individual with a disability may, because of the disability, be excluded from, denied the benefits of, or discriminated against under any program or activity conducted by an executive agency. Each agency issues its own rules for the programs it conducts."
+    },
+    {
+      "id": "src:doj-effective-communication-rule",
+      "title": "28 CFR § 39.160 — Communications (Department of Justice, Section 504 in federally conducted programs)",
+      "url": "https://www.law.cornell.edu/cfr/text/28/39.160",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The Justice Department’s rule, which other agencies’ Section 504 rules follow closely. The agency takes appropriate steps to communicate effectively with applicants, participants, and the public, provides auxiliary aids where necessary, giving primary consideration to the person’s request, and where it communicates by telephone, uses TDDs or equally effective telecommunication systems."
+    },
+    {
+      "id": "src:section-508-standards",
+      "title": "U.S. Access Board — Revised Section 508 Standards, 36 CFR Part 1194",
+      "url": "https://www.access-board.gov/ict/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Information and communication technology that agencies buy, build, maintain, or use conforms to the standards (E201.1). For two-way voice communication, voice mail, auto-attendant, interactive voice response, and caller identification systems are usable with a TTY (412.8.4), and caller identification is visible and audible (412.6). Web content and software conform to WCAG 2.0 Level AA."
+    },
+    {
+      "id": "src:section508-gov",
+      "title": "Section508.gov — Annual Section 508 assessment",
+      "url": "https://www.section508.gov/manage/section-508-assessment/",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Under Section 508 as the Consolidated Appropriations Act, 2023 amended it, agencies respond each year to OMB’s criteria for assessing their Section 508 compliance, and GSA reports the results to Congress."
+    },
+    {
+      "id": "src:eo-14224",
+      "title": "Executive Order 14224 — Designating English as the Official Language of the United States (March 1, 2025)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-03-06/pdf/2025-03694.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-03-06",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Revokes Executive Order 13166 on access to services for people with limited English proficiency, while saying nothing in the order requires a change in agencies’ services. Agency heads decide what their missions need, and aren’t required to stop documents or services offered in other languages (§ 3(b))."
+    },
+    {
+      "id": "src:plain-writing-act",
+      "title": "Plain Writing Act of 2010, Public Law 111-274",
+      "url": "https://www.govinfo.gov/link/plaw/111/public/274?link-type=html",
+      "kind": "official-reference",
+      "publicationDate": "2010-10-13",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Each agency uses plain writing, clear, concise, and well organized, in every covered document it issues or substantially revises (§ 4(b)). Covered documents include letters, publications, forms, notices, and instructions necessary for obtaining a federal benefit or service (§ 3(2))."
+    },
+    {
+      "id": "src:pra-44-usc-3502",
+      "title": "44 U.S.C. § 3502 — Definitions (Paperwork Reduction Act)",
+      "url": "https://www.govinfo.gov/link/uscode/44/3502?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "A collection of information includes answers to identical questions posed to ten or more people outside the federal government, which needs OMB approval under the Paperwork Reduction Act before it’s used."
+    },
+    {
+      "id": "src:privacy-act",
+      "title": "5 U.S.C. § 552a — Records maintained on individuals (Privacy Act of 1974)",
+      "url": "https://www.govinfo.gov/link/uscode/5/552a?link-type=html",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "An agency discloses a record from a system of records only with the person’s written request or consent, or under a listed exception (b). It tells people it asks for information the authority, purpose, routine uses, and effect of not answering (e)(3), keeps safeguards for the records (e)(10), and sets in its rules the requirements for identifying a person who asks for their own record (f)(2)."
+    },
+    {
+      "id": "src:grs-6-5",
+      "title": "National Archives — General Records Schedule 6.5, Public Customer Service Records",
+      "url": "https://www.archives.gov/files/records-mgmt/grs/grs06-5.pdf",
+      "kind": "official-reference",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Covers records of call and service centers that serve the public by phone, chat, and email, including incoming requests and responses, tracking logs, recordings used for quality control and training, FAQs, reports, and customer feedback and surveys: destroy 1 year after resolved, or when no longer needed for business use (item 010). Centers that take tips or allegations for oversight and enforcement offices need their own schedule."
+    },
+    {
+      "id": "src:omb-m-25-21",
+      "title": "OMB Memorandum M-25-21 — Accelerating Federal Use of AI through Innovation, Governance, and Public Trust (April 3, 2025)",
+      "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Innovation-Governance-and-Public-Trust.pdf",
+      "kind": "official-reference",
+      "publicationDate": "2025-04-03",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Agencies inventory their AI use cases. AI whose output is a principal basis for decisions with a significant effect on rights or safety is high-impact, and uses affecting the ability to apply for, or eligibility for, critical federal services and benefits are presumed to be. High-impact uses need pre-deployment testing, an impact assessment, ongoing monitoring, trained operators, human oversight, timely human review and appeal, and a way for the public to give feedback (§ 4(b))."
+    },
+    {
+      "id": "src:nist-ai-rmf",
+      "title": "NIST — Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "official-reference",
+      "publicationDate": "2023-01-26",
+      "lastReviewedAt": "2026-11-02",
+      "note": "A framework for voluntary use in managing the risks of AI systems, built around four functions, govern, map, measure, and manage, and the characteristics of trustworthy AI, such as being valid, accountable, and fair."
+    },
+    {
+      "id": "src:nist-sp-800-63-4",
+      "title": "NIST SP 800-63-4 — Digital Identity Guidelines",
+      "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+      "kind": "official-reference",
+      "publicationDate": "2025-07-31",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Requirements for identity proofing, authenticators, and authentication for people who use government systems, including the people signing in to an agency’s public website."
+    },
+    {
+      "id": "src:gsa-contact-center-playbook",
+      "title": "GSA Contact Center Center of Excellence — Fifteen Plays of Our Contact Center Approach (2020)",
+      "url": "https://coe.gsa.gov/2020/10/08/cc-update-5.html",
+      "kind": "background",
+      "publicationDate": "2020-10-08",
+      "lastReviewedAt": "2026-11-02",
+      "note": "Practices for modernizing federal contact centers, including workforce management against the center’s service-level standard, assessing whether calls and emails are answered soon enough, training that raises first-call resolution, evaluating agents, and building one shared knowledge base so answers are consistent."
+    },
+    {
+      "id": "src:gsa-contact-center-technologies",
+      "title": "Digital.gov — Contact center technologies",
+      "url": "https://digital.gov/resources/contact-center-guidelines/contact-center-technologies",
+      "kind": "background",
+      "lastReviewedAt": "2026-11-02",
+      "note": "The technologies a contact center commonly runs on, including automatic call distribution, intelligent routing, interactive voice response, web chat, email response management, knowledge management, TTY services, and workforce management."
+    }
+  ],
+  "elements": [
+    {
+      "id": "eb:mission:helping-the-public-get-answers",
+      "type": "mission",
+      "title": "Contact Center",
+      "description": "Help members of the public get answers and get things done with the agency, by phone, chat, email, and the web: reach them without a long wait, resolve what they came for on the first contact where possible, serve people with disabilities as well as anyone, protect what they share, and use what they say to improve the agency’s services.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "tagline": "Helping the public by phone, chat, email, and the web",
+        "sector": "public-sector",
+        "scope": "US-federal-contact-center",
+        "principles": [
+          "Each contact is one record, with its channel, its reason, the answer, and any handoff",
+          "People can move from the web to chat to a call without starting over",
+          "Agents, the website, and virtual agents draw on the same approved answers",
+          "People who call through relay or TTY, or use a screen reader, get the same service as anyone else",
+          "No one has to use the web to get help; a person is always reachable",
+          "A short survey after each contact goes back to the teams that can fix the cause",
+          "AI answers routine questions and suggests answers to agents, and people decide anything about a person’s case"
+        ]
+      }
+    },
+    {
+      "id": "eb:outcome:people-reach-help-quickly",
+      "type": "outcome",
+      "title": "People reach help without a long wait",
+      "description": "Calls are answered, chats are picked up, and emails get a reply within the times the agency sets, even on its busiest days.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:gsa-contact-center-playbook"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "average-speed-of-answer",
+            "title": "Average speed of answer",
+            "description": "The average time callers wait for an agent after choosing to speak to one, and the average time to a first reply on chat and email, by channel and by month. Most contact center systems report these figures already.",
+            "sourceIds": [
+              "src:gsdi-5-usc-321-324",
+              "src:gsa-contact-center-playbook"
+            ]
+          },
+          {
+            "id": "contacts-abandoned",
+            "title": "Contacts abandoned while waiting",
+            "description": "The share of calls and chats in which the person gave up before reaching an agent, by channel and by hour, which shows when staffing falls short.",
+            "sourceIds": [
+              "src:gsa-contact-center-playbook"
+            ]
+          }
+        ],
+        "theme": "timely"
+      }
+    },
+    {
+      "id": "eb:outcome:questions-resolved-first-time",
+      "type": "outcome",
+      "title": "People get what they came for on the first contact",
+      "description": "Agents and self-service give correct, complete answers, so people don’t have to call back, try another channel, or be passed from office to office.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:cx-feedback-handbook"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "first-contact-resolution",
+            "title": "First contact resolution",
+            "description": "The share of contacts resolved without the person contacting the agency again about the same matter within a set period, such as seven days, as the center defines it.",
+            "sourceIds": [
+              "src:gsa-contact-center-playbook"
+            ]
+          },
+          {
+            "id": "issue-resolved-share",
+            "title": "People who say their issue was resolved",
+            "description": "The share of post-contact survey respondents who choose “My issue was resolved,” the effectiveness driver in OMB’s Section 280 survey.",
+            "sourceIds": [
+              "src:a11-section-280",
+              "src:cx-feedback-handbook"
+            ]
+          }
+        ],
+        "theme": "results"
+      }
+    },
+    {
+      "id": "eb:outcome:everyone-can-get-help",
+      "type": "outcome",
+      "title": "Everyone can get help, whatever their abilities",
+      "description": "People who are deaf, hard of hearing, blind, or have other disabilities reach the center and are served as effectively as anyone else, on every channel the center offers.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rehabilitation-act-504",
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "channels-tested-for-508",
+            "title": "Public channels tested for Section 508 conformance",
+            "description": "The share of the center’s phone menus, chat, web forms, and virtual agents tested for conformance in the past year, and the open defects found, which feed the agency’s annual Section 508 assessment to OMB and GSA.",
+            "sourceIds": [
+              "src:section-508-standards",
+              "src:section508-gov"
+            ]
+          }
+        ],
+        "theme": "fair-accessible"
+      }
+    },
+    {
+      "id": "eb:outcome:answers-found-without-calling",
+      "type": "outcome",
+      "title": "People can find answers on their own",
+      "description": "Clear answers on the website, in the phone menu, and from virtual agents let people do routine things themselves, so agents have time for those who need a person.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "self-service-resolution",
+            "title": "Contacts resolved in self-service",
+            "description": "The share of web, phone menu, and virtual agent sessions that end with an answer and no handoff to an agent or follow-up contact within a set period.",
+            "sourceIds": [
+              "src:idea-act"
+            ]
+          },
+          {
+            "id": "ease-share",
+            "title": "People who say it was easy to find what they needed",
+            "description": "The share of post-contact survey respondents who choose the ease driver in OMB’s Section 280 survey, “It was easy to find what I needed.”",
+            "sourceIds": [
+              "src:a11-section-280",
+              "src:cx-feedback-handbook"
+            ]
+          }
+        ],
+        "theme": "easy-to-use"
+      }
+    },
+    {
+      "id": "eb:outcome:information-shared-is-protected",
+      "type": "outcome",
+      "title": "What people share is protected",
+      "description": "The center discusses a person’s records only with that person, once they’ve been verified, or as the law allows, and keeps recordings and contact records only as long as their schedule allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act",
+        "src:grs-6-5"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "privacy-incidents-from-contacts",
+            "title": "Privacy incidents that began in the contact center",
+            "description": "The number of privacy incidents that began with a contact, such as a record discussed with someone who wasn’t verified, from the agency’s privacy incident reports.",
+            "sourceIds": [
+              "src:privacy-act"
+            ]
+          }
+        ],
+        "theme": "integrity"
+      }
+    },
+    {
+      "id": "eb:outcome:feedback-improves-service",
+      "type": "outcome",
+      "title": "What people say improves the service",
+      "description": "The center asks people about their experience after each contact, and the agency acts on what they say and on the reasons they contacted it in the first place.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:gsdi-5-usc-321-324"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "trust-after-contact",
+            "title": "Trust after a contact",
+            "description": "The share of post-contact survey respondents who agree the interaction increased their trust in the agency, from OMB’s Section 280 survey. OMB’s benchmark is 75 percent or higher.",
+            "sourceIds": [
+              "src:a11-section-280",
+              "src:cx-feedback-handbook"
+            ]
+          }
+        ],
+        "theme": "accountable"
+      }
+    },
+    {
+      "id": "eb:outcome:service-results-public",
+      "type": "outcome",
+      "title": "The service’s results are open to view",
+      "description": "The agency reports what people say about its designated services to OMB each quarter, for publication on performance.gov, and shares its own service figures with the public.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:cx-feedback-handbook"
+      ],
+      "attributes": {
+        "measures": [
+          {
+            "id": "quarterly-feedback-reported",
+            "title": "Quarterly feedback reported on time",
+            "description": "For services designated by a High Impact Service Provider, the quarters in which the agency sent its post-contact survey data to OMB by the final business day of January, April, July, and October.",
+            "sourceIds": [
+              "src:a11-section-280"
+            ]
+          }
+        ],
+        "theme": "transparent"
+      }
+    },
+    {
+      "id": "eb:capability:service-planning-staffing",
+      "type": "capability",
+      "title": "Service Planning & Staffing",
+      "description": "Ability to set standards for how long people wait on each channel, forecast contacts by channel, topic, and hour, schedule and train enough agents to meet the standards, and plan for surges such as deadlines, outages, and emergencies.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:gsa-contact-center-playbook"
+      ],
+      "applicabilityNotes": "Many agencies contract for some or all of their agents, so the contract’s service levels become the standards the center is held to. Surges often follow the agency’s own deadlines and announcements, which program offices can warn the center about.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:knowledge-management",
+      "type": "capability",
+      "title": "Knowledge Management",
+      "description": "Ability to keep one approved set of answers that agents, the website, the phone menu, and virtual agents all use, written in plain language, each with an owner in the program office and a date for its next review.",
+      "status": "reference",
+      "sourceIds": [
+        "src:plain-writing-act",
+        "src:gsa-contact-center-playbook"
+      ],
+      "applicabilityNotes": "Program offices own what an answer says; the center owns how it’s written and found. Each language the agency chooses to serve needs its own approved answers, kept in step with the English ones.",
+      "attributes": {
+        "stage": "plan-prepare"
+      }
+    },
+    {
+      "id": "eb:capability:contact-intake-routing",
+      "type": "capability",
+      "title": "Contact Intake & Routing",
+      "description": "Ability to take contacts by phone, chat, email, web form, and relay service, and send each to self-service or to an agent with the right skills, by topic and urgency, offering a callback instead of a long hold.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act",
+        "src:gsa-contact-center-technologies"
+      ],
+      "applicabilityNotes": "Some agencies run one center for everything; others have a center for each program, behind one number or several. Inventorying every number and inbox the public uses is often the first step.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:self-service-virtual-assistance",
+      "type": "capability",
+      "title": "Self-Service & Virtual Assistants",
+      "description": "Ability to let people find answers and do routine things on their own, such as checking a status or updating an address, on the website, in the phone menu, or with a virtual agent, and to reach a person whenever they need one.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act",
+        "src:omb-m-25-21"
+      ],
+      "applicabilityNotes": "Which tasks suit self-service depends on the program and on what its systems can safely do without a person. An AI that only answers general questions is used differently from one that helps decide a person’s access to a benefit, which OMB presumes to be high-impact.",
+      "attributes": {
+        "stage": "reach-take-in"
+      }
+    },
+    {
+      "id": "eb:capability:caller-verification",
+      "type": "capability",
+      "title": "Caller Verification",
+      "description": "Ability to confirm who someone is before discussing or changing their records, with steps matched to what’s at stake, and to record how each person was verified.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act"
+      ],
+      "applicabilityNotes": "General questions need no verification. How much proof is enough for a status check, a change of address, or a payment question is set in the agency’s Privacy Act rules and its own risk decisions.",
+      "attributes": {
+        "stage": "assess-decide"
+      }
+    },
+    {
+      "id": "eb:capability:accessible-service",
+      "type": "capability",
+      "title": "Accessible Service",
+      "description": "Ability to serve people with disabilities as effectively as anyone else, taking relay and TTY calls, making phone menus, chat, and web forms work with assistive technology, and providing other aids when they’re needed, and to serve people in the other languages the agency chooses to support.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rehabilitation-act-504",
+        "src:doj-effective-communication-rule",
+        "src:section-508-standards",
+        "src:eo-14224"
+      ],
+      "applicabilityNotes": "Each agency has its own Section 504 rule for the programs it conducts, like the Justice Department’s. Executive Order 14224 of March 2025 revoked Executive Order 13166 on limited English proficiency, so whether and in which languages the center serves people is now each agency’s decision, unless a program’s own law requires it.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:contact-resolution-handoff",
+      "type": "capability",
+      "title": "Contact Resolution & Handoff",
+      "description": "Ability to resolve each contact or, when a program office must act, hand it off as a case with everything already gathered, so the person doesn’t have to explain again, and to tell them what happens next and when.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:cx-feedback-handbook",
+        "src:grs-6-5"
+      ],
+      "applicabilityNotes": "Agents can often resolve general questions, while anything about a person’s case is decided by the program office. Where the line falls, and what an agent may change, is set for each program.",
+      "attributes": {
+        "stage": "deliver-operate"
+      }
+    },
+    {
+      "id": "eb:capability:quality-review-coaching",
+      "type": "capability",
+      "title": "Quality Review & Coaching",
+      "description": "Ability to review a sample of each agent’s calls, chats, and emails against a written standard, coach agents on what the reviews find, and fix wrong or unclear answers in the knowledge base.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsa-contact-center-playbook",
+        "src:grs-6-5"
+      ],
+      "applicabilityNotes": "Where agents work for a contractor, the contractor usually runs the reviews and the agency checks a sample of its own. Reviewers from the program offices help on topics agents often get wrong.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:customer-feedback",
+      "type": "capability",
+      "title": "Customer Feedback",
+      "description": "Ability to ask people about their experience right after a contact, using OMB’s Section 280 questions with the clearance the Paperwork Reduction Act requires, and send what they say to the teams that can fix the cause.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:pra-44-usc-3502",
+        "src:cx-feedback-handbook"
+      ],
+      "applicabilityNotes": "High Impact Service Providers must survey their designated services this way. Other offices can use the same questions and their department’s umbrella clearance, which lets their results be compared.",
+      "attributes": {
+        "stage": "monitor-correct"
+      }
+    },
+    {
+      "id": "eb:capability:service-performance-reporting",
+      "type": "capability",
+      "title": "Service Performance Reporting",
+      "description": "Ability to report the center’s waits, resolution, and feedback to managers and program offices, find the top reasons people contact the agency and where they get stuck, and send survey data to OMB each quarter for designated services.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:gsdi-5-usc-321-324"
+      ],
+      "applicabilityNotes": "Quarterly reporting to OMB applies to High Impact Service Providers’ designated services. The reasons people contact the agency are often the most useful figures for program offices, since they show what to fix upstream.",
+      "attributes": {
+        "stage": "report-close"
+      }
+    },
+    {
+      "id": "eb:requirement:set-service-standards",
+      "type": "requirement",
+      "title": "Set wait and response standards for each channel, and measure against them",
+      "description": "Decide how long people should wait for an agent, a chat reply, and an email answer, and measure each channel against those standards, as the governmentwide service delivery standards weigh duration, including wait and processing times.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324"
+      ],
+      "attributes": {
+        "kind": "timeliness"
+      }
+    },
+    {
+      "id": "eb:requirement:answers-in-plain-language",
+      "type": "requirement",
+      "title": "Write public answers in plain language",
+      "description": "Write the answers, letters, and web content people need to get a benefit or service so they’re clear, concise, and well organized, as the Plain Writing Act requires of every covered document the agency issues or substantially revises.",
+      "status": "reference",
+      "sourceIds": [
+        "src:plain-writing-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:review-answers-on-schedule",
+      "type": "requirement",
+      "title": "Give each answer an owner and a review date",
+      "description": "Name the program office that owns each approved answer, review it on a schedule and whenever the program changes, and take it down when it’s no longer right.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsa-contact-center-playbook"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:keep-a-non-digital-path",
+      "type": "requirement",
+      "title": "Keep a way to get help without the web",
+      "description": "Keep an accessible way, such as by phone, on paper, or in person, to complete each service the agency offers online, so no one is kept from it for lack of digital access or skills.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:digital-channels-meet-idea",
+      "type": "requirement",
+      "title": "Build web and chat channels to the 21st Century IDEA’s standards",
+      "description": "Make each new or redesigned website, web form, and digital service accessible under Section 508, consistent in appearance, searchable, secure, designed around users’ needs, and usable on common mobile devices.",
+      "status": "reference",
+      "sourceIds": [
+        "src:idea-act"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:assess-ai-before-use",
+      "type": "requirement",
+      "title": "Review each use of AI, and meet OMB’s practices for high-impact uses",
+      "description": "List each AI use, such as a virtual agent or suggested answers, in the agency’s AI use case inventory, and before deploying a high-impact use, test it, assess its impact, monitor it, train the staff who oversee it, and give people a timely human review and a chance to appeal.",
+      "status": "reference",
+      "sourceIds": [
+        "src:omb-m-25-21"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:verify-before-disclosing",
+      "type": "requirement",
+      "title": "Confirm who a person is before discussing their records",
+      "description": "Disclose a record from a system of records only to the person it’s about, once they’ve met the identification requirements in the agency’s Privacy Act rules, or to others only with their written consent or as the Privacy Act allows.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:communicate-effectively",
+      "type": "requirement",
+      "title": "Communicate as effectively with people with disabilities as with others",
+      "description": "Take relay and TTY calls, or use equally effective systems, wherever the center talks with people by phone, and provide other aids people need, giving primary consideration to what each person asks for.",
+      "status": "reference",
+      "sourceIds": [
+        "src:rehabilitation-act-504",
+        "src:doj-effective-communication-rule"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:menus-usable-with-tty",
+      "type": "requirement",
+      "title": "Make phone menus and voice mail usable with a TTY",
+      "description": "Make the center’s voice mail, auto-attendant, interactive voice response, and caller identification usable with a TTY, as the Section 508 standards require of two-way voice systems.",
+      "status": "reference",
+      "sourceIds": [
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:accessible-digital-channels",
+      "type": "requirement",
+      "title": "Make chat, web forms, and virtual agents conform to Section 508",
+      "description": "Buy, build, and keep the center’s digital channels conforming to the Section 508 standards, so people using screen readers, keyboards, magnification, or captions can use them, and test them before launch and after changes.",
+      "status": "reference",
+      "sourceIds": [
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:record-each-contact",
+      "type": "requirement",
+      "title": "Record each contact, and keep the records on schedule",
+      "description": "Record each contact’s reason, answer, and any handoff, and keep contact records, recordings, and survey data as General Records Schedule 6.5 allows, destroying them 1 year after the contact is resolved or when no longer needed for business use.",
+      "status": "reference",
+      "sourceIds": [
+        "src:grs-6-5"
+      ],
+      "attributes": {
+        "kind": "decisions-on-record"
+      }
+    },
+    {
+      "id": "eb:requirement:tell-people-why-information-is-collected",
+      "type": "requirement",
+      "title": "Tell people why the center asks for their information",
+      "description": "Where the center asks people for information that goes into a system of records, such as on a web form or in chat, tell them the authority for asking, the purpose, the routine uses, and what happens if they don’t answer.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act"
+      ],
+      "attributes": {
+        "kind": "privacy-security"
+      }
+    },
+    {
+      "id": "eb:requirement:hand-off-with-context",
+      "type": "requirement",
+      "title": "Hand off with what’s been gathered, and say what happens next",
+      "description": "When a program office must act, send it the contact’s details so the person doesn’t have to repeat them, and tell the person who will act, what they’ll need, and when to expect an answer.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:cx-feedback-handbook"
+      ],
+      "attributes": {
+        "kind": "service-access"
+      }
+    },
+    {
+      "id": "eb:requirement:review-contacts-for-quality",
+      "type": "requirement",
+      "title": "Review a sample of each agent’s contacts against a written standard",
+      "description": "Score a regular sample of each agent’s calls, chats, and emails against a written standard for accuracy, completeness, privacy, and courtesy, coach on the results, and check that reviewers score alike.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsa-contact-center-playbook",
+        "src:grs-6-5"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:survey-after-contacts",
+      "type": "requirement",
+      "title": "Survey people after contacts with OMB’s questions",
+      "description": "For each designated service, ask people after a significant contact, or at the end of the service, whether it increased their trust and what made the difference, using OMB’s Section 280 question wording and response choices.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:cx-feedback-handbook"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:clear-surveys-under-pra",
+      "type": "requirement",
+      "title": "Clear surveys under the Paperwork Reduction Act",
+      "description": "Get OMB approval before asking the same questions of ten or more people, using the department’s Section 280 umbrella clearance for post-contact surveys where it applies.",
+      "status": "reference",
+      "sourceIds": [
+        "src:pra-44-usc-3502",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "kind": "checks-controls"
+      }
+    },
+    {
+      "id": "eb:requirement:report-feedback-quarterly",
+      "type": "requirement",
+      "title": "Report survey data to OMB each quarter",
+      "description": "For designated services of High Impact Service Providers, send OMB the post-contact survey data by the final business day of January, April, July, and October, for publication on performance.gov.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:requirement:use-contact-data-to-improve",
+      "type": "requirement",
+      "title": "Use what contacts show to improve services",
+      "description": "Share the top reasons people contact the agency, and where they get stuck, with the program offices and the agency’s service delivery official, so the causes are fixed and not just answered.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324"
+      ],
+      "attributes": {
+        "kind": "transparency-reporting"
+      }
+    },
+    {
+      "id": "eb:implementationPattern:cloud-contact-center",
+      "type": "implementationPattern",
+      "title": "A Contact Center System Across Phone, Chat, and Email",
+      "description": "An example architecture: one contact center system takes calls, chats, and emails, routes each to self-service or to an agent with the right skills, offers callbacks, records contacts for quality review, and schedules agents from forecasts, with relay and TTY calls handled like any other.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsa-contact-center-technologies",
+        "src:gsa-contact-center-playbook"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "Toll-free numbers, a phone menu that understands speech and keypresses, and routing by topic, skill, and urgency",
+          "Chat on the agency’s website, and email and web forms in the same queues as calls",
+          "Callbacks that keep a person’s place in line instead of a long hold",
+          "Relay and TTY calls, and a phone menu and voice mail usable with a TTY",
+          "Recordings of calls and chats, with evaluation forms for quality review",
+          "Forecasts and schedules for agents, and live views of queues and waits",
+          "Connections to the contact record, the knowledge base, and the program offices’ case systems"
+        ],
+        "strengths": [
+          "One place to see every channel’s waits and staff them together",
+          "Agents see a person’s earlier contacts, whatever channel they came through",
+          "Capacity grows for a surge without new phone lines or equipment"
+        ],
+        "fitsWhen": [
+          "The center runs on an aging phone system, or on several systems for different channels",
+          "Agents work from more than one site, or from home"
+        ],
+        "watchFor": [
+          "Accessibility has to be tested with relay, TTY, and screen readers, not taken from a product sheet",
+          "Recordings and transcripts hold personal information, so who can hear them and how long they’re kept need setting",
+          "Moving phone numbers and menus without an outage needs careful planning"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contact-records-crm",
+      "type": "implementationPattern",
+      "title": "Contact Records and Handoffs in a CRM",
+      "description": "An example architecture: each contact is a record in a customer relationship management (CRM) system, with its channel, reason, answer, and outcome, linked to the person’s earlier contacts once they’re verified, and handed to the program office as a case when it must act.",
+      "status": "reference",
+      "sourceIds": [
+        "src:grs-6-5",
+        "src:gsdi-5-usc-321-324"
+      ],
+      "attributes": {
+        "layer": "business-applications",
+        "parts": [
+          "A contact record for each call, chat, email, and web form, with its reason and outcome chosen from set lists",
+          "The person’s earlier contacts and open cases, shown once they’re verified",
+          "Handoffs that open a case in the program office’s system with the contact’s details, and send the person a reference number",
+          "Follow-up tasks and callbacks, with due dates",
+          "Retention set from General Records Schedule 6.5, with holds when a contact is part of a dispute"
+        ],
+        "strengths": [
+          "People don’t have to repeat themselves when they call back or are handed off",
+          "Contact reasons recorded the same way show what to fix upstream",
+          "Program offices get handoffs with everything they need"
+        ],
+        "fitsWhen": [
+          "Agents keep notes in spreadsheets, email, or the phone system alone",
+          "Handoffs to program offices go by email and are hard to follow up"
+        ],
+        "watchFor": [
+          "Reason codes only help if there are few enough for agents to choose well, and someone reviews them",
+          "A record of every contact about a person is itself sensitive, so access follows role and need"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:shared-knowledge-base",
+      "type": "implementationPattern",
+      "title": "One Knowledge Base for Agents, the Website, and Virtual Agents",
+      "description": "An example architecture: approved answers are written once in a knowledge base, each with an owner in the program office and a review date, and published to agents’ screens, the agency’s website, the phone menu, and virtual agents.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsa-contact-center-playbook",
+        "src:plain-writing-act"
+      ],
+      "attributes": {
+        "layer": "worker-productivity",
+        "parts": [
+          "Answers written in plain language, each with its owner, its sources, and its next review date",
+          "Review and approval by the program office before an answer is published or changed",
+          "Search for agents, with answers suggested from the contact’s topic",
+          "Publishing to the website, and to the phone menu and virtual agents, from the same answer",
+          "Feedback from agents and the public on answers that are wrong or unclear, routed to the owner",
+          "Versions of each answer, so the center can show what it told people on a given day"
+        ],
+        "strengths": [
+          "People get the same answer on every channel",
+          "A change made once reaches agents and the website together",
+          "New agents become useful sooner"
+        ],
+        "fitsWhen": [
+          "Agents keep their own notes or search shared drives for answers",
+          "The website and the center give different answers to the same question"
+        ],
+        "watchFor": [
+          "Answers go stale unless program offices own them and reviews happen on time",
+          "Each language the agency serves doubles the work of keeping answers current"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:virtual-agent",
+      "type": "implementationPattern",
+      "title": "A Virtual Agent That Answers from Approved Content and Hands Off to People",
+      "description": "An example architecture: a virtual agent on the website and in the phone menu answers general questions only from the agency’s approved answers, shows where each answer came from, and hands the person to an agent, with the conversation so far, whenever it can’t help or they ask for a person.",
+      "status": "reference",
+      "sourceIds": [
+        "src:omb-m-25-21",
+        "src:nist-ai-rmf",
+        "src:section-508-standards"
+      ],
+      "attributes": {
+        "layer": "public-facing",
+        "parts": [
+          "A chat window on the website and speech in the phone menu, both usable with assistive technology",
+          "Answers drawn only from the approved knowledge base, with a link to the source",
+          "Handoff to a live agent at any point, carrying the conversation so far",
+          "Verified tasks, such as checking a status, only after the person signs in or is verified",
+          "Review of conversations the virtual agent couldn’t answer, and of a sample of those it did",
+          "A listing in the agency’s AI use case inventory, and the practices OMB requires if the use is high-impact"
+        ],
+        "strengths": [
+          "Answers routine questions at any hour without a wait",
+          "Agents have more time for people who need them",
+          "Questions it can’t answer show where the knowledge base falls short"
+        ],
+        "fitsWhen": [
+          "Many contacts are general questions with set answers",
+          "The knowledge base is current and owned"
+        ],
+        "watchFor": [
+          "Answers can be wrong or sound surer than they are, so it stays within approved content and is checked over time",
+          "It mustn’t decide anyone’s access to a benefit; uses that do are presumed high-impact under OMB’s AI memo",
+          "People who can’t or won’t use it need an easy way to reach a person",
+          "What people type may include personal information, so where it’s processed and kept matters"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:caller-verification-codes",
+      "type": "implementationPattern",
+      "title": "Caller Verification with One-Time Codes and Signed-In Sessions",
+      "description": "An example architecture: before an agent discusses a person’s records, the person is verified by a one-time code sent to contact details already on file, or by arriving from a session where they signed in to the agency’s website, and the method used is recorded on the contact.",
+      "status": "reference",
+      "sourceIds": [
+        "src:privacy-act",
+        "src:nist-sp-800-63-4"
+      ],
+      "attributes": {
+        "layer": "security-identity",
+        "parts": [
+          "Levels of verification set for each kind of request, from none for general questions to stronger checks for changes",
+          "One-time codes sent by text or email to contact details already on file, never to details the caller gives",
+          "Handoffs from a signed-in website session into chat or a callback, carrying who the person is",
+          "Knowledge questions only as a fallback, with their limits understood",
+          "The method used, and its result, recorded on the contact"
+        ],
+        "strengths": [
+          "Agents follow the same steps every time, without judgment calls",
+          "Codes and signed-in sessions are harder to fake than questions anyone could look up",
+          "The record shows how each person was verified, if a disclosure is questioned"
+        ],
+        "fitsWhen": [
+          "Agents verify people with questions such as date of birth and address",
+          "People sign in to the agency’s website for its services"
+        ],
+        "watchFor": [
+          "Contact details on file can be out of date, so there needs to be another way for people who can’t receive a code",
+          "Callers using relay services need a way to verify that works for them",
+          "Social engineering targets agents directly, so they need training and the backing to say no"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contact-ai-insights",
+      "type": "implementationPattern",
+      "title": "AI Summaries, Suggested Answers, and Contact Insights",
+      "description": "An example architecture: calls and chats are transcribed, and an AI model, in an environment the agency approves, summarizes each one for the record, suggests knowledge articles to the agent, finds the top reasons people contact the agency, and flags contacts worth a quality review, with staff deciding what to do with each.",
+      "status": "reference",
+      "sourceIds": [
+        "src:omb-m-25-21",
+        "src:nist-ai-rmf"
+      ],
+      "attributes": {
+        "layer": "ai-insights",
+        "parts": [
+          "Transcripts of calls and chats, kept with the recording on the same schedule",
+          "A draft summary of each contact that the agent checks and saves",
+          "Suggested knowledge articles shown to the agent during the contact",
+          "Contact reasons and trends across all contacts, by program and channel",
+          "Contacts flagged for quality review, such as long holds or repeat contacts, for reviewers to score"
+        ],
+        "strengths": [
+          "Agents spend less time on notes and more on people",
+          "Trends across every contact, not just a sample, show what to fix upstream",
+          "Reviewers spend their time on the contacts most worth reviewing"
+        ],
+        "fitsWhen": [
+          "Agents’ notes are thin or inconsistent",
+          "Managers want to know why people contact the agency, beyond reason codes"
+        ],
+        "watchFor": [
+          "Summaries and suggestions can be wrong, so agents check each one and accuracy is reviewed over time",
+          "Transcripts hold personal information, so where they’re processed and kept matters",
+          "The agency’s AI governance may require a listing in its AI use case inventory first"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:post-contact-survey",
+      "type": "implementationPattern",
+      "title": "Post-Contact Surveys on OMB’s Section 280 Questions",
+      "description": "An example architecture: after a contact, the person is offered a short survey by text, email, or at the end of a chat or call, using OMB’s Section 280 questions under the department’s umbrella clearance, with results joined to the contact’s channel and reason and sent to OMB each quarter.",
+      "status": "reference",
+      "sourceIds": [
+        "src:a11-section-280",
+        "src:cx-feedback-handbook",
+        "src:pra-44-usc-3502"
+      ],
+      "attributes": {
+        "layer": "connections",
+        "parts": [
+          "A survey offered after the contact, or at the end of the service, on the channel the person used",
+          "OMB’s trust question and drivers, with their wording and response choices",
+          "An approval under the department’s Section 280 umbrella clearance",
+          "Results joined to the contact’s channel, reason, and team, without identifying the person in reports",
+          "Quarterly datasets in OMB’s format, sent by the final business day of January, April, July, and October"
+        ],
+        "strengths": [
+          "Results can be compared with other agencies’ on performance.gov",
+          "Joined to contact reasons, the answers show which topics and channels need work",
+          "Quarterly reporting comes from the same data the center uses"
+        ],
+        "fitsWhen": [
+          "The agency is a High Impact Service Provider, or wants results it can compare",
+          "The center has no survey, or one with its own questions"
+        ],
+        "watchFor": [
+          "Response rates are low and skew toward strong feelings, so results need context",
+          "Surveys outside the umbrella clearance’s terms need their own Paperwork Reduction Act approval"
+        ]
+      }
+    },
+    {
+      "id": "eb:implementationPattern:contact-center-reporting",
+      "type": "implementationPattern",
+      "title": "Contact Center Performance Reporting",
+      "description": "An example architecture: a reporting workspace brings together queue and wait figures, contact records, survey results, and self-service sessions, and shows managers and program offices how each channel is doing, why people contact the agency, and where they get stuck.",
+      "status": "reference",
+      "sourceIds": [
+        "src:gsdi-5-usc-321-324",
+        "src:a11-section-280"
+      ],
+      "attributes": {
+        "layer": "data-records",
+        "parts": [
+          "Regular feeds from the contact center system, the contact records, the surveys, and the website and virtual agent",
+          "Waits, abandonment, and resolution by channel, program, and hour, against the center’s standards",
+          "Top contact reasons and repeat contacts, by program",
+          "Self-service sessions that ended in a call, and why",
+          "Views for program offices of the contacts about their programs"
+        ],
+        "strengths": [
+          "One set of figures for managers, program offices, and reports to OMB",
+          "Program offices see the questions their programs cause",
+          "Forecasts and staffing start from real volumes"
+        ],
+        "fitsWhen": [
+          "Reports are put together by hand each month from several systems",
+          "Program offices rarely hear what the center learns"
+        ],
+        "watchFor": [
+          "Figures defined differently across systems, such as when a contact counts as resolved, need agreeing first",
+          "Averages hide the worst hours and channels, so look at the spread too"
+        ]
+      }
+    },
+    {
+      "id": "eb:resource:contact-center-playbook",
+      "type": "resource",
+      "title": "Fifteen Plays of Our Contact Center Approach",
+      "description": "A 2020 playbook for agencies modernizing their contact centers, in fifteen plays from inventorying every center and number through workforce, cost, and maturity assessments, a shared knowledge base, new technology, and the contracting model, with a downloadable PDF.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://coe.gsa.gov/2020/10/08/cc-update-5.html",
+        "by": "Contact Center Center of Excellence, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:contact-center-technologies",
+      "type": "resource",
+      "title": "Contact center technologies",
+      "description": "What each common contact center technology does, from automatic call distributors, intelligent routing, and phone menus to web chat, email response, knowledge management, TTY services, and workforce management.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://digital.gov/resources/contact-center-guidelines/contact-center-technologies",
+        "by": "Digital.gov, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:contact-center-community",
+      "type": "resource",
+      "title": "Contact Center Community",
+      "description": "A community of practice for people who run government contact centers at every level of government, with a mailing list and events on performance, experience, and efficiency. Joining takes a government email address.",
+      "status": "reference",
+      "attributes": {
+        "kind": "community",
+        "url": "https://digital.gov/communities/contact-center",
+        "by": "Digital.gov, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:cx-feedback-handbook",
+      "type": "resource",
+      "title": "Customer feedback data handbook",
+      "description": "The Section 280 post-transaction survey explained, with the trust question, the drivers and their wording, the response scales, how trust is scored, and the data published on performance.gov.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://www.performance.gov/cx/data/handbook/",
+        "by": "Performance.gov, Office of Management and Budget and General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:section508-gov",
+      "type": "resource",
+      "title": "Section508.gov",
+      "description": "Guidance, training, and tools for making technology accessible under Section 508, including how to test, how to write accessibility into a solicitation, and the annual Section 508 assessment.",
+      "status": "reference",
+      "attributes": {
+        "kind": "site",
+        "url": "https://www.section508.gov/",
+        "by": "Office of Government-wide Policy, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:plain-language-guide",
+      "type": "resource",
+      "title": "Plain language guide series",
+      "description": "How to write, design, and test content people can understand, carried forward from PlainLanguage.gov, for anyone writing the answers agents and the website give.",
+      "status": "reference",
+      "attributes": {
+        "kind": "guide",
+        "url": "https://digital.gov/guides/plain-language",
+        "by": "Digital.gov, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:resource:usagov-quality-blueprint",
+      "type": "resource",
+      "title": "Creating a blueprint for quality: How the PX Contact Center helps agents grow their skills",
+      "description": "How USAGov’s Public Experience contact center reviews calls and chats, through live monitoring and audits of recordings, coaches agents on what it finds, and holds weekly calibration so reviewers score alike.",
+      "status": "reference",
+      "attributes": {
+        "kind": "case-study",
+        "url": "https://www.usa.gov/blog/2024/04/creating-a-blueprint-for-quality-how-the-px-contact-center-helps-agents-grow-their-skills",
+        "by": "USAGov, General Services Administration",
+        "lastReviewedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "eb:solution:cloud-contact-center-product",
+      "type": "solution",
+      "title": "A cloud contact center product",
+      "description": "A cloud contact center product with a FedRAMP authorization, configured and run by the agency’s own center.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The agency controls its menus, routing, and data",
+          "New channels and features arrive with the product’s updates"
+        ],
+        "fitsWhen": [
+          "The agency has people who can configure and run it"
+        ],
+        "watchFor": [
+          "Another product to buy, secure, and keep up, with its own authorization to operate"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:cloud-contact-center-department-platform",
+      "type": "solution",
+      "title": "The department’s shared contact center platform",
+      "description": "A contact center platform the department runs for its components, with each program getting its own numbers, menus, queues, and reports.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Uses contracts, skills, and security approvals the department already has",
+          "Calls can be passed between components without the person calling again"
+        ],
+        "fitsWhen": [
+          "The department already runs a platform like this for other components"
+        ],
+        "watchFor": [
+          "Changes and upgrades are decided for the whole department, not for the program"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:cloud-contact-center-contracted-center",
+      "type": "solution",
+      "title": "A contact center run by a contractor",
+      "description": "A contractor provides the agents, the system, and the sites, under service levels the agency sets and monitors.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The agency can add agents for a surge without hiring",
+          "The contractor brings systems and experience running large centers"
+        ],
+        "fitsWhen": [
+          "Contacts swing widely through the year, such as around deadlines",
+          "The agency lacks the staff to run a center itself"
+        ],
+        "watchFor": [
+          "The agency still owns the answers, the data, and the results, and needs people who can manage the contract well",
+          "Contact records, recordings, and the knowledge base must stay the agency’s, and be easy to move at the contract’s end"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:contact-records-crm-agency-platform",
+      "type": "solution",
+      "title": "The agency’s shared case platform",
+      "description": "Contact records, handoffs, and follow-up built on the low-code or CRM platform the agency already runs for its cases.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Handoffs become cases on the same platform the program offices use",
+          "Uses licenses, skills, and security approvals the agency already has"
+        ],
+        "fitsWhen": [
+          "The program offices already work their cases on the platform"
+        ],
+        "watchFor": [
+          "The connection to the contact center system, to open records as calls arrive, takes real building"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:contact-records-crm-contact-center-product",
+      "type": "solution",
+      "title": "The contact center product’s own records",
+      "description": "The contact records and case features that come with the contact center product.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Works with calls, chats, and recordings with little building"
+        ],
+        "fitsWhen": [
+          "Most contacts are resolved by the center without a program office"
+        ],
+        "watchFor": [
+          "Handoffs to program offices’ own systems still need connecting"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:shared-knowledge-base-product",
+      "type": "solution",
+      "title": "A knowledge management product",
+      "description": "A knowledge management product connected to the contact center system and the website.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Built for review cycles, versions, and publishing to several channels"
+        ],
+        "fitsWhen": [
+          "The center has many topics or many programs"
+        ],
+        "watchFor": [
+          "Another product to buy and keep up, and to connect to the website"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:shared-knowledge-base-platform",
+      "type": "solution",
+      "title": "Knowledge articles on the agency’s shared platform",
+      "description": "Knowledge articles kept on the CRM or case platform the agency already runs.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Agents find answers on the same screen as the contact record"
+        ],
+        "fitsWhen": [
+          "The center already works on the platform"
+        ],
+        "watchFor": [
+          "Publishing to the website and virtual agents may need building"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:virtual-agent-product",
+      "type": "solution",
+      "title": "The contact center product’s virtual agent",
+      "description": "The virtual agent that comes with the contact center product, configured to use the agency’s knowledge base.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Hands off to agents with the conversation, with little building"
+        ],
+        "fitsWhen": [
+          "The agency runs a contact center product that includes one"
+        ],
+        "watchFor": [
+          "Its AI model and where it runs need the agency’s approval"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:virtual-agent-agency-ai",
+      "type": "solution",
+      "title": "An AI model the agency approves",
+      "description": "A virtual agent built on an AI model in an environment the agency has approved, connected to the knowledge base and the contact center.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The same approved model can serve other uses in the agency"
+        ],
+        "fitsWhen": [
+          "The agency has an approved AI environment and people who can build on it"
+        ],
+        "watchFor": [
+          "Handoffs to agents, and testing with assistive technology, take real building"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:caller-verification-codes-combine",
+      "type": "solution",
+      "title": "Codes and sign-in combined with the contact center",
+      "description": "The contact center system’s verification steps, combined with a one-time code service and the agency’s public sign-in.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Uses the sign-in the public already has with the agency"
+        ],
+        "fitsWhen": [
+          "The agency’s public sign-in and contact center can exchange who a person is"
+        ],
+        "watchFor": [
+          "Each connection between sign-in, codes, and the contact center needs keeping up"
+        ],
+        "approach": "combine"
+      }
+    },
+    {
+      "id": "eb:solution:contact-ai-insights-product",
+      "type": "solution",
+      "title": "The contact center product’s AI features",
+      "description": "Transcription, summaries, suggested answers, and analytics that come with the contact center product.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Works with the product’s recordings and queues with little building"
+        ],
+        "fitsWhen": [
+          "The agency runs a contact center product that includes them"
+        ],
+        "watchFor": [
+          "Its AI model and where it runs need the agency’s approval"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:contact-ai-insights-agency-ai",
+      "type": "solution",
+      "title": "An AI model the agency approves",
+      "description": "Transcripts sent to an AI model in an environment the agency has approved, with results written back to the contact record and reports.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "The same approved model can serve other uses in the agency"
+        ],
+        "fitsWhen": [
+          "The agency has an approved AI environment and people who can build on it"
+        ],
+        "watchFor": [
+          "Connections to recordings, contact records, and reports take real building"
+        ],
+        "approach": "platform"
+      }
+    },
+    {
+      "id": "eb:solution:post-contact-survey-touchpoints",
+      "type": "solution",
+      "title": "GSA’s Touchpoints",
+      "description": "GSA’s Touchpoints, a government tool for customer feedback forms, set up for the Section 280 questions and the quarterly reporting to OMB.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Built for the Section 280 questions and quarterly reporting",
+          "Run by GSA for federal agencies, with a FIPS moderate rating on cloud.gov"
+        ],
+        "fitsWhen": [
+          "The center can link to a survey from its texts, emails, and chat"
+        ],
+        "watchFor": [
+          "Joining results to contact reasons needs the contact’s details passed to the survey"
+        ],
+        "approach": "shared"
+      }
+    },
+    {
+      "id": "eb:solution:post-contact-survey-product",
+      "type": "solution",
+      "title": "The contact center product’s surveys",
+      "description": "The survey features of the contact center product, set up with OMB’s questions.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Surveys can be offered at the end of a call or chat, and joined to the contact automatically"
+        ],
+        "fitsWhen": [
+          "The agency runs a contact center product with surveys"
+        ],
+        "watchFor": [
+          "Quarterly datasets still need putting into OMB’s format"
+        ],
+        "approach": "product"
+      }
+    },
+    {
+      "id": "eb:solution:contact-center-reporting-build",
+      "type": "solution",
+      "title": "A reporting workspace",
+      "description": "Data from the center’s systems brought together in the agency’s analytics tools.",
+      "status": "reference",
+      "attributes": {
+        "strengths": [
+          "Reports can join data from every system the center uses"
+        ],
+        "fitsWhen": [
+          "The agency has analytics tools and people who use them"
+        ],
+        "watchFor": [
+          "Each feed needs keeping up as the systems change"
+        ],
+        "approach": "build"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-people-reach-help-quickly",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:people-reach-help-quickly"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-questions-resolved-first-time",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:questions-resolved-first-time"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-everyone-can-get-help",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:everyone-can-get-help"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-answers-found-without-calling",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:answers-found-without-calling"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-information-shared-is-protected",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-feedback-improves-service",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:feedback-improves-service"
+    },
+    {
+      "id": "rel:helping-the-public-get-answers-seeks-service-results-public",
+      "from": "eb:mission:helping-the-public-get-answers",
+      "predicate": "seeks",
+      "to": "eb:outcome:service-results-public"
+    },
+    {
+      "id": "rel:service-planning-staffing-contributes-to-people-reach-help-quickly",
+      "from": "eb:capability:service-planning-staffing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:people-reach-help-quickly"
+    },
+    {
+      "id": "rel:service-planning-staffing-satisfies-set-service-standards",
+      "from": "eb:capability:service-planning-staffing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:set-service-standards"
+    },
+    {
+      "id": "rel:service-planning-staffing-candidate-pattern-cloud-contact-center",
+      "from": "eb:capability:service-planning-staffing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:cloud-contact-center",
+      "coverage": "partial",
+      "description": "Its workforce management tools forecast contacts and schedule agents. The standards and the staffing budget are the agency’s decisions."
+    },
+    {
+      "id": "rel:service-planning-staffing-candidate-pattern-contact-center-reporting",
+      "from": "eb:capability:service-planning-staffing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contact-center-reporting",
+      "coverage": "partial",
+      "description": "Shows volumes and waits by channel and hour, which forecasts start from."
+    },
+    {
+      "id": "rel:knowledge-management-contributes-to-questions-resolved-first-time",
+      "from": "eb:capability:knowledge-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:questions-resolved-first-time"
+    },
+    {
+      "id": "rel:knowledge-management-contributes-to-answers-found-without-calling",
+      "from": "eb:capability:knowledge-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:answers-found-without-calling"
+    },
+    {
+      "id": "rel:knowledge-management-satisfies-answers-in-plain-language",
+      "from": "eb:capability:knowledge-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:answers-in-plain-language"
+    },
+    {
+      "id": "rel:knowledge-management-satisfies-review-answers-on-schedule",
+      "from": "eb:capability:knowledge-management",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-answers-on-schedule"
+    },
+    {
+      "id": "rel:knowledge-management-candidate-pattern-shared-knowledge-base",
+      "from": "eb:capability:knowledge-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-knowledge-base"
+    },
+    {
+      "id": "rel:contact-intake-routing-contributes-to-people-reach-help-quickly",
+      "from": "eb:capability:contact-intake-routing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:people-reach-help-quickly"
+    },
+    {
+      "id": "rel:contact-intake-routing-contributes-to-everyone-can-get-help",
+      "from": "eb:capability:contact-intake-routing",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:everyone-can-get-help"
+    },
+    {
+      "id": "rel:contact-intake-routing-satisfies-keep-a-non-digital-path",
+      "from": "eb:capability:contact-intake-routing",
+      "predicate": "satisfies",
+      "to": "eb:requirement:keep-a-non-digital-path"
+    },
+    {
+      "id": "rel:contact-intake-routing-candidate-pattern-cloud-contact-center",
+      "from": "eb:capability:contact-intake-routing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:cloud-contact-center"
+    },
+    {
+      "id": "rel:contact-intake-routing-candidate-pattern-ai-assisted-intake-sorting",
+      "from": "eb:capability:contact-intake-routing",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:ai-assisted-intake-sorting",
+      "coverage": "partial",
+      "description": "Suggests the topic and urgency of emails and web forms for staff to confirm. Calls and chats are routed by the contact center system."
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-contributes-to-answers-found-without-calling",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:answers-found-without-calling"
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-contributes-to-people-reach-help-quickly",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:people-reach-help-quickly"
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-satisfies-digital-channels-meet-idea",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:digital-channels-meet-idea"
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-satisfies-assess-ai-before-use",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "satisfies",
+      "to": "eb:requirement:assess-ai-before-use"
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-candidate-pattern-virtual-agent",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:virtual-agent"
+    },
+    {
+      "id": "rel:self-service-virtual-assistance-candidate-pattern-shared-knowledge-base",
+      "from": "eb:capability:self-service-virtual-assistance",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-knowledge-base",
+      "coverage": "partial",
+      "description": "Publishes the approved answers on the website. Tasks such as checking a status need connections to the program’s systems."
+    },
+    {
+      "id": "rel:caller-verification-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:caller-verification",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:caller-verification-satisfies-verify-before-disclosing",
+      "from": "eb:capability:caller-verification",
+      "predicate": "satisfies",
+      "to": "eb:requirement:verify-before-disclosing"
+    },
+    {
+      "id": "rel:caller-verification-candidate-pattern-caller-verification-codes",
+      "from": "eb:capability:caller-verification",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:caller-verification-codes"
+    },
+    {
+      "id": "rel:accessible-service-contributes-to-everyone-can-get-help",
+      "from": "eb:capability:accessible-service",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:everyone-can-get-help"
+    },
+    {
+      "id": "rel:accessible-service-satisfies-communicate-effectively",
+      "from": "eb:capability:accessible-service",
+      "predicate": "satisfies",
+      "to": "eb:requirement:communicate-effectively"
+    },
+    {
+      "id": "rel:accessible-service-satisfies-menus-usable-with-tty",
+      "from": "eb:capability:accessible-service",
+      "predicate": "satisfies",
+      "to": "eb:requirement:menus-usable-with-tty"
+    },
+    {
+      "id": "rel:accessible-service-satisfies-accessible-digital-channels",
+      "from": "eb:capability:accessible-service",
+      "predicate": "satisfies",
+      "to": "eb:requirement:accessible-digital-channels"
+    },
+    {
+      "id": "rel:accessible-service-candidate-pattern-cloud-contact-center",
+      "from": "eb:capability:accessible-service",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:cloud-contact-center",
+      "coverage": "partial",
+      "description": "Relay and TTY calls, and accessible chat, are features to require and test. Interpreters and other aids are arranged outside it."
+    },
+    {
+      "id": "rel:accessible-service-candidate-pattern-virtual-agent",
+      "from": "eb:capability:accessible-service",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:virtual-agent",
+      "coverage": "partial",
+      "description": "Has to work with screen readers and keyboards, and hand off to a person for anyone it can’t serve."
+    },
+    {
+      "id": "rel:contact-resolution-handoff-contributes-to-questions-resolved-first-time",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:questions-resolved-first-time"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-satisfies-record-each-contact",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "satisfies",
+      "to": "eb:requirement:record-each-contact"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-satisfies-tell-people-why-information-is-collected",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "satisfies",
+      "to": "eb:requirement:tell-people-why-information-is-collected"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-satisfies-hand-off-with-context",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "satisfies",
+      "to": "eb:requirement:hand-off-with-context"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-candidate-pattern-contact-records-crm",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contact-records-crm"
+    },
+    {
+      "id": "rel:contact-resolution-handoff-candidate-pattern-shared-case-platform",
+      "from": "eb:capability:contact-resolution-handoff",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "coverage": "partial",
+      "description": "Holds the program office’s cases that contacts are handed off to. Contacts themselves are recorded in the contact system."
+    },
+    {
+      "id": "rel:quality-review-coaching-contributes-to-questions-resolved-first-time",
+      "from": "eb:capability:quality-review-coaching",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:questions-resolved-first-time"
+    },
+    {
+      "id": "rel:quality-review-coaching-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:quality-review-coaching",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:quality-review-coaching-satisfies-review-contacts-for-quality",
+      "from": "eb:capability:quality-review-coaching",
+      "predicate": "satisfies",
+      "to": "eb:requirement:review-contacts-for-quality"
+    },
+    {
+      "id": "rel:quality-review-coaching-candidate-pattern-contact-ai-insights",
+      "from": "eb:capability:quality-review-coaching",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contact-ai-insights",
+      "coverage": "partial",
+      "description": "Finds contacts worth reviewing and summarizes them. Reviewers still score each one and coach agents."
+    },
+    {
+      "id": "rel:quality-review-coaching-candidate-pattern-cloud-contact-center",
+      "from": "eb:capability:quality-review-coaching",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:cloud-contact-center",
+      "coverage": "partial",
+      "description": "Records calls and chats, and holds the evaluation forms and scores."
+    },
+    {
+      "id": "rel:customer-feedback-contributes-to-feedback-improves-service",
+      "from": "eb:capability:customer-feedback",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:feedback-improves-service"
+    },
+    {
+      "id": "rel:customer-feedback-contributes-to-service-results-public",
+      "from": "eb:capability:customer-feedback",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:service-results-public"
+    },
+    {
+      "id": "rel:customer-feedback-satisfies-survey-after-contacts",
+      "from": "eb:capability:customer-feedback",
+      "predicate": "satisfies",
+      "to": "eb:requirement:survey-after-contacts"
+    },
+    {
+      "id": "rel:customer-feedback-satisfies-clear-surveys-under-pra",
+      "from": "eb:capability:customer-feedback",
+      "predicate": "satisfies",
+      "to": "eb:requirement:clear-surveys-under-pra"
+    },
+    {
+      "id": "rel:customer-feedback-candidate-pattern-post-contact-survey",
+      "from": "eb:capability:customer-feedback",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:post-contact-survey"
+    },
+    {
+      "id": "rel:service-performance-reporting-contributes-to-service-results-public",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:service-results-public"
+    },
+    {
+      "id": "rel:service-performance-reporting-contributes-to-feedback-improves-service",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:feedback-improves-service"
+    },
+    {
+      "id": "rel:service-performance-reporting-satisfies-report-feedback-quarterly",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:report-feedback-quarterly"
+    },
+    {
+      "id": "rel:service-performance-reporting-satisfies-use-contact-data-to-improve",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "satisfies",
+      "to": "eb:requirement:use-contact-data-to-improve"
+    },
+    {
+      "id": "rel:service-performance-reporting-candidate-pattern-contact-center-reporting",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contact-center-reporting"
+    },
+    {
+      "id": "rel:service-performance-reporting-candidate-pattern-post-contact-survey",
+      "from": "eb:capability:service-performance-reporting",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:post-contact-survey",
+      "coverage": "partial",
+      "description": "Sends the survey data to OMB each quarter. The center’s other figures come from its own systems."
+    },
+    {
+      "id": "rel:cloud-contact-center-works-with-contact-records-crm",
+      "from": "eb:implementationPattern:cloud-contact-center",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-records-crm",
+      "description": "Each call, chat, and email opens or updates a contact record, with its recording and transcript linked."
+    },
+    {
+      "id": "rel:cloud-contact-center-works-with-shared-knowledge-base",
+      "from": "eb:implementationPattern:cloud-contact-center",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:shared-knowledge-base",
+      "description": "Agents see answers for the topic the caller chose in the phone menu."
+    },
+    {
+      "id": "rel:cloud-contact-center-works-with-contact-center-reporting",
+      "from": "eb:implementationPattern:cloud-contact-center",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-center-reporting",
+      "description": "Queue, wait, and abandonment figures feed the reports."
+    },
+    {
+      "id": "rel:contact-records-crm-works-with-caller-verification-codes",
+      "from": "eb:implementationPattern:contact-records-crm",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:caller-verification-codes",
+      "description": "A verified person’s earlier contacts and cases show on the record."
+    },
+    {
+      "id": "rel:contact-records-crm-works-with-records-in-business-systems",
+      "from": "eb:implementationPattern:contact-records-crm",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:records-in-business-systems",
+      "description": "Contact records follow their schedule in the system that holds them."
+    },
+    {
+      "id": "rel:shared-knowledge-base-works-with-virtual-agent",
+      "from": "eb:implementationPattern:shared-knowledge-base",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:virtual-agent",
+      "description": "The virtual agent answers only from approved articles."
+    },
+    {
+      "id": "rel:shared-knowledge-base-works-with-contact-ai-insights",
+      "from": "eb:implementationPattern:shared-knowledge-base",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-ai-insights",
+      "description": "Contacts without a good answer show where articles are missing."
+    },
+    {
+      "id": "rel:virtual-agent-depends-on-shared-knowledge-base",
+      "from": "eb:implementationPattern:virtual-agent",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-knowledge-base",
+      "description": "The virtual agent answers only from approved knowledge articles."
+    },
+    {
+      "id": "rel:virtual-agent-works-with-cloud-contact-center",
+      "from": "eb:implementationPattern:virtual-agent",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:cloud-contact-center",
+      "description": "Handoffs land in the agents’ queues with the conversation so far."
+    },
+    {
+      "id": "rel:virtual-agent-works-with-caller-verification-codes",
+      "from": "eb:implementationPattern:virtual-agent",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:caller-verification-codes",
+      "description": "Tasks about a person’s own records start only after they’re verified."
+    },
+    {
+      "id": "rel:caller-verification-codes-works-with-contact-records-crm",
+      "from": "eb:implementationPattern:caller-verification-codes",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-records-crm",
+      "description": "The verification method is saved on the contact record."
+    },
+    {
+      "id": "rel:contact-ai-insights-works-with-contact-records-crm",
+      "from": "eb:implementationPattern:contact-ai-insights",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-records-crm",
+      "description": "Summaries and contact reasons are saved on the contact record."
+    },
+    {
+      "id": "rel:contact-ai-insights-works-with-contact-center-reporting",
+      "from": "eb:implementationPattern:contact-ai-insights",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-center-reporting",
+      "description": "Contact reasons and trends feed the reports."
+    },
+    {
+      "id": "rel:post-contact-survey-works-with-contact-center-reporting",
+      "from": "eb:implementationPattern:post-contact-survey",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:contact-center-reporting",
+      "description": "Survey results appear beside waits and resolution in the reports."
+    },
+    {
+      "id": "rel:contact-center-reporting-works-with-cloud-contact-center",
+      "from": "eb:implementationPattern:contact-center-reporting",
+      "predicate": "works_with",
+      "to": "eb:implementationPattern:cloud-contact-center"
+    },
+    {
+      "id": "rel:contact-center-playbook-helps-with-helping-the-public-get-answers",
+      "from": "eb:resource:contact-center-playbook",
+      "predicate": "helps_with",
+      "to": "eb:mission:helping-the-public-get-answers"
+    },
+    {
+      "id": "rel:contact-center-playbook-helps-with-service-planning-staffing",
+      "from": "eb:resource:contact-center-playbook",
+      "predicate": "helps_with",
+      "to": "eb:capability:service-planning-staffing"
+    },
+    {
+      "id": "rel:contact-center-playbook-helps-with-knowledge-management",
+      "from": "eb:resource:contact-center-playbook",
+      "predicate": "helps_with",
+      "to": "eb:capability:knowledge-management"
+    },
+    {
+      "id": "rel:contact-center-technologies-helps-with-contact-intake-routing",
+      "from": "eb:resource:contact-center-technologies",
+      "predicate": "helps_with",
+      "to": "eb:capability:contact-intake-routing"
+    },
+    {
+      "id": "rel:contact-center-technologies-helps-with-service-planning-staffing",
+      "from": "eb:resource:contact-center-technologies",
+      "predicate": "helps_with",
+      "to": "eb:capability:service-planning-staffing"
+    },
+    {
+      "id": "rel:contact-center-technologies-helps-with-cloud-contact-center-product",
+      "from": "eb:resource:contact-center-technologies",
+      "predicate": "helps_with",
+      "to": "eb:solution:cloud-contact-center-product"
+    },
+    {
+      "id": "rel:contact-center-community-helps-with-helping-the-public-get-answers",
+      "from": "eb:resource:contact-center-community",
+      "predicate": "helps_with",
+      "to": "eb:mission:helping-the-public-get-answers"
+    },
+    {
+      "id": "rel:cx-feedback-handbook-helps-with-customer-feedback",
+      "from": "eb:resource:cx-feedback-handbook",
+      "predicate": "helps_with",
+      "to": "eb:capability:customer-feedback"
+    },
+    {
+      "id": "rel:cx-feedback-handbook-helps-with-service-performance-reporting",
+      "from": "eb:resource:cx-feedback-handbook",
+      "predicate": "helps_with",
+      "to": "eb:capability:service-performance-reporting"
+    },
+    {
+      "id": "rel:cx-feedback-handbook-helps-with-post-contact-survey",
+      "from": "eb:resource:cx-feedback-handbook",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:post-contact-survey"
+    },
+    {
+      "id": "rel:section508-gov-helps-with-accessible-service",
+      "from": "eb:resource:section508-gov",
+      "predicate": "helps_with",
+      "to": "eb:capability:accessible-service"
+    },
+    {
+      "id": "rel:plain-language-guide-helps-with-knowledge-management",
+      "from": "eb:resource:plain-language-guide",
+      "predicate": "helps_with",
+      "to": "eb:capability:knowledge-management"
+    },
+    {
+      "id": "rel:plain-language-guide-helps-with-shared-knowledge-base",
+      "from": "eb:resource:plain-language-guide",
+      "predicate": "helps_with",
+      "to": "eb:implementationPattern:shared-knowledge-base"
+    },
+    {
+      "id": "rel:usagov-quality-blueprint-helps-with-quality-review-coaching",
+      "from": "eb:resource:usagov-quality-blueprint",
+      "predicate": "helps_with",
+      "to": "eb:capability:quality-review-coaching"
+    },
+    {
+      "id": "rel:cloud-contact-center-product-implements-cloud-contact-center",
+      "from": "eb:solution:cloud-contact-center-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:cloud-contact-center"
+    },
+    {
+      "id": "rel:cloud-contact-center-department-platform-implements-cloud-contact-center",
+      "from": "eb:solution:cloud-contact-center-department-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:cloud-contact-center"
+    },
+    {
+      "id": "rel:cloud-contact-center-contracted-center-implements-cloud-contact-center",
+      "from": "eb:solution:cloud-contact-center-contracted-center",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:cloud-contact-center"
+    },
+    {
+      "id": "rel:contact-records-crm-agency-platform-implements-contact-records-crm",
+      "from": "eb:solution:contact-records-crm-agency-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:contact-records-crm"
+    },
+    {
+      "id": "rel:contact-records-crm-agency-platform-depends-on-shared-case-platform",
+      "from": "eb:solution:contact-records-crm-agency-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:shared-case-platform",
+      "description": "The contact records and handoffs are the shared platform, set up for the contact center."
+    },
+    {
+      "id": "rel:contact-records-crm-contact-center-product-implements-contact-records-crm",
+      "from": "eb:solution:contact-records-crm-contact-center-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:contact-records-crm"
+    },
+    {
+      "id": "rel:shared-knowledge-base-product-implements-shared-knowledge-base",
+      "from": "eb:solution:shared-knowledge-base-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:shared-knowledge-base"
+    },
+    {
+      "id": "rel:shared-knowledge-base-platform-implements-shared-knowledge-base",
+      "from": "eb:solution:shared-knowledge-base-platform",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:shared-knowledge-base"
+    },
+    {
+      "id": "rel:virtual-agent-product-implements-virtual-agent",
+      "from": "eb:solution:virtual-agent-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:virtual-agent"
+    },
+    {
+      "id": "rel:virtual-agent-agency-ai-implements-virtual-agent",
+      "from": "eb:solution:virtual-agent-agency-ai",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:virtual-agent"
+    },
+    {
+      "id": "rel:caller-verification-codes-combine-implements-caller-verification-codes",
+      "from": "eb:solution:caller-verification-codes-combine",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:caller-verification-codes"
+    },
+    {
+      "id": "rel:contact-ai-insights-product-implements-contact-ai-insights",
+      "from": "eb:solution:contact-ai-insights-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:contact-ai-insights"
+    },
+    {
+      "id": "rel:contact-ai-insights-agency-ai-implements-contact-ai-insights",
+      "from": "eb:solution:contact-ai-insights-agency-ai",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:contact-ai-insights"
+    },
+    {
+      "id": "rel:post-contact-survey-touchpoints-implements-post-contact-survey",
+      "from": "eb:solution:post-contact-survey-touchpoints",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:post-contact-survey"
+    },
+    {
+      "id": "rel:post-contact-survey-product-implements-post-contact-survey",
+      "from": "eb:solution:post-contact-survey-product",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:post-contact-survey"
+    },
+    {
+      "id": "rel:contact-center-reporting-build-implements-contact-center-reporting",
+      "from": "eb:solution:contact-center-reporting-build",
+      "predicate": "implements",
+      "to": "eb:implementationPattern:contact-center-reporting"
+    },
+    {
+      "id": "rel:case-management-contributes-to-questions-resolved-first-time",
+      "from": "eb:capability:case-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:questions-resolved-first-time"
+    },
+    {
+      "id": "rel:case-management-candidate-pattern-contact-records-crm",
+      "from": "eb:capability:case-management",
+      "predicate": "candidate_pattern",
+      "to": "eb:implementationPattern:contact-records-crm"
+    },
+    {
+      "id": "rel:records-management-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:records-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:identity-access-management-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:identity-access-management",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:data-protection-privacy-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:data-protection-privacy",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    },
+    {
+      "id": "rel:security-logging-monitoring-contributes-to-information-shared-is-protected",
+      "from": "eb:capability:security-logging-monitoring",
+      "predicate": "contributes_to",
+      "to": "eb:outcome:information-shared-is-protected"
+    }
+  ],
+  "assessments": [
+    {
+      "id": "assessment:contact-center-results",
+      "title": "Contact center results discovery",
+      "questions": [
+        {
+          "id": "question:contact-priority-results",
+          "prompt": "Which of these results matter most for this effort?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "people-reach-help-quickly",
+              "label": "People reach help without a long wait"
+            },
+            {
+              "value": "questions-resolved-first-time",
+              "label": "People get what they came for on the first contact"
+            },
+            {
+              "value": "everyone-can-get-help",
+              "label": "Everyone can get help, whatever their abilities"
+            },
+            {
+              "value": "answers-found-without-calling",
+              "label": "People can find answers on their own"
+            },
+            {
+              "value": "information-shared-is-protected",
+              "label": "What people share is protected"
+            },
+            {
+              "value": "feedback-improves-service",
+              "label": "What people say improves the service"
+            },
+            {
+              "value": "service-results-public",
+              "label": "The service’s results are open to view"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "people-reach-help-quickly",
+              "elementId": "eb:outcome:people-reach-help-quickly",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "questions-resolved-first-time",
+              "elementId": "eb:outcome:questions-resolved-first-time",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "everyone-can-get-help",
+              "elementId": "eb:outcome:everyone-can-get-help",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "answers-found-without-calling",
+              "elementId": "eb:outcome:answers-found-without-calling",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "information-shared-is-protected",
+              "elementId": "eb:outcome:information-shared-is-protected",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "feedback-improves-service",
+              "elementId": "eb:outcome:feedback-improves-service",
+              "interpretation": "This effort is meant to advance this result."
+            },
+            {
+              "answerValue": "service-results-public",
+              "elementId": "eb:outcome:service-results-public",
+              "interpretation": "This effort is meant to advance this result."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-tracked-measures",
+          "prompt": "Which of these does the center track during the year?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "waits",
+              "label": "How long people wait, and how many give up"
+            },
+            {
+              "value": "resolution",
+              "label": "How many contacts are resolved the first time"
+            },
+            {
+              "value": "self-service",
+              "label": "How many people find answers without an agent"
+            },
+            {
+              "value": "accessibility",
+              "label": "Whether phone menus, chat, and web forms are tested for accessibility"
+            },
+            {
+              "value": "privacy",
+              "label": "Privacy incidents that began with a contact"
+            },
+            {
+              "value": "survey",
+              "label": "Post-contact survey results, such as trust and ease"
+            },
+            {
+              "value": "none",
+              "label": "None of these regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "waits",
+              "elementId": "eb:measure:average-speed-of-answer",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "waits",
+              "elementId": "eb:measure:contacts-abandoned",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "resolution",
+              "elementId": "eb:measure:first-contact-resolution",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "resolution",
+              "elementId": "eb:measure:issue-resolved-share",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "self-service",
+              "elementId": "eb:measure:self-service-resolution",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "self-service",
+              "elementId": "eb:measure:ease-share",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "accessibility",
+              "elementId": "eb:measure:channels-tested-for-508",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "privacy",
+              "elementId": "eb:measure:privacy-incidents-from-contacts",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "survey",
+              "elementId": "eb:measure:trust-after-contact",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            },
+            {
+              "answerValue": "survey",
+              "elementId": "eb:measure:quarterly-feedback-reported",
+              "interpretation": "The center tracks this already, so there may be a value for today."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-measure-sources",
+          "prompt": "Where do those figures come from today, and who puts them together?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions for the start of an engagement about which results matter most for the agency’s contact center and how the center tells how it’s doing. They ask about the center’s operations, never about individual contacts or the people who made them. Some answers point to outcomes and measures worth exploring."
+    },
+    {
+      "id": "assessment:contact-center-operations",
+      "title": "Contact center operations discovery",
+      "questions": [
+        {
+          "id": "question:contact-channels",
+          "prompt": "Through which channels can the public reach the center?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "relay-tty",
+              "label": "Relay services and TTY"
+            },
+            {
+              "value": "chat",
+              "label": "Chat on the website"
+            },
+            {
+              "value": "virtual-agent",
+              "label": "A virtual agent or chatbot"
+            },
+            {
+              "value": "email",
+              "label": "Email or a web form"
+            },
+            {
+              "value": "in-person",
+              "label": "In person"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "chat",
+              "elementId": "eb:capability:contact-intake-routing",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            },
+            {
+              "answerValue": "virtual-agent",
+              "elementId": "eb:capability:contact-intake-routing",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:contact-intake-routing",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            },
+            {
+              "answerValue": "chat",
+              "elementId": "eb:implementationPattern:cloud-contact-center",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            },
+            {
+              "answerValue": "virtual-agent",
+              "elementId": "eb:implementationPattern:cloud-contact-center",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:implementationPattern:cloud-contact-center",
+              "interpretation": "Channels beyond the phone work best in the same queues, so waits and staffing can be seen together."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-phone-system",
+          "prompt": "What runs the center’s phones and chat today?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "cloud-product",
+              "label": "A cloud contact center product the agency runs"
+            },
+            {
+              "value": "department-platform",
+              "label": "The department’s shared contact center platform"
+            },
+            {
+              "value": "contractor",
+              "label": "A contractor’s system, with the contractor’s agents"
+            },
+            {
+              "value": "on-premises",
+              "label": "A phone system the agency hosts itself"
+            },
+            {
+              "value": "desk-phones",
+              "label": "Desk phones, hunt groups, and a shared mailbox"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "on-premises",
+              "elementId": "eb:capability:contact-intake-routing",
+              "interpretation": "Older systems often can’t route by skill, offer callbacks, or show waits across channels."
+            },
+            {
+              "answerValue": "desk-phones",
+              "elementId": "eb:capability:contact-intake-routing",
+              "interpretation": "Older systems often can’t route by skill, offer callbacks, or show waits across channels."
+            },
+            {
+              "answerValue": "on-premises",
+              "elementId": "eb:implementationPattern:cloud-contact-center",
+              "interpretation": "Older systems often can’t route by skill, offer callbacks, or show waits across channels."
+            },
+            {
+              "answerValue": "desk-phones",
+              "elementId": "eb:implementationPattern:cloud-contact-center",
+              "interpretation": "Older systems often can’t route by skill, offer callbacks, or show waits across channels."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-staffing-forecasts",
+          "prompt": "How does the center decide how many agents to schedule?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "workforce-tool",
+              "label": "Forecasts and schedules from a workforce management tool"
+            },
+            {
+              "value": "spreadsheets",
+              "label": "Forecasts in spreadsheets"
+            },
+            {
+              "value": "fixed",
+              "label": "The same schedule every week"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:capability:service-planning-staffing",
+              "interpretation": "Without forecasts from real volumes, waits grow at the busiest hours and around deadlines."
+            },
+            {
+              "answerValue": "fixed",
+              "elementId": "eb:capability:service-planning-staffing",
+              "interpretation": "Without forecasts from real volumes, waits grow at the busiest hours and around deadlines."
+            },
+            {
+              "answerValue": "spreadsheets",
+              "elementId": "eb:implementationPattern:contact-center-reporting",
+              "interpretation": "Without forecasts from real volumes, waits grow at the busiest hours and around deadlines."
+            },
+            {
+              "answerValue": "fixed",
+              "elementId": "eb:implementationPattern:contact-center-reporting",
+              "interpretation": "Without forecasts from real volumes, waits grow at the busiest hours and around deadlines."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-wait-standards",
+          "prompt": "Has the center set how long people should wait on each channel?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:service-planning-staffing",
+              "interpretation": "Without a standard, there’s no way to tell whether staffing is enough."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:set-service-standards",
+              "interpretation": "Without a standard, there’s no way to tell whether staffing is enough."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-knowledge",
+          "prompt": "Where do agents find the approved answers?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "shared",
+              "label": "One knowledge base that the website also uses"
+            },
+            {
+              "value": "agents-only",
+              "label": "A knowledge base for agents only"
+            },
+            {
+              "value": "documents",
+              "label": "Documents and shared drives"
+            },
+            {
+              "value": "experience",
+              "label": "Mostly experience, notes, and asking colleagues"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "agents-only",
+              "elementId": "eb:capability:knowledge-management",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:capability:knowledge-management",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            },
+            {
+              "answerValue": "experience",
+              "elementId": "eb:capability:knowledge-management",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            },
+            {
+              "answerValue": "agents-only",
+              "elementId": "eb:implementationPattern:shared-knowledge-base",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            },
+            {
+              "answerValue": "documents",
+              "elementId": "eb:implementationPattern:shared-knowledge-base",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            },
+            {
+              "answerValue": "experience",
+              "elementId": "eb:implementationPattern:shared-knowledge-base",
+              "interpretation": "Answers kept in more than one place drift apart, so people get different answers on different channels."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-languages",
+          "prompt": "Besides English, does the center serve people in other languages?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "english-only",
+              "label": "English only"
+            },
+            {
+              "value": "spanish",
+              "label": "English and Spanish"
+            },
+            {
+              "value": "several",
+              "label": "Several languages, with their own agents or answers"
+            },
+            {
+              "value": "interpreters",
+              "label": "Through an interpreter line on request"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "several",
+              "elementId": "eb:capability:knowledge-management",
+              "interpretation": "Each language needs its own approved answers, kept in step with the English ones."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-self-service",
+          "prompt": "What can people do without reaching an agent?",
+          "kind": "multiple-choice",
+          "options": [
+            {
+              "value": "web-answers",
+              "label": "Find answers on the website"
+            },
+            {
+              "value": "status",
+              "label": "Check the status of a request or application"
+            },
+            {
+              "value": "updates",
+              "label": "Update details, such as an address"
+            },
+            {
+              "value": "phone-menu",
+              "label": "Get answers in the phone menu"
+            },
+            {
+              "value": "virtual-agent",
+              "label": "Ask a virtual agent"
+            },
+            {
+              "value": "none",
+              "label": "Little or nothing yet"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "none",
+              "elementId": "eb:capability:self-service-virtual-assistance",
+              "interpretation": "Routine questions that could be answered on their own take agents’ time from people who need them."
+            },
+            {
+              "answerValue": "none",
+              "elementId": "eb:implementationPattern:virtual-agent",
+              "interpretation": "Routine questions that could be answered on their own take agents’ time from people who need them."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-ai-inventory",
+          "prompt": "Is AI used in the center, such as a virtual agent, transcripts, or suggested answers, and is each use in the agency’s AI use case inventory?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "listed",
+              "label": "Yes, and each use is listed"
+            },
+            {
+              "value": "not-sure",
+              "label": "Yes, but we’re not sure each is listed"
+            },
+            {
+              "value": "none",
+              "label": "No AI is used yet"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:capability:self-service-virtual-assistance",
+              "interpretation": "OMB requires each use to be inventoried, and high-impact uses to meet its practices before they’re deployed."
+            },
+            {
+              "answerValue": "not-sure",
+              "elementId": "eb:requirement:assess-ai-before-use",
+              "interpretation": "OMB requires each use to be inventoried, and high-impact uses to meet its practices before they’re deployed."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-verification",
+          "prompt": "How do agents confirm who someone is before discussing their records?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "codes-or-sign-in",
+              "label": "A one-time code, or the person’s signed-in session"
+            },
+            {
+              "value": "questions",
+              "label": "Questions such as date of birth and address"
+            },
+            {
+              "value": "varies",
+              "label": "It varies by agent"
+            },
+            {
+              "value": "no-records",
+              "label": "Agents don’t discuss people’s records"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "questions",
+              "elementId": "eb:capability:caller-verification",
+              "interpretation": "Answers to questions like these can often be found or guessed, and steps that vary by agent are hard to defend."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:capability:caller-verification",
+              "interpretation": "Answers to questions like these can often be found or guessed, and steps that vary by agent are hard to defend."
+            },
+            {
+              "answerValue": "questions",
+              "elementId": "eb:implementationPattern:caller-verification-codes",
+              "interpretation": "Answers to questions like these can often be found or guessed, and steps that vary by agent are hard to defend."
+            },
+            {
+              "answerValue": "varies",
+              "elementId": "eb:implementationPattern:caller-verification-codes",
+              "interpretation": "Answers to questions like these can often be found or guessed, and steps that vary by agent are hard to defend."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-accessibility-testing",
+          "prompt": "Have the center’s phone menus, chat, and web forms been tested with a TTY, relay calls, and screen readers in the past year?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:accessible-service",
+              "interpretation": "Barriers in a phone menu or chat window shut people out before they ever reach an agent."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:menus-usable-with-tty",
+              "interpretation": "Barriers in a phone menu or chat window shut people out before they ever reach an agent."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:requirement:accessible-digital-channels",
+              "interpretation": "Barriers in a phone menu or chat window shut people out before they ever reach an agent."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-records",
+          "prompt": "Is each contact recorded, with its reason and outcome, in one system?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:contact-resolution-handoff",
+              "interpretation": "Without a record, people repeat themselves when they call back, and the center can’t tell why people contact it."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:contact-records-crm",
+              "interpretation": "Without a record, people repeat themselves when they call back, and the center can’t tell why people contact it."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-handoffs",
+          "prompt": "When a program office must act, how does the contact reach it?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "case",
+              "label": "A case opens in the office’s system, with the contact’s details"
+            },
+            {
+              "value": "email",
+              "label": "By email or a form sent to the office"
+            },
+            {
+              "value": "redirect",
+              "label": "The person is told to contact the office themselves"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "email",
+              "elementId": "eb:capability:contact-resolution-handoff",
+              "interpretation": "Handoffs by email are hard to follow up, and sending people elsewhere makes them start over."
+            },
+            {
+              "answerValue": "redirect",
+              "elementId": "eb:capability:contact-resolution-handoff",
+              "interpretation": "Handoffs by email are hard to follow up, and sending people elsewhere makes them start over."
+            },
+            {
+              "answerValue": "email",
+              "elementId": "eb:requirement:hand-off-with-context",
+              "interpretation": "Handoffs by email are hard to follow up, and sending people elsewhere makes them start over."
+            },
+            {
+              "answerValue": "redirect",
+              "elementId": "eb:requirement:hand-off-with-context",
+              "interpretation": "Handoffs by email are hard to follow up, and sending people elsewhere makes them start over."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-quality-reviews",
+          "prompt": "How are contacts reviewed for quality?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "regular-sample",
+              "label": "A regular sample of each agent’s contacts, scored against a written standard"
+            },
+            {
+              "value": "complaints",
+              "label": "When there’s a complaint"
+            },
+            {
+              "value": "not-regularly",
+              "label": "Not regularly"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "complaints",
+              "elementId": "eb:capability:quality-review-coaching",
+              "interpretation": "Wrong answers spread until someone notices, and reviews are how agents and the knowledge base improve."
+            },
+            {
+              "answerValue": "not-regularly",
+              "elementId": "eb:capability:quality-review-coaching",
+              "interpretation": "Wrong answers spread until someone notices, and reviews are how agents and the knowledge base improve."
+            },
+            {
+              "answerValue": "complaints",
+              "elementId": "eb:implementationPattern:contact-ai-insights",
+              "interpretation": "Wrong answers spread until someone notices, and reviews are how agents and the knowledge base improve."
+            },
+            {
+              "answerValue": "not-regularly",
+              "elementId": "eb:implementationPattern:contact-ai-insights",
+              "interpretation": "Wrong answers spread until someone notices, and reviews are how agents and the knowledge base improve."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-surveys",
+          "prompt": "How does the center ask people about their experience?",
+          "kind": "single-choice",
+          "options": [
+            {
+              "value": "section-280",
+              "label": "A survey after the contact, with OMB’s Section 280 questions"
+            },
+            {
+              "value": "own-survey",
+              "label": "A survey with our own questions"
+            },
+            {
+              "value": "comments",
+              "label": "Only through complaints and comments"
+            },
+            {
+              "value": "none",
+              "label": "It doesn’t yet"
+            }
+          ],
+          "candidateMappings": [
+            {
+              "answerValue": "own-survey",
+              "elementId": "eb:capability:customer-feedback",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            },
+            {
+              "answerValue": "comments",
+              "elementId": "eb:capability:customer-feedback",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            },
+            {
+              "answerValue": "none",
+              "elementId": "eb:capability:customer-feedback",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            },
+            {
+              "answerValue": "own-survey",
+              "elementId": "eb:implementationPattern:post-contact-survey",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            },
+            {
+              "answerValue": "comments",
+              "elementId": "eb:implementationPattern:post-contact-survey",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            },
+            {
+              "answerValue": "none",
+              "elementId": "eb:implementationPattern:post-contact-survey",
+              "interpretation": "OMB’s questions, under the department’s umbrella clearance, give results the agency can act on and compare."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-hisp-service",
+          "prompt": "Is the center part of a service that a High Impact Service Provider has designated?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "true",
+              "elementId": "eb:capability:service-performance-reporting",
+              "interpretation": "Designated services report survey data to OMB every quarter, for publication on performance.gov."
+            },
+            {
+              "answerValue": "true",
+              "elementId": "eb:requirement:report-feedback-quarterly",
+              "interpretation": "Designated services report survey data to OMB every quarter, for publication on performance.gov."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-reasons-shared",
+          "prompt": "Do program offices regularly hear the top reasons people contact the agency about their programs?",
+          "kind": "boolean",
+          "candidateMappings": [
+            {
+              "answerValue": "false",
+              "elementId": "eb:capability:service-performance-reporting",
+              "interpretation": "The reasons people contact the agency show what to fix in the programs, so fewer people need to contact it."
+            },
+            {
+              "answerValue": "false",
+              "elementId": "eb:implementationPattern:contact-center-reporting",
+              "interpretation": "The reasons people contact the agency show what to fix in the programs, so fewer people need to contact it."
+            }
+          ]
+        },
+        {
+          "id": "question:contact-monthly-volume",
+          "prompt": "About how many contacts does the center handle in a typical month, across all channels?",
+          "kind": "number"
+        },
+        {
+          "id": "question:contact-hardest-part",
+          "prompt": "What’s the hardest part of serving the public through the center today?",
+          "kind": "text"
+        }
+      ],
+      "description": "Questions about how the center serves the public today, from planning and intake to resolution and reporting. They ask about the center’s tools and steps, never about individual contacts or the people who made them. Answers point to capabilities and example patterns worth exploring."
+    }
+  ]
+}

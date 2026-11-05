@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { parse } from 'yaml';
-import { elementTypes, groupings, patternApproaches, patternFields, patternLayers, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
+import { elementTypes, groupings, patternFields, patternLayers, retiredKinds, soldKinds, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 import {
   addPackage, capabilitiesProviding, deleteElement, deleteQuestion, deleteSet, deleteSource, EditError, forms, packageList, questionKinds, readDiscovery, readElements, readSources, readTargets,
   saveElement, saveQuestion, saveSet, saveSource, type ElementFields, type PackageFields, type QuestionFields, type SetFields, type SourceFields, type Target,
@@ -86,10 +86,9 @@ async function state() {
     packages: packageList(root),
     groups: {
       ...Object.fromEntries(Object.keys(forms).filter((t) => groupings[t]).map((t) => [t, Object.entries(groupings[t].groups).map(([id, g]) => ({ id, label: g.label, hint: g.hint }))])),
-      // The library's own resources are free ones; services and products belong in other organizations' packages.
-      resource: Object.entries(groupings.resource.groups).filter(([id]) => publisher || !['service', 'product'].includes(id)).map(([id, g]) => ({ id, label: g.label, hint: g.hint })),
+      // The library's own resources are free ones; services belong in other organizations' packages, and a product is a solution.
+      resource: Object.entries(groupings.resource.groups).filter(([id]) => !retiredKinds.includes(id) && (publisher || !soldKinds.includes(id))).map(([id, g]) => ({ id, label: g.label, hint: g.hint })),
       layer: Object.entries(patternLayers).map(([id, l]) => ({ id, label: l.label, hint: l.hint })),
-      approach: Object.entries(patternApproaches).map(([id, label]) => ({ id, label })),
       source: Object.entries(sourceKinds).map(([id, label]) => ({ id, label })),
       question: Object.entries(questionKinds).map(([id, label]) => ({ id, label })),
     },

@@ -42,7 +42,8 @@ Work from the top down, since each step links to the one before it.
 1. **Choose a package.** Choose **+ Add > Add a package** if the mission needs a new one, then **Add a mission**.
 2. **Add outcomes** from the mission's page, with their measures.
 3. **Add capabilities** from the mission's page. To reuse one from another package, open an outcome and
-   choose it under **Capabilities that contribute**. That leaves the other package unchanged.
+   choose it under **Capabilities that contribute**. That leaves the other package unchanged. A shared
+   capability can need another one first, such as Identity & Access Management, and the form says which.
 4. **Add requirements and patterns** from each capability's page. Each requirement belongs to one capability
    in its package. A pattern needs a layer and at least one way to source it.
 5. **Add sources.** Choose **Add a new source** under **Sources** on any form, without leaving it. An item can
@@ -57,7 +58,9 @@ Work from the top down, since each step links to the one before it.
   form says why, and often what to add, and your files stay as they were.
 - **It's still YAML.** The editor writes to the files under `source/<package>/`, and keeps your comments and
   any fields the forms don't show. You can edit by hand or use Git whenever you like.
-- **IDs don't change.** An item's ID comes from its first title and stays, since tools link to it.
+- **IDs don't change.** A new item's form suggests an ID from its title. Shorten it before you add the item,
+  since it stays: it's in web addresses, and tools link to it. Measures and ways always take theirs from
+  their titles.
 - **Deleting takes links along.** The form stops first if that would leave a resource with nothing to help
   with, or a requirement with no capability, and names it.
 - **Dependencies look after themselves.** A link to a new package adds it to `package.yaml`. Keep missions
@@ -82,6 +85,8 @@ being a draft. With Git, `git restore source content` also works, along with del
 ## Still done in the YAML
 
 - The sources of a single measure or link.
+- The coverage or note on a link from another package's capability, which goes in `links.yaml`.
+- A mission's `sector` and `scope`.
 - The order of items and questions. New ones go at the end.
 - A package's details once it's started, such as its description, jurisdictions, and tags.
 

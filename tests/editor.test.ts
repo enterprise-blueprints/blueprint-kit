@@ -516,6 +516,20 @@ describe('the editor’s files', () => {
       });
     });
 
+    it('saves what varies on a capability, and leaves it when a form doesn’t send it', () => {
+      const notes = 'Some offices work under a city charter.';
+      const { id } = saveElement(root, capability({ applicabilityNotes: ` ${notes} ` }), targets);
+      expect(list('audit/capabilities.yaml').find((c) => c.id === id)!.applicabilityNotes).toBe(notes);
+      const fresh = readTargets(root, RELEASE);
+      const saved = readElements(root, fresh).find((e) => e.type === 'capability' && e.id === id)!;
+      expect(saved.applicabilityNotes).toBe(notes);
+      const { applicabilityNotes: _notes, ...without } = saved;
+      saveElement(root, without, fresh);
+      expect(list('audit/capabilities.yaml').find((c) => c.id === id)!.applicabilityNotes).toBe(notes);
+      saveElement(root, { ...saved, applicabilityNotes: '' }, fresh);
+      expect(list('audit/capabilities.yaml').find((c) => c.id === id)).not.toHaveProperty('applicabilityNotes');
+    });
+
     it('keeps a pattern’s link as written unless its coverage or note changes', () => {
       const was = element('capability', 'audit-planning');
       saveElement(root, { ...was, links: { ...was.links, candidate_pattern: [{ to: 'eb:implementationPattern:case-platform' }] } }, targets);
@@ -662,6 +676,12 @@ describe('the editor’s files', () => {
   describe('sources', () => {
     it('reads a package’s sources', () => {
       expect(readSources(root)).toEqual([{ package: 'audit', id: 'audit-standards', sourceId: 'src:audit-standards', packageId: 'com.example.audit', title: 'Government Auditing Standards', url: 'https://example.com/standards', kind: 'official-reference', publicationDate: '2024-02-01', lastReviewedAt: '2026-10-30', note: 'What an audit has to do.' }]);
+    });
+
+    it('uses the ID chosen for a new source', () => {
+      expect(saveSource(root, source({ chosenId: 'charter' })).id).toBe('charter');
+      expect(() => saveSource(root, source({ chosenId: 'charter' }))).toThrow('already in use');
+      expect(() => saveSource(root, source({ chosenId: 'City Charter' }))).toThrow('won’t work as an ID');
     });
 
     it('adds a source, starting the file for a package with none, and undoes that', () => {
@@ -815,6 +835,11 @@ describe('the editor’s files', () => {
       expect(first.points).toEqual([{ when: ['on-plan', 'closed'], to: ['capability:records-management'], why: 'Either one needs it.' }]);
     });
 
+    it('uses the ID chosen for a new question', () => {
+      expect(saveQuestion(root, question({ chosenId: 'audit-planning-approach' }), targets).id).toBe('audit-planning-approach');
+      expect(() => saveQuestion(root, question({ chosenId: 'audit-planning-approach' }), targets)).toThrow('already in use');
+    });
+
     it('says what’s wrong with a question, and writes nothing', () => {
       const save = (over: Partial<QuestionFields>) => () => saveQuestion(root, question(over), targets);
       expect(save({ prompt: ' ' })).toThrow('Write the question.');
@@ -847,6 +872,13 @@ describe('the editor’s files', () => {
       writeFileSync(join(root, 'source', 'audit', 'package.yaml'), `schemaVersion: 0.6.0\npackageId: org.enterprise-blueprints.audit\nidPrefix: eb\ntitle: Audit\npublisher:\n  name: Enterprise Blueprints\nlicense: MIT\ndomain: public-sector\n`);
       expect(addPackage(root, { title: 'Benefits', description: 'x' }).name).toBe('benefits');
       expect(parse(text('benefits/package.yaml'))).toMatchObject({ packageId: 'org.enterprise-blueprints.benefits', idPrefix: 'eb', license: 'MIT' });
+    });
+
+    it('uses the ID chosen for a package as its folder and the end of its package ID', () => {
+      writeFileSync(join(root, 'source', 'audit', 'package.yaml'), `schemaVersion: 0.6.0\n${AUDIT}publisher:\n  name: Acme\n  url: https://example.com\nlicense: MIT\ndomain: public-sector\n`);
+      expect(addPackage(root, { title: 'Benefits and Eligibility', chosenId: 'city-benefits', description: 'x' }).name).toBe('city-benefits');
+      expect(parse(text('city-benefits/package.yaml')).packageId).toMatch(/\.city-benefits$/);
+      expect(() => addPackage(root, { title: 'Another', chosenId: 'city-benefits', description: 'x' })).toThrow('already in use');
     });
 
     it('won’t take a folder name your packages or the library’s have', () => {
@@ -948,6 +980,23 @@ describe('the editor’s files', () => {
     expect(saveElement(root, resource({ title: 'Something else' }), targets).id).toBe('something-else');
     expect(saveElement(root, resource({ title: 'Something else' }), targets).id).toBe('something-else-2');
     expect(newId('Café: the “best” guide!', [])).toBe('cafe-the-best-guide');
+    expect(newId('What’s the plan', [])).toBe('whats-the-plan');
+  });
+
+  it('cuts a long ID between words', () => {
+    const id = newId('Benefits are paid on time, in the right amount, to the right person', []);
+    expect(id).toBe('benefits-are-paid-on-time-in-the-right-amount-to-the-right');
+    expect(newId('x'.repeat(70), [])).toHaveLength(60);
+  });
+
+  it('uses a chosen ID for something new, if it can', () => {
+    expect(saveElement(root, resource({ title: 'A long title for a guide', chosenId: 'short-guide' }), targets).id).toBe('short-guide');
+    expect(saveElement(root, resource({ title: 'Blank means the title', chosenId: ' ' }), targets).id).toBe('blank-means-the-title');
+    expect(() => saveElement(root, resource({ chosenId: 'short-guide' }), targets)).toThrow('already in use');
+    expect(() => saveElement(root, resource({ chosenId: 'Not An ID' }), targets)).toThrow('won’t work as an ID');
+    expect(() => saveElement(root, resource({ chosenId: 'ends-with-' }), targets)).toThrow('won’t work as an ID');
+    // An ID never changes, so a chosen one means nothing on something that has one.
+    expect(saveElement(root, { ...element('resource', 'intake-assessment'), chosenId: 'other' }, targets).id).toBe('intake-assessment');
   });
 
   it('says what’s wrong with a form that isn’t finished, and writes nothing', () => {

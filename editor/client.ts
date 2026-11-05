@@ -7,13 +7,14 @@
 // result.
 
 import './client.css';
+import { idFromTitle } from '../src/lib/format.ts';
 
 interface Link { to: string; way?: string; coverage?: 'partial'; note?: string }
 interface Measure { id?: string; title: string; description: string }
 interface Way { id?: string; approach: string; title: string; description?: string; strengths?: string[]; fitsWhen?: string[]; watchFor?: string[] }
 interface Pattern { layer: string; parts?: string[]; strengths?: string[]; fitsWhen?: string[]; watchFor?: string[]; ways: Way[] }
 interface Item {
-  package: string; type: string; id: string; elementId: string; title: string; description: string; status?: string;
+  package: string; type: string; id: string; elementId: string; title: string; description: string; status?: string; applicabilityNotes?: string;
   values?: Record<string, string>; details?: Record<string, string>; tagline?: string; principles?: string[];
   measures?: Measure[]; pattern?: Pattern; sources?: string[]; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
 }
@@ -71,6 +72,16 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props = {}, ...
   el.append(...children.filter((c): c is Node | string => Boolean(c)));
   return el;
 }
+
+/** The ID of something new, which follows what it's named from until someone changes it. */
+function idInput(from: HTMLInputElement | HTMLTextAreaElement) {
+  const id = h('input', { value: idFromTitle(from.value), pattern: '[a-z0-9]+(-[a-z0-9]+)*', title: 'Lowercase letters and numbers, with hyphens between words', autocomplete: 'off', spellcheck: false });
+  let chosen = false;
+  id.addEventListener('input', () => { chosen = id.value !== ''; });
+  from.addEventListener('input', () => { if (!chosen) id.value = idFromTitle(from.value); });
+  return id;
+}
+const ID_HINT = 'Short and lasting. It’s in this item’s web address and in every link to it, so it can’t change later.';
 
 async function post(path: string, body: unknown): Promise<Record<string, unknown>> {
   const res = await fetch(`/__editor/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -297,6 +308,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
   const cited = asLinks(existing?.sources);
 
   const title = h('input', { value: existing?.title ?? '', required: true });
+  const chosenId = idInput(title);
   const description = h('textarea', { rows: '4', required: true, value: existing?.description ?? '' });
   const status = h('select', {}, ...options(state.statuses, existing?.status ?? (state.publisher ? 'draft' : 'reference')));
   const inPackage = h('select', {}, ...state.packages.map((p) => h('option', { value: p.name, selected: p.name === defaultPackage(state, type, start) }, p.title)));
@@ -357,14 +369,16 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
 
   if (type === 'capability') {
     const stage = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.capability, existing?.values?.stage));
+    const varies = h('textarea', { rows: '3', value: existing?.applicabilityNotes ?? '' });
     parts.push(
       h('div', { className: 'site-editor-pair' }, field('Stage of the work', stage), field('Status', status)),
       field('Description', description, 'What must be possible. It usually starts “Ability to”.'),
+      field('What varies', varies, 'What differs from one office to another, if anything. The page shows it as Applicability.'),
       group('Outcomes it contributes to', linkPicker(state, linksFor('contributes_to'), { types: ['outcome'], placeholder: 'Search outcomes', suggest: start.suggest })),
       group('Patterns that could provide it', linkPicker(state, linksFor('candidate_pattern'), { types: ['implementationPattern'], placeholder: 'Search patterns', coverage: true })),
       group('Requirements', linkPicker(state, linksFor('satisfies'), { types: ['requirement'], placeholder: 'Search requirements' })),
     );
-    read = () => ({ values: { stage: stage.value } });
+    read = () => ({ values: { stage: stage.value }, applicabilityNotes: varies.value });
   }
 
   if (type === 'requirement') {
@@ -446,7 +460,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
         const saved = await post('save', {
           type,
           package: packageName(),
-          ...(existing && { id: existing.id }),
+          ...(existing ? { id: existing.id } : { chosenId: chosenId.value }),
           title: title.value,
           description: description.value,
           status: status.value,
@@ -466,6 +480,7 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
     h('header', {}, h('h2', {}, existing ? `Change this ${name.word}` : `Add ${name.a}`), h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': 'Close', onclick: close }, '✕')),
     problems,
     field('Title', title, type === 'requirement' ? 'An instruction, such as “Publish the approved audit plan”.' : undefined),
+    !existing && field('ID', chosenId, ID_HINT),
     ...parts.filter((p): p is HTMLElement => Boolean(p)),
     !existing && !start.package && type !== 'requirement' && state.packages.length > 1 && field('Package', inPackage),
     h('footer', {},
@@ -537,6 +552,7 @@ const packageSelect = (state: State, current?: string) => h('select', {}, ...sta
 /** The form for a source. Given `then`, it hands the new source back, for citing, and the page stays as it is. */
 function openSource(state: State, existing?: Source, start: { package?: string; then?: (source: Source) => void } = {}) {
   const title = h('input', { value: existing?.title ?? '', required: true });
+  const chosenId = idInput(title);
   const url = h('input', { type: 'url', value: existing?.url ?? '', required: true, placeholder: 'https://' });
   const kind = h('select', { required: true }, h('option', { value: '' }, 'Choose one'), ...options(state.groups.source, existing?.kind));
   const published = h('input', { type: 'date', value: existing?.publicationDate ?? '' });
@@ -549,6 +565,7 @@ function openSource(state: State, existing?: Source, start: { package?: string; 
     submit: existing ? 'Save' : 'Add it',
     fields: [
       field('Title', title),
+      !existing && field('ID', chosenId, 'Short and lasting. Items cite the source by it, so it can’t change later.'),
       field('Link', url),
       h('div', { className: 'site-editor-pair' }, field('Kind', kind), field('Last checked', checked), field('Published', published, 'If it has a date.')),
       field('Note', note, 'What it’s cited for.'),
@@ -556,7 +573,7 @@ function openSource(state: State, existing?: Source, start: { package?: string; 
     ],
     send: async () => {
       const fields = { package: packageName(), title: title.value, url: url.value, kind: kind.value, lastReviewedAt: checked.value, ...(published.value && { publicationDate: published.value }), note: note.value };
-      const saved = await post('source', { ...fields, ...(existing && { id: existing.id }) });
+      const saved = await post('source', { ...fields, ...(existing ? { id: existing.id } : { chosenId: chosenId.value }) });
       if (start.then) {
         const source = { ...fields, id: String(saved.id), sourceId: `src:${saved.id}`, packageId: '' };
         state.sources.push(source);
@@ -660,6 +677,7 @@ function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
   drawKind();
 
   const packageName = () => set?.package ?? inPackage.value;
+  const chosenId = idInput(prompt);
   plainForm({
     heading: existing ? 'Change this question' : set ? 'Add a question' : 'Add a question set',
     submit: existing ? 'Save' : 'Add it',
@@ -668,6 +686,7 @@ function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
       !set && field('Description', setDescription, 'When it’s for, and what it covers.'),
       !set && state.packages.length > 1 && field('Package', inPackage),
       field(set ? 'Question' : 'First question', prompt, 'Ask how the office works today, never about a particular case or person.'),
+      !existing && field('ID', chosenId, 'Short and lasting, such as foia-tracking-tools. Answers are saved by it, so it can’t change later.'),
       field('How it’s answered', kind),
       answersGroup,
       pointersGroup,
@@ -676,7 +695,7 @@ function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
       const saved = await post('question', {
         package: packageName(),
         ...(set ? { set: set.id } : { newSet: { title: setTitle.value, description: setDescription.value } }),
-        ...(existing && { id: existing.id }),
+        ...(existing ? { id: existing.id } : { chosenId: chosenId.value }),
         prompt: prompt.value,
         kind: kind.value,
         options: choice() ? answers : [],
@@ -692,16 +711,18 @@ function openQuestion(state: State, set?: QuestionSet, existing?: Question) {
 /** The form for starting a package, whose publisher's details come from your other packages. */
 function openPackage(state: State) {
   const title = h('input', { required: true });
+  const chosenId = idInput(title);
   const description = h('textarea', { rows: '3', required: true });
   const dialog = plainForm({
     heading: 'Add a package',
     submit: 'Add it',
     fields: [
       field('Title', title, 'What it holds, such as “Our Services” or a mission’s name.'),
+      field('ID', chosenId, 'Short and lasting, such as federal-foia. It’s the package’s folder and the end of its package ID, so it can’t change later.'),
       field('Description', description),
     ],
     send: async () => {
-      const saved = await post('package', { title: title.value, description: description.value });
+      const saved = await post('package', { title: title.value, chosenId: chosenId.value, description: description.value });
       const name = String(saved.name);
       state.packages.push({ name, title: title.value.trim() });
       dialog.querySelector('form')!.replaceChildren(

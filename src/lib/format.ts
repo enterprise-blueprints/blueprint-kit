@@ -5,6 +5,20 @@ export function formatDate(iso: string): string {
   return dateFormat.format(new Date(`${iso}T00:00:00Z`));
 }
 
+/** "Records: the “best” guide’s plan" → "records-the-best-guides-plan", cut between words if it's long. */
+export function idFromTitle(title: string): string {
+  const words = title
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (words.length <= 60) return words;
+  const end = words.lastIndexOf('-', 60);
+  return words.slice(0, end > 0 ? end : 60);
+}
+
 /** "actualImplementationUnknown" → "Actual implementation unknown". */
 export function attributeLabel(key: string): string {
   const words = key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();

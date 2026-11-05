@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { join } from 'node:path';
 import { Document, isMap, isScalar, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
 import { compareVersions } from '../src/lib/format.ts';
+import { idFromTitle } from '../src/lib/format.ts';
 import { elementTypes, groupings, patternApproaches, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 
 /** A link to an element, by its full ID, with what the link can say about itself. */
@@ -57,6 +58,10 @@ export interface ElementFields {
   title: string;
   description: string;
   status?: string;
+  /** The ID for a new one, from its form. Without it, one comes from the title. */
+  chosenId?: string;
+  /** On a capability, what varies from one office to another. */
+  applicabilityNotes?: string;
   /** Fields written on the element by name, such as kind, theme, stage, or url. */
   values?: Record<string, string>;
   /** A resource's other details, such as an edition. */
@@ -83,8 +88,9 @@ export interface EditorElement extends ElementFields {
 export interface SourceFields {
   /** The folder under source/ it's in. */
   package: string;
-  /** Absent on a new source, which takes one from its title. */
+  /** Absent on a new source, which takes one from `chosenId` or its title. */
   id?: string;
+  chosenId?: string;
   title: string;
   url: string;
   kind: string;
@@ -130,6 +136,8 @@ export interface QuestionFields {
   set?: string;
   newSet?: { title: string; description?: string };
   id?: string;
+  /** The ID for a new one, from its form. Without it, one comes from the question. */
+  chosenId?: string;
   prompt: string;
   kind: string;
   options?: AnswerFields[];
@@ -159,6 +167,8 @@ export interface EditorSet extends SetFields {
 export interface PackageFields {
   title: string;
   description: string;
+  /** Its folder under source/. Without it, one comes from the title. */
+  chosenId?: string;
   prefix?: string;
   publisher?: string;
 }
@@ -314,6 +324,7 @@ function elementFrom(root: string, name: string, type: string, raw: Raw, targets
     status: String(raw.status ?? 'reference'),
     values: Object.fromEntries(form.values.filter((v) => raw[v] !== undefined).map((v) => [v, String(raw[v])])),
     ...(type === 'resource' && raw.attributes ? { details: Object.fromEntries(Object.entries(attributes).map(([k, v]) => [k, String(v)])) } : {}),
+    ...(type === 'capability' && raw.applicabilityNotes ? { applicabilityNotes: String(raw.applicabilityNotes) } : {}),
     ...(type === 'mission' ? { tagline: String(attributes.tagline ?? ''), principles: asList(attributes.principles).map(String) } : {}),
     ...(type === 'outcome' ? { measures: (asList(raw.measures) as Raw[]).map((m) => ({ id: String(m.id), title: String(m.title ?? ''), description: String(m.description ?? '') })) } : {}),
     ...(type === 'implementationPattern' ? { pattern: patternFrom(attributes) } : {}),
@@ -332,17 +343,19 @@ export function readElements(root: string, targets: Target[]): EditorElement[] {
 
 /** A short ID from a title, such as "records-assessment", that isn't taken. */
 export function newId(title: string, taken: string[]): string {
-  const base =
-    title
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .slice(0, 60)
-      .replace(/^-+|-+$/g, '') || 'item';
+  const base = idFromTitle(title) || 'item';
   let id = base;
   for (let n = 2; taken.includes(id); n++) id = `${base}-${n}`;
   return id;
+}
+
+/** The ID for something new: the one chosen on its form, if it can be used, or one from its title. */
+function idFor(chosen: string | undefined, title: string, taken: string[]): string {
+  const wanted = chosen?.trim();
+  if (!wanted) return newId(title, taken);
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(wanted)) throw new EditError(`“${wanted}” won’t work as an ID. Use lowercase letters and numbers, with hyphens between words.`);
+  if (taken.includes(wanted)) throw new EditError(`The ID ${wanted} is already in use, so choose another.`);
+  return wanted;
 }
 
 function check(input: ElementFields & { id?: string }, targets: Target[], before: Raw | undefined, current: Record<string, string[]>) {
@@ -678,7 +691,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
   const current = Object.fromEntries(form.incoming.map((p) => [p, input.id ? readIncoming(root, input.package, p, fullIdOf(root, input.package, type, input.id), targets) : []]));
   check(input, targets, before, current);
 
-  const id = input.id ?? newId(input.title, readElements(root, targets).filter((e) => e.type === type).map((e) => e.id));
+  const id = input.id ?? idFor(input.chosenId, input.title, readElements(root, targets).filter((e) => e.type === type).map((e) => e.id));
   const elementId = fullIdOf(root, input.package, type, id);
   if (type === 'implementationPattern' && before) checkWaysInUse(root, input, before, elementId, targets);
   let map: YAMLMap;
@@ -697,6 +710,9 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
   for (const field of rest) setField(doc, map, field, values[field]?.trim());
   setField(doc, map, 'description', input.description.trim());
   if (type !== 'resource' && input.sources && !same(asList(before?.sources).map(String), input.sources)) setField(doc, map, 'sources', input.sources);
+
+  // A form that doesn't send it leaves it, and one that sends it empty clears it.
+  if (type === 'capability' && input.applicabilityNotes !== undefined) setField(doc, map, 'applicabilityNotes', input.applicabilityNotes.trim());
 
   if (type === 'resource') {
     const had = (before?.attributes ?? {}) as Raw;
@@ -833,7 +849,7 @@ export function saveSource(root: string, input: SourceFields): { id: string; und
   const { doc, seq } = edits.list(join(root, 'source', input.package, 'sources.yaml'));
   const at = input.id ? itemIndex(seq, input.id) : -1;
   if (input.id && at < 0) throw new EditError(`There's no source called ${input.id} in ${input.package}.`);
-  const id = input.id ?? newId(input.title, seq.items.filter(isMap).map((item) => String((item as YAMLMap).get('id'))));
+  const id = input.id ?? idFor(input.chosenId, input.title, seq.items.filter(isMap).map((item) => String((item as YAMLMap).get('id'))));
   let map: YAMLMap;
   if (at >= 0) map = seq.items[at] as YAMLMap;
   else {
@@ -999,7 +1015,7 @@ export function saveQuestion(root: string, input: QuestionFields, targets: Targe
     setMap = spaced(doc.createNode({ id: setId, title: input.newSet!.title.trim(), ...(description ? { description } : {}), questions: [] }) as YAMLMap, seq);
     seq.add(setMap);
   }
-  const id = input.id ?? newId(input.prompt, sets.flatMap((s) => mapsUnder(s, 'questions').map((q) => String(q.get('id')))));
+  const id = input.id ?? idFor(input.chosenId, input.prompt, sets.flatMap((s) => mapsUnder(s, 'questions').map((q) => String(q.get('id')))));
   let map: YAMLMap;
   if (asked) map = asked;
   else {
@@ -1056,7 +1072,7 @@ export function addPackage(root: string, input: PackageFields): { name: string; 
   if (problems.length) throw new EditError(problems.join('\n'));
 
   // A folder named like one of the library's packages couldn't be told apart in dependencies.
-  const name = newId(input.title, [...existing, ...folders(join(root, 'library', 'packages'))]);
+  const name = idFor(input.chosenId, input.title, [...existing, ...folders(join(root, 'library', 'packages'))]);
   const doc = new Document({
     schemaVersion: template?.schemaVersion ?? newestSchema(root),
     packageId: template ? String(template.packageId).replace(/[^.]+$/, name) : `org.${prefix}.${name}`,

@@ -1,6 +1,6 @@
 # The package itself. Its version and date are set when it is built (pnpm content:build).
 
-schemaVersion: 0.7.0
+schemaVersion: 0.8.0
 packageId: com.example.offerings
 # The first part of every element ID in your packages. Pick one that's yours; "eb" is the library's.
 idPrefix: example

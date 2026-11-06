@@ -318,6 +318,25 @@ export const solutionApproaches: Grouping = {
   },
 };
 
+// Since schema 0.8.0, a solution can list its components, the parts that run
+// separately, each in a tier, and say who hosts it.
+export const componentTiers: Record<string, { label: string; hint: string }> = {
+  front: { label: 'Front', hint: 'What people use, such as portals, forms, and apps' },
+  service: { label: 'Service', hint: 'Logic, workflows, APIs, and integration' },
+  data: { label: 'Data', hint: 'Databases, document stores, and warehouses' },
+};
+
+export const hostings: Record<string, { label: string; hint: string }> = {
+  vendor: { label: 'Hosted by its maker', hint: 'Its maker runs it as a service.' },
+  agency: { label: 'Run by the agency', hint: 'The agency runs it, in its own hosting.' },
+  provider: { label: 'Run by another agency', hint: 'Another agency runs it as a shared service.' },
+};
+
+export const exposures: Record<string, string> = {
+  public: 'Public-facing',
+  internal: 'Internal',
+};
+
 /** The grouping each type uses, by element type. */
 export const groupings: Record<string, Grouping> = {
   outcome: outcomeThemes,

@@ -35,8 +35,9 @@ export interface PackageSource {
 /** "capabilities" → "capability", for element files named after their type's section. */
 const typeOfSection = Object.fromEntries(Object.entries(elementTypes).map(([type, info]) => [info.section, type]));
 const PACKAGE_KEYS = ['schemaVersion', 'packageId', 'idPrefix', 'title', 'description', 'publisher', 'license', 'domain', 'jurisdictions', 'tags', 'dependencies'];
-const ELEMENT_KEYS = ['id', 'title', 'description', 'status', 'replacedBy', 'sources', 'tags', 'jurisdictions', 'applicabilityNotes', 'attributes', 'measures', ...resourceFields, ...new Set(Object.values(groupings).map((g) => g.field))];
+const ELEMENT_KEYS = ['id', 'title', 'description', 'status', 'replacedBy', 'sources', 'tags', 'jurisdictions', 'applicabilityNotes', 'attributes', 'measures', 'components', 'hostedBy', ...resourceFields, ...new Set(Object.values(groupings).map((g) => g.field))];
 const MEASURE_KEYS = ['id', 'title', 'description', 'sources'];
+const COMPONENT_KEYS = ['id', 'title', 'description', 'tier', 'technology', 'exposure', 'sendsTo', 'needs'];
 const LINK_KEYS = ['to', 'note', 'sources', 'id', 'coverage', 'way'];
 /** Schema versions whose links can name one of a pattern's ways; since 0.7.0, a solution is linked instead. */
 const WAYS = ['0.4.0', '0.5.0', '0.6.0'];
@@ -191,6 +192,25 @@ export function compilePackage(src: PackageSource, deps: Record<string, Resolved
           ...(m.sources ? { sourceIds: strings(m.sources).map((s) => `src:${s}`) } : {}),
         })),
       };
+    }
+    // A solution's components and who hosts it are written on it and published in its attributes, since schema 0.8.0.
+    // A component's needs name patterns, as the solution's own needs do.
+    if (raw.components !== undefined) {
+      if (type !== 'solution') problems.push(`${where}: only a solution has components`);
+      const components = (Array.isArray(raw.components) ? raw.components : []) as Raw[];
+      for (const c of components) for (const key of Object.keys(c)) if (!COMPONENT_KEYS.includes(key)) problems.push(`${where}: unknown field "${key}" in a component`);
+      e.attributes = {
+        ...e.attributes,
+        components: components.map((c) => ({
+          ...c,
+          ...(c.sendsTo !== undefined && { sendsTo: strings(c.sendsTo) }),
+          ...(c.needs !== undefined && { needs: strings(c.needs).map((n) => ref(n.includes(':') ? n : `implementationPattern:${n}`, where)) }),
+        })),
+      };
+    }
+    if (raw.hostedBy !== undefined) {
+      if (type !== 'solution') problems.push(`${where}: only a solution has hostedBy`);
+      e.attributes = { ...e.attributes, hostedBy: String(raw.hostedBy) };
     }
     // An outcome's theme, a capability's stage, or a requirement's or resource's kind is written on it and published in its attributes.
     for (const field of new Set(Object.values(groupings).map((g) => g.field))) {

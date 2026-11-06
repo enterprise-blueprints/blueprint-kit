@@ -47,7 +47,8 @@ Work from the top down, since each step links to the one before it.
 4. **Add requirements and patterns** from each capability's page. Each requirement belongs to one capability
    in its package. A pattern needs a layer. Then add its **solutions**, the ways to source it, with **+ Add a
    solution** on its page: each has an approach and the patterns it implements, and a product can have a
-   link.
+   link. Under **Components**, list the parts that run separately, each with a tier, the other parts it sends
+   to, and which of the solution's needs it makes the connection for; **Who runs it** says who hosts it.
 5. **Add sources.** Choose **Add a new source** under **Sources** on any form, without leaving it. An item can
    cite only its own package's sources.
 6. **Add discovery questions.** Choose **+ Add > Add a question set**, which starts with its first question.

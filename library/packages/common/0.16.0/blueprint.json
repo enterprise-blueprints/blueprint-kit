@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.7.0",
+  "schemaVersion": "0.8.0",
   "packageId": "org.enterprise-blueprints.common",
   "idPrefix": "eb",
   "version": "0.16.0",
@@ -737,6 +737,36 @@
       "description": "The low-code or CRM platform the agency already runs, with case types, forms, queues, and permissions set up for each office.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "case-forms",
+            "title": "Case forms and queues",
+            "description": "Each office’s case types, forms, and work queues.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "case-workflows"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "case-workflows",
+            "title": "Case workflows",
+            "description": "Each office’s steps, routing, and notifications.",
+            "tier": "service",
+            "sendsTo": [
+              "case-data"
+            ]
+          },
+          {
+            "id": "case-data",
+            "title": "Case data",
+            "description": "Case records, with permissions set for each office.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -747,6 +777,33 @@
       "description": "The identity provider the agency already runs, with phishing-resistant authenticators and role groups that each system trusts.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "sign-in",
+            "title": "Sign-in page",
+            "description": "Where staff sign in once, with a phishing-resistant authenticator.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "identity-provider"
+            ]
+          },
+          {
+            "id": "identity-provider",
+            "title": "Identity provider",
+            "description": "Checks who someone is, and tells each system that trusts it.",
+            "tier": "service",
+            "sendsTo": [
+              "directory"
+            ]
+          },
+          {
+            "id": "directory",
+            "title": "Directory and role groups",
+            "description": "Staff accounts, and the groups each system grants access by.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -757,6 +814,35 @@
       "description": "The office suite and collaboration workspace the agency already licenses, with its retention and sensitivity labels turned on and set up.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "workspaces",
+            "title": "Team workspaces",
+            "description": "Sites, channels, and shared folders for each team or piece of work.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "labels"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "labels",
+            "title": "Retention and sensitivity labels",
+            "description": "Applied to documents and messages, by default or by hand.",
+            "tier": "service",
+            "sendsTo": [
+              "document-storage"
+            ]
+          },
+          {
+            "id": "document-storage",
+            "title": "Document storage",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -767,6 +853,23 @@
       "description": "The document templates in the case system or office suite, filled in from a case’s fields and saved back to its file.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "letter-generation",
+            "title": "Letter generation",
+            "description": "Fills a template from a case’s fields, and saves the letter to its file.",
+            "tier": "service",
+            "sendsTo": [
+              "templates"
+            ]
+          },
+          {
+            "id": "templates",
+            "title": "Template library",
+            "description": "Approved letter templates, each with the case fields it uses.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -777,6 +880,45 @@
       "description": "The security monitoring the agency’s security operations team already runs, with the office’s systems sending it their logs.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "analyst-console",
+            "title": "Analyst console",
+            "description": "Where the security operations team investigates alerts.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "detections"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "log-collection",
+            "title": "Log collection",
+            "description": "Takes in each system’s sign-in, access, and change logs.",
+            "tier": "service",
+            "sendsTo": [
+              "log-storage"
+            ]
+          },
+          {
+            "id": "detections",
+            "title": "Detections and alerts",
+            "description": "Rules that look for misuse and raise alerts.",
+            "tier": "service",
+            "sendsTo": [
+              "log-storage"
+            ]
+          },
+          {
+            "id": "log-storage",
+            "title": "Log storage",
+            "description": "Logs kept as long as the agency’s policy says.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -797,6 +939,30 @@
       "description": "An AI model the agency has approved, called from the intake system to suggest each new matter’s category, urgency, and route.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "suggestions",
+            "title": "Suggestion service",
+            "description": "Called by the intake system for each new matter, and returns a suggested category, urgency, and route.",
+            "tier": "service",
+            "sendsTo": [
+              "ai-model",
+              "suggestion-log"
+            ]
+          },
+          {
+            "id": "ai-model",
+            "title": "Approved AI model",
+            "description": "The model the agency has approved, run where its data rules allow.",
+            "tier": "service"
+          },
+          {
+            "id": "suggestion-log",
+            "title": "Suggestion log",
+            "description": "Each suggestion and what staff decided, to check how well it does.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -807,6 +973,23 @@
       "description": "A connection the agency builds from its award systems to SAM.gov’s APIs, run before each award and on a schedule.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "entity-checks",
+            "title": "Entity check service",
+            "description": "Asks SAM.gov about each awardee before an award, and again on a schedule.",
+            "tier": "service",
+            "sendsTo": [
+              "check-results"
+            ]
+          },
+          {
+            "id": "check-results",
+            "title": "Check results",
+            "description": "What each check found, kept with the award.",
+            "tier": "data"
+          }
+        ],
         "approach": "build"
       }
     },
@@ -838,6 +1021,32 @@
         ],
         "watchFor": [
           "Each system needs a connection, and offices must agree who can place and see holds on their records"
+        ],
+        "components": [
+          {
+            "id": "connectors",
+            "title": "System connectors",
+            "description": "Link each business system to the records service.",
+            "tier": "service",
+            "sendsTo": [
+              "records-rules"
+            ]
+          },
+          {
+            "id": "records-rules",
+            "title": "Schedules and holds",
+            "description": "Applies retention schedules and legal holds across the connected systems.",
+            "tier": "service",
+            "sendsTo": [
+              "records-catalog"
+            ]
+          },
+          {
+            "id": "records-catalog",
+            "title": "Records catalog",
+            "description": "What’s held where, under which schedule, and when it’s due for disposal.",
+            "tier": "data"
+          }
         ],
         "approach": "platform"
       }
@@ -1096,6 +1305,12 @@
       "to": "eb:implementationPattern:shared-case-platform"
     },
     {
+      "id": "rel:shared-case-platform-platform-depends-on-agency-sign-on",
+      "from": "eb:solution:shared-case-platform-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:agency-sign-on-platform-implements-agency-sign-on",
       "from": "eb:solution:agency-sign-on-platform",
       "predicate": "implements",
@@ -1108,6 +1323,12 @@
       "to": "eb:implementationPattern:records-aware-collaboration"
     },
     {
+      "id": "rel:records-aware-collaboration-platform-depends-on-agency-sign-on",
+      "from": "eb:solution:records-aware-collaboration-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:letters-from-case-data-platform-implements-letters-from-case-data",
       "from": "eb:solution:letters-from-case-data-platform",
       "predicate": "implements",
@@ -1118,6 +1339,12 @@
       "from": "eb:solution:agency-security-monitoring-platform",
       "predicate": "implements",
       "to": "eb:implementationPattern:agency-security-monitoring"
+    },
+    {
+      "id": "rel:agency-security-monitoring-platform-depends-on-agency-sign-on",
+      "from": "eb:solution:agency-security-monitoring-platform",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
     },
     {
       "id": "rel:built-in-audit-trails-product-implements-built-in-audit-trails",

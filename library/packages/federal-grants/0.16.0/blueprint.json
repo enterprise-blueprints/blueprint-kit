@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.7.0",
+  "schemaVersion": "0.8.0",
   "packageId": "org.enterprise-blueprints.federal-grants",
   "idPrefix": "eb",
   "version": "0.16.0",

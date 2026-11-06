@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.7.0",
+  "schemaVersion": "0.8.0",
   "packageId": "org.enterprise-blueprints.federal-oig",
   "idPrefix": "eb",
   "version": "0.16.0",
@@ -1151,6 +1151,56 @@
         "watchFor": [
           "Another product to buy, secure, and keep up"
         ],
+        "components": [
+          {
+            "id": "staff-intake",
+            "title": "Staff intake forms",
+            "description": "Where staff log a matter that came by phone, email, or mail.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "case-workflow"
+            ]
+          },
+          {
+            "id": "case-workspace",
+            "title": "Investigator workspace",
+            "description": "Where investigators work their assigned cases.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "case-workflow"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "case-workflow",
+            "title": "Triage and case workflow",
+            "description": "Routes each matter, records triage decisions and referrals, and limits access by assignment.",
+            "tier": "service",
+            "sendsTo": [
+              "case-records"
+            ]
+          },
+          {
+            "id": "statistics",
+            "title": "Semiannual statistics",
+            "description": "Counts for oversight reporting, from the case records.",
+            "tier": "service",
+            "sendsTo": [
+              "case-records"
+            ]
+          },
+          {
+            "id": "case-records",
+            "title": "Case and evidence records",
+            "description": "Each matter from intake to closure, with its evidence records.",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product"
       }
     },
@@ -1171,6 +1221,36 @@
           "The office’s independence depends on keeping its administration and access apart from the agency’s",
           "Evidence handling, such as chain of custody, usually needs building"
         ],
+        "components": [
+          {
+            "id": "case-forms",
+            "title": "Office case types and forms",
+            "description": "The office’s own case types, forms, and queues, seen only by its staff.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "case-steps"
+            ]
+          },
+          {
+            "id": "case-steps",
+            "title": "Triage and referral steps",
+            "description": "The office’s workflow on the platform, with recorded triage decisions.",
+            "tier": "service",
+            "sendsTo": [
+              "case-data"
+            ],
+            "needs": [
+              "eb:implementationPattern:shared-case-platform"
+            ]
+          },
+          {
+            "id": "case-data",
+            "title": "Office case data",
+            "description": "Case records kept apart from the agency’s, with the office controlling who sees them.",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -1181,6 +1261,48 @@
       "description": "A hotline product with a public web form and phone line, anonymous reporting, and a code to check back.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "web-form",
+            "title": "Public reporting form",
+            "description": "Where anyone reports a concern, with or without their name, and gets a code to check back.",
+            "tier": "front",
+            "exposure": "public",
+            "sendsTo": [
+              "intake-queue"
+            ]
+          },
+          {
+            "id": "phone-line",
+            "title": "Hotline phone line",
+            "description": "Calls taken by staff or recorded, into the same queue.",
+            "tier": "front",
+            "exposure": "public",
+            "sendsTo": [
+              "intake-queue"
+            ]
+          },
+          {
+            "id": "intake-queue",
+            "title": "Intake queue",
+            "description": "Where the intake team reviews new reports.",
+            "tier": "service",
+            "exposure": "internal",
+            "sendsTo": [
+              "report-records"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "report-records",
+            "title": "Report records",
+            "description": "Reports with the identities of people who report kept from staff who don’t need them.",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product"
       }
     },
@@ -1201,6 +1323,36 @@
         "watchFor": [
           "Another product to buy, secure, and keep up"
         ],
+        "components": [
+          {
+            "id": "auditor-workspace",
+            "title": "Auditor workspace",
+            "description": "Where auditors plan engagements and write work papers.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "review"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "review",
+            "title": "Review and sign-off",
+            "description": "Supervisors’ review notes and sign-offs, recorded on each work paper.",
+            "tier": "service",
+            "sendsTo": [
+              "work-papers"
+            ]
+          },
+          {
+            "id": "work-papers",
+            "title": "Work papers and recommendations",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product"
       }
     },
@@ -1222,6 +1374,36 @@
           "Cross-references and review sign-offs depend on discipline, which peer reviews will test",
           "Reporting across engagements, such as on open recommendations, takes manual work"
         ],
+        "components": [
+          {
+            "id": "engagement-sites",
+            "title": "Engagement workspaces",
+            "description": "A workspace for each engagement, made from a template.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "approvals"
+            ],
+            "needs": [
+              "eb:implementationPattern:records-aware-collaboration"
+            ]
+          },
+          {
+            "id": "approvals",
+            "title": "Sign-off approvals",
+            "description": "Document approvals that record a supervisor’s sign-off.",
+            "tier": "service",
+            "sendsTo": [
+              "work-paper-library"
+            ]
+          },
+          {
+            "id": "work-paper-library",
+            "title": "Work paper library",
+            "description": "The engagement’s documents, with retention labels applied.",
+            "tier": "data"
+          }
+        ],
         "approach": "combine"
       }
     },
@@ -1238,6 +1420,36 @@
         "watchFor": [
           "Agency officials need access to the office’s product, limited to their own recommendations"
         ],
+        "components": [
+          {
+            "id": "officials-portal",
+            "title": "Agency officials’ portal",
+            "description": "Where agency officials update their recommendations and attach evidence.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "follow-up"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "follow-up",
+            "title": "Recommendation follow-up",
+            "description": "Reminders, status changes, and the office’s review of closure requests.",
+            "tier": "service",
+            "sendsTo": [
+              "recommendations"
+            ]
+          },
+          {
+            "id": "recommendations",
+            "title": "Recommendation records",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product"
       }
     },
@@ -1254,6 +1466,35 @@
         "watchFor": [
           "The office keeps the app working, and in step with its audit tools"
         ],
+        "components": [
+          {
+            "id": "tracker-app",
+            "title": "Tracker app",
+            "description": "Where office staff and agency officials see and update recommendations.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "reminders"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "reminders",
+            "title": "Reminders and escalations",
+            "description": "Notices as target dates near, and escalations when they pass.",
+            "tier": "service",
+            "sendsTo": [
+              "recommendations"
+            ]
+          },
+          {
+            "id": "recommendations",
+            "title": "Recommendation records",
+            "tier": "data"
+          }
+        ],
         "approach": "platform"
       }
     },
@@ -1264,6 +1505,36 @@
       "description": "A reporting store the office builds, fed by its case, audit, and recommendation systems.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "report-views",
+            "title": "Report views",
+            "description": "The semiannual statistics and other reports, for the office’s staff.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "reporting-store"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "data-feeds",
+            "title": "Data feeds",
+            "description": "Scheduled loads from the case, audit, and recommendation systems.",
+            "tier": "service",
+            "sendsTo": [
+              "reporting-store"
+            ]
+          },
+          {
+            "id": "reporting-store",
+            "title": "Reporting store",
+            "description": "The figures each report is built from, with where each came from.",
+            "tier": "data"
+          }
+        ],
         "approach": "build"
       }
     },
@@ -1274,6 +1545,35 @@
       "description": "An analytics workspace where the office’s data team brings in agency financial, payment, and program data.",
       "status": "reference",
       "attributes": {
+        "components": [
+          {
+            "id": "analytics-workspace",
+            "title": "Analytics workspace",
+            "description": "Notebooks and dashboards for the office’s data team.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "analysis-store"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "data-loads",
+            "title": "Data loads",
+            "description": "Copies of agency financial, payment, and program data, brought in on a schedule.",
+            "tier": "service",
+            "sendsTo": [
+              "analysis-store"
+            ]
+          },
+          {
+            "id": "analysis-store",
+            "title": "Analysis data store",
+            "tier": "data"
+          }
+        ],
         "approach": "build"
       }
     },
@@ -1290,6 +1590,36 @@
         "watchFor": [
           "Another product to buy, secure, and keep up"
         ],
+        "components": [
+          {
+            "id": "evidence-review",
+            "title": "Evidence upload and review",
+            "description": "Where investigators add, view, and share evidence.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "custody"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "custody",
+            "title": "Custody log and hashing",
+            "description": "Records who handled each item, and checks it hasn’t changed.",
+            "tier": "service",
+            "sendsTo": [
+              "evidence-storage"
+            ]
+          },
+          {
+            "id": "evidence-storage",
+            "title": "Evidence storage",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product"
       }
     },
@@ -1305,6 +1635,36 @@
         ],
         "watchFor": [
           "The custody log and hashing carry the evidence’s weight, so they must be built and checked with care"
+        ],
+        "components": [
+          {
+            "id": "evidence-intake",
+            "title": "Evidence intake app",
+            "description": "Where investigators add evidence and link it to a case.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "custody-log"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "custody-log",
+            "title": "Custody log",
+            "description": "Records each transfer and access, with a hash of each file.",
+            "tier": "service",
+            "sendsTo": [
+              "encrypted-storage"
+            ]
+          },
+          {
+            "id": "encrypted-storage",
+            "title": "Encrypted storage",
+            "description": "Kept apart for the office, in the agency’s cloud or data center.",
+            "tier": "data"
+          }
         ],
         "approach": "build"
       }
@@ -1808,6 +2168,12 @@
       "to": "eb:implementationPattern:oversight-intake-case-tracking"
     },
     {
+      "id": "rel:oversight-intake-case-tracking-product-depends-on-agency-sign-on",
+      "from": "eb:solution:oversight-intake-case-tracking-product",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:oversight-intake-case-tracking-agency-platform-implements-oversight-intake-case-tracking",
       "from": "eb:solution:oversight-intake-case-tracking-agency-platform",
       "predicate": "implements",
@@ -1827,10 +2193,22 @@
       "to": "eb:implementationPattern:confidential-hotline-intake"
     },
     {
+      "id": "rel:confidential-hotline-intake-product-depends-on-agency-sign-on",
+      "from": "eb:solution:confidential-hotline-intake-product",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:audit-management-system-product-implements-audit-management-system",
       "from": "eb:solution:audit-management-system-product",
       "predicate": "implements",
       "to": "eb:implementationPattern:audit-management-system"
+    },
+    {
+      "id": "rel:audit-management-system-product-depends-on-agency-sign-on",
+      "from": "eb:solution:audit-management-system-product",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
     },
     {
       "id": "rel:audit-management-system-workspace-implements-audit-management-system",
@@ -1852,10 +2230,22 @@
       "to": "eb:implementationPattern:shared-recommendation-tracker"
     },
     {
+      "id": "rel:shared-recommendation-tracker-audit-module-depends-on-agency-sign-on",
+      "from": "eb:solution:shared-recommendation-tracker-audit-module",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:shared-recommendation-tracker-owned-app-implements-shared-recommendation-tracker",
       "from": "eb:solution:shared-recommendation-tracker-owned-app",
       "predicate": "implements",
       "to": "eb:implementationPattern:shared-recommendation-tracker"
+    },
+    {
+      "id": "rel:shared-recommendation-tracker-owned-app-depends-on-agency-sign-on",
+      "from": "eb:solution:shared-recommendation-tracker-owned-app",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
     },
     {
       "id": "rel:oversight-reporting-from-source-data-build-implements-oversight-reporting-from-source-data",
@@ -1864,10 +2254,22 @@
       "to": "eb:implementationPattern:oversight-reporting-from-source-data"
     },
     {
+      "id": "rel:oversight-reporting-from-source-data-build-depends-on-agency-sign-on",
+      "from": "eb:solution:oversight-reporting-from-source-data-build",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:oversight-data-analytics-build-implements-oversight-data-analytics",
       "from": "eb:solution:oversight-data-analytics-build",
       "predicate": "implements",
       "to": "eb:implementationPattern:oversight-data-analytics"
+    },
+    {
+      "id": "rel:oversight-data-analytics-build-depends-on-agency-sign-on",
+      "from": "eb:solution:oversight-data-analytics-build",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
     },
     {
       "id": "rel:digital-evidence-store-product-implements-digital-evidence-store",
@@ -1876,10 +2278,22 @@
       "to": "eb:implementationPattern:digital-evidence-store"
     },
     {
+      "id": "rel:digital-evidence-store-product-depends-on-agency-sign-on",
+      "from": "eb:solution:digital-evidence-store-product",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
+    },
+    {
       "id": "rel:digital-evidence-store-secure-storage-implements-digital-evidence-store",
       "from": "eb:solution:digital-evidence-store-secure-storage",
       "predicate": "implements",
       "to": "eb:implementationPattern:digital-evidence-store"
+    },
+    {
+      "id": "rel:digital-evidence-store-secure-storage-depends-on-agency-sign-on",
+      "from": "eb:solution:digital-evidence-store-secure-storage",
+      "predicate": "depends_on",
+      "to": "eb:implementationPattern:agency-sign-on"
     },
     {
       "id": "rel:identity-access-management-contributes-to-concerns-raised-safely",

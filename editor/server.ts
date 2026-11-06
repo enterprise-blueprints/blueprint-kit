@@ -11,7 +11,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 import { parse } from 'yaml';
-import { elementTypes, groupings, patternFields, patternLayers, retiredKinds, soldKinds, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
+import { componentTiers, elementTypes, exposures, groupings, hostings, patternFields, patternLayers, retiredKinds, soldKinds, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 import {
   addPackage, capabilitiesProviding, deleteElement, deleteQuestion, deleteSet, deleteSource, EditError, forms, packageList, questionKinds, readDiscovery, readElements, readSources, readTargets,
   saveElement, saveQuestion, saveSet, saveSource, type ElementFields, type PackageFields, type QuestionFields, type SetFields, type SourceFields, type Target,
@@ -91,6 +91,9 @@ async function state() {
       layer: Object.entries(patternLayers).map(([id, l]) => ({ id, label: l.label, hint: l.hint })),
       source: Object.entries(sourceKinds).map(([id, label]) => ({ id, label })),
       question: Object.entries(questionKinds).map(([id, label]) => ({ id, label })),
+      tier: Object.entries(componentTiers).map(([id, t]) => ({ id, label: t.label, hint: t.hint })),
+      hostedBy: Object.entries(hostings).map(([id, t]) => ({ id, label: t.label, hint: t.hint })),
+      exposure: Object.entries(exposures).map(([id, label]) => ({ id, label })),
     },
     patternFields: Object.entries(patternFields).map(([id, f]) => ({ id, label: f.label, hint: f.definition })),
     statuses: Object.entries(statuses).map(([id, label]) => ({ id, label })),

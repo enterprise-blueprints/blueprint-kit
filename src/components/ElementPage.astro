@@ -10,8 +10,10 @@ import PatternCompare from './PatternCompare.astro';
 import ResourceList from './ResourceList.astro';
 import LibraryMark from './LibraryMark.astro';
 import {
+  componentsOf,
   downloadUrl,
   elements,
+  hostingOf,
   groupOf,
   lastReviewed,
   measuresOf,
@@ -21,6 +23,7 @@ import {
   questionsAbout,
   relationGroups,
   resourceDetails,
+  SOLUTIONS_NEEDING,
   resourcesFor,
   scopeLabel,
   sourcesOf,
@@ -29,7 +32,7 @@ import {
   usedBy,
   type LibraryElement,
 } from '../lib/library';
-import { groupings, patternFields, patternLayers, predicates, resourceFields, statuses } from '../lib/vocabulary';
+import { componentTiers, exposures, groupings, patternFields, patternLayers, predicates, resourceFields, statuses } from '../lib/vocabulary';
 import { attributeLabel, attributeValue, formatDate } from '../lib/format';
 
 /** Where to read about an element, who made it, and when that was checked. */
@@ -56,7 +59,11 @@ const isPattern = element.type === 'implementationPattern';
 // A pattern, and a solution that implements one, describe themselves with fields of their own, which get sections.
 const pattern = isPattern ? patternDetails(element) : null;
 const solution = element.type === 'solution' ? patternDetails(element) : null;
-const ownFields = ['approach', 'layer', 'role', 'ways', ...Object.keys(patternFields)];
+const ownFields = ['approach', 'layer', 'role', 'ways', 'components', 'hostedBy', ...Object.keys(patternFields)];
+// A solution's parts, by tier, and who runs it, since schema 0.8.0.
+const components = solution ? componentsOf(element) : [];
+const tiers = Object.entries(componentTiers).map(([key, t]) => ({ ...t, key, parts: components.filter((c) => c.tier === key) })).filter((t) => t.parts.length);
+const hosting = solution ? hostingOf(element) : undefined;
 const fields = (pattern ?? solution)?.fields ?? [];
 // A pattern's solutions, since schema 0.7.0, each with a page of its own; before then, its ways.
 const solutions = pattern?.ways.some((w) => w.solution);
@@ -83,7 +90,7 @@ const replacement = element.replacedBy ? elements.find((e) => e.id === element.r
 // The stack already shows the mission's outcomes and capabilities, and a capability compares its patterns.
 const covered = [predicates.helps_with.incoming, ...(solutions ? [predicates.implements.incoming] : []), ...(stacked ? [predicates.seeks.outgoing, predicates.supports_mission.incoming] : [])];
 const patternGroup = groups.find((g) => g.heading === predicates.candidate_pattern.outgoing);
-const perLink = [predicates.candidate_pattern.incoming, predicates.depends_on.outgoing, predicates.depends_on.incoming, predicates.works_with.outgoing];
+const perLink = [predicates.candidate_pattern.incoming, predicates.depends_on.outgoing, predicates.depends_on.incoming, predicates.works_with.outgoing, SOLUTIONS_NEEDING];
 const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes(g.heading));
 ---
 <Base title={element.title} description={element.description}>
@@ -190,6 +197,36 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
           </div>
         )}
 
+        {(components.length > 0 || hosting) && (
+          <section class="section">
+            <h2>Components</h2>
+            <p class="section-note">
+              {hosting && <><strong>{hosting.label}.</strong> {hosting.hint} </>}
+              {components.length > 0 ? 'The parts that run separately, by tier, with what each sends to and needs.' : 'Its parts aren’t listed yet.'}
+            </p>
+            {tiers.length > 0 && (
+              <div class="components">
+                {tiers.map((t) => (
+                  <div class={`components__tier components__tier--${t.key}`}>
+                    <h3>{t.label} <span class="muted">· {t.hint}</span></h3>
+                    <dl>
+                      {t.parts.map((c) => (
+                        <div id={`component-${c.id}`}>
+                          <dt>{c.title}{c.exposure === exposures.public && <span class="approach-badge">{c.exposure}</span>}</dt>
+                          {c.description && <dd>{c.description}</dd>}
+                          {c.technology && <dd>Built with {c.technology}</dd>}
+                          {c.sendsTo.length > 0 && <dd>Sends to {c.sendsTo.map((o, i) => <>{i > 0 && ', '}<a href={`#component-${o.id}`}>{o.title}</a></>)}</dd>}
+                          {c.needs.length > 0 && <dd>Connects to what fills {c.needs.map((n, i) => <>{i > 0 && ', '}<a href={n.url}>{n.title}</a></>)}</dd>}
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
         {pattern && (solutions || pattern.ways.length > 1) && (
           <section class="section">
             <h2>{solutions ? 'Solutions' : 'Ways to source it'}</h2>
@@ -229,7 +266,7 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
             <section class="section">
               <h2>{g.heading}</h2>
               {!perRow && g.notes.map((n) => <p class="section-note">{n}</p>)}
-              <ElementTable elements={g.elements} notes={notes} partial={partial} within={pkg} />
+              <ElementTable elements={g.elements} notes={notes} partial={partial} parents={g.parents} within={pkg} />
             </section>
           );
         })}
@@ -320,6 +357,16 @@ const shownGroups = groups.filter((g) => g !== patternGroup && !covered.includes
   .section--resources:empty { display: none; }
   .record-resource { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin: 0; }
   .measures { display: grid; gap: .9rem; margin: 0; max-width: 54rem; }
+  .components { display: grid; gap: 1rem; max-width: 54rem; }
+  .components__tier { border-left: 4px solid var(--border); padding-left: .9rem; }
+  .components__tier--front { border-left-color: #0ea5e9; }
+  .components__tier--service { border-left-color: #8b5cf6; }
+  .components__tier--data { border-left-color: #f59e0b; }
+  .components__tier h3 { font-size: .95rem; margin: 0 0 .4rem; }
+  .components__tier h3 .muted { font-weight: 400; }
+  .components dl { display: grid; gap: .7rem; margin: 0; }
+  .components dt { font-weight: 650; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .components dd { margin: .1rem 0 0; color: var(--text-muted); }
   .measures dt { font-weight: 650; }
   .measures dd { margin: .15rem 0 0; color: var(--text-muted); }
 </style>

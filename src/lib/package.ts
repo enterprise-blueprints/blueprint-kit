@@ -10,7 +10,8 @@
 // each package a prefix for its element IDs, so packages from other
 // publishers can build on the library's. Schema 0.7.0 makes the ways to
 // source a pattern solutions that implement it, so organizations' products
-// are solutions too, and a link no longer names a way. Packages stay valid
+// are solutions too, and a link no longer names a way. Schema 0.8.0 lets a
+// solution list its components and say who hosts it. Packages stay valid
 // under the schema they were published with.
 
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -22,7 +23,8 @@ import schema040 from '../../schemas/blueprint-package-0.4.0.schema.json' with {
 import schema050 from '../../schemas/blueprint-package-0.5.0.schema.json' with { type: 'json' };
 import schema060 from '../../schemas/blueprint-package-0.6.0.schema.json' with { type: 'json' };
 import schema070 from '../../schemas/blueprint-package-0.7.0.schema.json' with { type: 'json' };
-import { earlierLayers, elementTypes, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates } from './vocabulary.ts';
+import schema080 from '../../schemas/blueprint-package-0.8.0.schema.json' with { type: 'json' };
+import { componentTiers, earlierLayers, hostings, elementTypes, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates } from './vocabulary.ts';
 
 export interface Source {
   id: string;
@@ -96,7 +98,7 @@ export interface Dependency {
 }
 
 export interface BlueprintPackage {
-  schemaVersion: '0.1.0' | '0.2.0' | '0.3.0' | '0.4.0' | '0.5.0' | '0.6.0' | '0.7.0';
+  schemaVersion: '0.1.0' | '0.2.0' | '0.3.0' | '0.4.0' | '0.5.0' | '0.6.0' | '0.7.0' | '0.8.0';
   packageId: string;
   /** Since schema 0.6.0: the first part of its element IDs. Before then, always "eb". */
   idPrefix?: string;
@@ -126,6 +128,7 @@ const schemas = {
   '0.5.0': ajv.compile<BlueprintPackage>(schema050),
   '0.6.0': ajv.compile<BlueprintPackage>(schema060),
   '0.7.0': ajv.compile<BlueprintPackage>(schema070),
+  '0.8.0': ajv.compile<BlueprintPackage>(schema080),
 };
 export const schemaVersions = Object.keys(schemas) as (keyof typeof schemas)[];
 
@@ -209,6 +212,9 @@ export function validatePackage(data: unknown, resolve: Resolve = () => undefine
   }
   // A measure's ID is unique in its package, since discovery answers and tools name it as <prefix>:measure:<id>.
   for (const id of duplicates(pkg.elements.flatMap((e) => measuresIn(e).map((m) => m.id)))) errors.push(`two measures have the ID ${id}`);
+  for (const e of pkg.elements) errors.push(...componentProblems(e, pkg));
+  // Tools name a component <prefix>:component:<solution key>-<id>, so those are unique too.
+  for (const id of duplicates(pkg.elements.flatMap((e) => componentsIn(e).map((c) => componentId(e, c.id))))) errors.push(`two components would both be ${id}`);
 
   const edges = new Set<string>();
   for (const r of pkg.relations) {
@@ -263,6 +269,61 @@ export const measureId = (outcome: Pick<Element, 'id'>, id: string) => `${outcom
 const BEFORE_060 = new Set(['0.1.0', '0.2.0', '0.3.0', '0.4.0', '0.5.0']);
 /** Schema versions before 0.7.0, whose patterns list their ways instead of having solutions. */
 const BEFORE_070 = new Set([...BEFORE_060, '0.6.0']);
+/** Schema versions before 0.8.0, whose solutions have no components or hosting. */
+const BEFORE_080 = new Set([...BEFORE_070, '0.7.0']);
+
+/** A component as a solution lists it, since schema 0.8.0. */
+export interface Component {
+  id: string;
+  title: string;
+  description?: string;
+  tier: string;
+  technology?: string;
+  exposure?: string;
+  sendsTo?: string[];
+  needs?: string[];
+}
+
+/** A solution's components, since schema 0.8.0. */
+export const componentsIn = (e: Pick<Element, 'type' | 'attributes'>): Component[] =>
+  e.type === 'solution' && Array.isArray(e.attributes?.components) ? (e.attributes.components as Component[]) : [];
+
+/** A component's ID, as tools name it: its solution's prefix, then component, then its solution's key and its own ID. */
+export const componentId = (solution: Pick<Element, 'id'>, id: string) => {
+  const [prefix, , key] = solution.id.split(':');
+  return `${prefix}:component:${key}-${id}`;
+};
+
+/**
+ * A solution's components and hosting, since schema 0.8.0: unique IDs, a
+ * known tier, connections to other parts of the same solution, and needs that
+ * are the solution's own.
+ */
+function componentProblems(e: Element, pkg: BlueprintPackage): string[] {
+  const a = e.attributes ?? {};
+  const errors: string[] = [];
+  if (e.type !== 'solution') return errors;
+  if (BEFORE_080.has(pkg.schemaVersion)) {
+    if ('components' in a) errors.push(`solution ${e.id}: components are new in schema 0.8.0`);
+    if ('hostedBy' in a) errors.push(`solution ${e.id}: hostedBy is new in schema 0.8.0`);
+    return errors;
+  }
+  if ('hostedBy' in a && !(typeof a.hostedBy === 'string' && hostings[a.hostedBy])) errors.push(`solution ${e.id} has unknown hostedBy ${JSON.stringify(a.hostedBy)}`);
+  const parts = componentsIn(e);
+  const ids = new Set(parts.map((c) => c.id));
+  for (const id of duplicates(parts.map((c) => c.id))) errors.push(`solution ${e.id} has two components with the ID ${id}`);
+  const needs = new Set(pkg.relations.filter((r) => r.from === e.id && r.predicate === 'depends_on').map((r) => r.to));
+  for (const c of parts) {
+    if (!componentTiers[c.tier]) errors.push(`component ${c.id} of ${e.id} has unknown tier ${JSON.stringify(c.tier)}`);
+    for (const to of c.sendsTo ?? []) {
+      if (to === c.id) errors.push(`component ${c.id} of ${e.id} sends to itself`);
+      else if (!ids.has(to)) errors.push(`component ${c.id} of ${e.id} sends to ${to}, which isn't one of the solution's components`);
+    }
+    for (const n of c.needs ?? []) if (!needs.has(n)) errors.push(`component ${c.id} of ${e.id} needs ${n}, which the solution doesn't depend on`);
+  }
+  return errors;
+}
+
 /** Schema versions before 0.4.0, which have example solutions, and measures as elements of their own. */
 const BEFORE_040 = new Set(['0.1.0', '0.2.0', '0.3.0']);
 /**

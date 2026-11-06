@@ -13,8 +13,8 @@
 // validation problem in the site's own packages stops the build.
 
 import { site } from '../site';
-import { measureId, validatePackage, type Assessment, type BlueprintPackage, type Element, type Question, type Relation, type Source } from './package';
-import { elementTypes, groupings, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates, resourceKinds, type ElementTypeInfo } from './vocabulary';
+import { componentId, componentsIn, measureId, validatePackage, type Assessment, type BlueprintPackage, type Element, type Question, type Relation, type Source } from './package';
+import { componentTiers, elementTypes, exposures, groupings, hostings, libraryPrefix, patternApproaches, patternFields, patternLayers, predicates, resourceKinds, type ElementTypeInfo } from './vocabulary';
 import { href } from './paths';
 import { compareVersions } from './format';
 import type { SearchItem } from './search';
@@ -35,7 +35,12 @@ export interface RelationGroup {
   elements: LibraryElement[];
   /** What each link says, by the element at its other end: its note, and whether it covers only part of a capability. */
   links: Map<string, { note?: string; partial: boolean }>;
+  /** Each element's pattern, for solutions listed apart. */
+  parents?: Map<string, LibraryElement>;
 }
+
+/** On a pattern's page, the solutions that need it, listed apart from the patterns that do, each with its own pattern. */
+export const SOLUTIONS_NEEDING = 'Solutions that need it';
 
 /** A package version as stored: its folder under content/, its exact text, and its data. */
 export interface PackageFile {
@@ -226,8 +231,15 @@ export function relationGroups(element: LibraryElement): RelationGroup[] {
     for (const direction of ['outgoing', 'incoming'] as const) {
       const rels = relationsOf(element, name, direction).filter((r) => !(r.way && name === 'depends_on' && direction === 'outgoing'));
       if (!rels.length) continue;
-      const others = related(element, name, direction);
+      let others = related(element, name, direction);
       const links = new Map(rels.map((r, i) => [others[i].id, { ...(r.description && { note: r.description }), partial: r.coverage === 'partial' }]));
+      if (name === 'depends_on' && direction === 'incoming' && others.some((e) => e.type === 'solution')) {
+        const solutions = others.filter((e) => e.type === 'solution');
+        const parents = new Map(solutions.flatMap((s) => related(s, 'implements', 'outgoing').slice(0, 1).map((p) => [s.id, p] as const)));
+        groups.push({ heading: SOLUTIONS_NEEDING, notes: [], elements: solutions, links: new Map([...links].filter(([id]) => parents.has(id) || solutions.some((s) => s.id === id))), parents });
+        others = others.filter((e) => e.type !== 'solution');
+        if (!others.length) continue;
+      }
       const same = groups.find((g) => g.heading === info[direction]);
       if (same) {
         same.elements.push(...others.filter((e) => !same.links.has(e.id)));
@@ -242,6 +254,12 @@ export function relationGroups(element: LibraryElement): RelationGroup[] {
         links,
       });
     }
+  }
+  // The solutions that need it come after the patterns that do.
+  const apart = groups.findIndex((g) => g.heading === SOLUTIONS_NEEDING);
+  if (apart >= 0) {
+    const [g] = groups.splice(apart, 1);
+    groups.splice(groups.findIndex((x) => x.heading === predicates.depends_on.incoming) + 1, 0, g);
   }
   return groups;
 }
@@ -270,6 +288,57 @@ export function measuresOf(outcome: LibraryElement): Measure[] {
   return Array.isArray(list)
     ? (list as Omit<Measure, 'outcome' | 'url' | 'elementId'>[]).map((m) => ({ ...m, elementId: measureId(outcome, m.id), outcome, url: `${outcome.url}#measure-${m.id}` }))
     : [];
+}
+
+/** A solution's component, since schema 0.8.0, with what it sends to and needs. */
+export interface SolutionComponent {
+  id: string;
+  /** The ID tools name it by, such as eb:component:<solution key>-<id>. */
+  elementId: string;
+  title: string;
+  description?: string;
+  tier: string;
+  tierLabel: string;
+  technology?: string;
+  exposure?: string;
+  /** The other parts of its solution it sends to. */
+  sendsTo: { id: string; title: string }[];
+  /** The patterns it makes its solution's connection to. */
+  needs: LibraryElement[];
+  /** Its place on the solution's page. */
+  url: string;
+}
+
+/** A solution's components, in order. */
+export function componentsOf(solution: LibraryElement): SolutionComponent[] {
+  const list = componentsIn(solution);
+  return list.map((c) => ({
+    id: c.id,
+    elementId: componentId(solution, c.id),
+    title: c.title,
+    ...(c.description && { description: c.description }),
+    tier: c.tier,
+    tierLabel: componentTiers[c.tier]?.label ?? c.tier,
+    ...(c.technology && { technology: c.technology }),
+    ...(c.exposure && { exposure: exposures[c.exposure] ?? c.exposure }),
+    sendsTo: (c.sendsTo ?? []).flatMap((id) => list.find((o) => o.id === id) ?? []).map((o) => ({ id: o.id, title: o.title })),
+    needs: (c.needs ?? []).flatMap((id) => byId.get(id) ?? []),
+    url: `${solution.url}#component-${c.id}`,
+  }));
+}
+
+/**
+ * Who runs a solution: what it says, since schema 0.8.0, or else what its
+ * approach implies. A shared service is run by another agency, and a platform
+ * the agency has or something built to fit by the agency; a product or tools
+ * combined can go either way, so only what's written says.
+ */
+export function hostingOf(solution: LibraryElement): { label: string; hint: string; said: boolean } | undefined {
+  const a = solution.attributes ?? {};
+  const said = typeof a.hostedBy === 'string' ? a.hostedBy : undefined;
+  const implied = a.approach === 'shared' ? 'provider' : a.approach === 'platform' || a.approach === 'build' ? 'agency' : undefined;
+  const key = said ?? implied;
+  return key && hostings[key] ? { ...hostings[key], said: Boolean(said) } : undefined;
 }
 
 /** What a discovery answer can point at: an element, or an outcome's measure. */

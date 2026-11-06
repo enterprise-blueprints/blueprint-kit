@@ -69,6 +69,11 @@
 .site-editor-details, .site-editor-measures { display: grid; gap: .35rem; }
 .site-editor-measures__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .25rem .35rem; padding-bottom: .35rem; }
 .site-editor-measures__row input:last-child { grid-column: 1 / -1; }
+.site-editor-components { display: grid; gap: .6rem; }
+.site-editor-components__row { display: grid; gap: .3rem; padding: .5rem; border: 1px solid var(--border); border-radius: .5rem; }
+.site-editor-components__head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .35rem; }
+.site-editor-components__checks { display: flex; flex-wrap: wrap; gap: .15rem .8rem; margin: 0; padding: 0; border: 0; }
+.site-editor-components__checks legend { width: 100%; font-size: .8rem; color: var(--text-muted); padding: 0; }
 .site-editor-details__row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto; gap: .35rem; align-items: center; }
 .site-editor-ways { display: grid; gap: .5rem; }
 .site-editor-way { display: grid; gap: .35rem; padding: .5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); }

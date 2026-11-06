@@ -191,6 +191,7 @@ the library's patterns, beside the library's own example solutions on each patte
 - id: example-case-manager
   title: Example Case Manager
   approach: product
+  hostedBy: vendor
   url: https://yourfirm.example/products/case-manager
   lastReviewedAt: 2026-11-05
   description: A case management product for oversight offices.
@@ -198,6 +199,25 @@ the library's patterns, beside the library's own example solutions on each patte
     editions: Standard, Government Cloud
     strengths:
       - Comes configured for an Inspector General’s intake and referrals
+  components:
+    - id: intake-forms
+      title: Intake forms
+      tier: front
+      exposure: public
+      sendsTo: [ case-engine ]
+    - id: case-console
+      title: Case console
+      tier: front
+      sendsTo: [ case-engine ]
+      needs: [ agency-sign-on ]
+    - id: case-engine
+      title: Case engine
+      tier: service
+      technology: Your workflow service
+      sendsTo: [ case-store ]
+    - id: case-store
+      title: Case store
+      tier: data
   implements: [ oversight-intake-case-tracking ]
   depends_on:
     - to: agency-sign-on
@@ -209,6 +229,14 @@ the library's patterns, beside the library's own example solutions on each patte
 - **`implements`** names the patterns it sources, by their keys on the library's pages. One platform can
   implement several.
 - **`depends_on`** names patterns it needs when it's the one chosen, such as sign-on.
+- **`hostedBy`** says who runs it: `vendor` (you, as a service), `agency`, or `provider` (another agency).
+- **`components`** lists the parts that run separately, each with an `id`, a `title`, and a `tier`:
+  `front` for what people use, `service` for logic, workflows, APIs, and integration, and `data` for what's
+  stored. Each can have a `description`, a `technology` (what it's built with), an `exposure` (`public` or
+  `internal`), `sendsTo` (its other parts, by ID), and `needs` (which of the solution's `depends_on`
+  patterns this part connects to). When an architect chooses it, Studio brings the parts in, connected, in
+  a hosting box of their own if you run it, and suggests connecting each need to whatever fills that
+  pattern.
 - **`attributes`** holds its own `strengths`, `fitsWhen`, and `watchFor`, which add to the pattern's, and
   anything else, such as its editions.
 

@@ -705,6 +705,39 @@ describe('the editor’s files', () => {
       expect(added).toMatchObject({ implements: ['eb:implementationPattern:case-platform'], depends_on: [{ to: 'audit-workbench', note: 'Its findings.' }] });
     });
 
+    it('writes a solution’s components and who runs it, giving new parts IDs and naming what they send to by ID', () => {
+      const platform = 'eb:implementationPattern:case-platform';
+      saveElement(root, solution({
+        values: { approach: 'build', hostedBy: 'agency' },
+        links: { implements: [{ to: 'example:implementationPattern:audit-workbench' }], depends_on: [{ to: platform }] },
+        components: [
+          { key: 'new-1', title: 'Auditor app', tier: 'front', exposure: 'internal', sendsTo: ['new-2'], needs: [platform] },
+          { key: 'new-2', title: ' Work papers ', tier: 'data', technology: ' ' },
+        ],
+      }), targets);
+      const added = list('audit/solutions.yaml').at(-1)!;
+      expect(added.hostedBy).toBe('agency');
+      expect(added.components).toEqual([
+        { id: 'auditor-app', title: 'Auditor app', tier: 'front', exposure: 'internal', sendsTo: ['work-papers'], needs: [platform] },
+        { id: 'work-papers', title: 'Work papers', tier: 'data' },
+      ]);
+      // Read back for the form, each is keyed by its ID.
+      const read = readElements(root, targets).find((e) => e.type === 'solution' && e.id === added.id)!;
+      expect(read.components![0]).toMatchObject({ key: 'auditor-app', id: 'auditor-app', sendsTo: ['work-papers'], needs: [platform] });
+      // Saved again, a part keeps its ID.
+      saveElement(root, { ...read, components: [{ ...read.components![1], title: 'Work paper library' }, read.components![0]] }, targets);
+      expect((list('audit/solutions.yaml').at(-1)!.components as { id: string }[]).map((c) => c.id)).toEqual(['work-papers', 'auditor-app']);
+    });
+
+    it('needs each component’s title and tier, and only the solution’s own needs', () => {
+      const save = (input: ElementFields) => () => saveElement(root, input, targets);
+      expect(save(solution({ components: [{ key: 'a', title: '', tier: 'front' }] }))).toThrow('Give each component a title.');
+      expect(save(solution({ components: [{ key: 'a', title: 'App', tier: 'middle' }] }))).toThrow('Choose a tier for App.');
+      expect(save(solution({ components: [{ key: 'a', title: 'App', tier: 'front', needs: ['eb:implementationPattern:case-platform'] }] }))).toThrow('a pattern the solution doesn\'t need');
+      expect(save(solution({ values: { approach: 'build', hostedBy: 'cloud' } }))).toThrow('Choose who runs it.');
+      expect(text('audit/solutions.yaml')).toBe(SOLUTIONS);
+    });
+
     it('needs an approach and a pattern to implement, and a link that’s a link', () => {
       const save = (input: ElementFields) => () => saveElement(root, input, targets);
       expect(save(solution({ values: { approach: 'outsource' } }))).toThrow('Choose its approach.');

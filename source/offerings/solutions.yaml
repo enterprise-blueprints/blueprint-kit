@@ -5,10 +5,18 @@
 # and can have a link, who makes it if that isn't you, and what's particular to
 # it, in attributes: strengths, fitsWhen, and watchFor add to the pattern's, and
 # anything else, such as its editions, shows on its page.
+#
+# hostedBy says who runs it: vendor (you, as a service), agency, or provider
+# (another agency). components lists the parts that run separately, each with a
+# tier (front, service, or data), and where it helps, what it's built with,
+# whether the public reaches it, the other parts it sendsTo, and which of the
+# solution's needs it makes the connection for. Studio brings them in, connected,
+# when an architect chooses the solution.
 
 - id: example-case-manager
   title: Example Case Manager
   approach: product
+  hostedBy: vendor
   url: https://example.com/products/case-manager
   lastReviewedAt: 2026-10-30
   description: A case management product for oversight offices, with intake forms, confidential reporter handling, case assignment, and referral tracking that come configured for an Inspector General’s work.
@@ -16,6 +24,29 @@
     editions: Standard, Government Cloud
     strengths:
       - Comes configured for an Inspector General’s intake, referrals, and confidential reporters
+  components:
+    - id: intake-forms
+      title: Intake forms
+      description: The public reporting form and staff intake, with confidential reporters handled apart.
+      tier: front
+      exposure: public
+      sendsTo: [ case-engine ]
+    - id: case-console
+      title: Case console
+      description: Where staff triage, assign, and work cases, and track referrals.
+      tier: front
+      exposure: internal
+      sendsTo: [ case-engine ]
+      needs: [ agency-sign-on ]
+    - id: case-engine
+      title: Case engine
+      description: Routing, assignment, and referral rules, configured for an Inspector General.
+      tier: service
+      sendsTo: [ case-store ]
+    - id: case-store
+      title: Case store
+      description: Cases, reporters’ details kept apart, and the audit trail.
+      tier: data
   implements: [ oversight-intake-case-tracking ]
   depends_on:
     - to: agency-sign-on

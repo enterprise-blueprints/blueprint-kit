@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { Document, isMap, isScalar, isSeq, parse, parseDocument, type YAMLMap, type YAMLSeq } from 'yaml';
 import { compareVersions } from '../src/lib/format.ts';
 import { idFromTitle } from '../src/lib/format.ts';
-import { elementTypes, groupings, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
+import { componentTiers, elementTypes, exposures, groupings, hostings, patternLayers, predicates, sourceKinds, statuses } from '../src/lib/vocabulary.ts';
 
 /** A link to an element, by its full ID, with what the link can say about itself. */
 export interface Link {
@@ -39,6 +39,24 @@ export interface PatternFields {
   watchFor?: string[];
 }
 
+/**
+ * A solution's component as its form shows it. The key names it on the form,
+ * its ID for one that's saved, so what it sends to can name a part that's new.
+ */
+export interface ComponentFields {
+  key: string;
+  id?: string;
+  title: string;
+  description?: string;
+  tier: string;
+  technology?: string;
+  exposure?: string;
+  /** The keys of the other parts it sends to. */
+  sendsTo?: string[];
+  /** The patterns, by full ID, it makes the solution's connection to: some of the solution's needs. */
+  needs?: string[];
+}
+
 /** An element as the editor's form shows it. */
 export interface ElementFields {
   /** The folder under source/ it's in. */
@@ -59,6 +77,8 @@ export interface ElementFields {
   principles?: string[];
   measures?: MeasureFields[];
   pattern?: PatternFields;
+  /** A solution's components, since schema 0.8.0. */
+  components?: ComponentFields[];
   /** The IDs of the sources it cites, from its own package's sources.yaml. */
   sources?: string[];
   /** What it links to, by predicate. */
@@ -182,7 +202,7 @@ export const forms: Record<string, { values: string[]; links: string[]; incoming
   capability: { values: ['stage'], links: ['contributes_to', 'candidate_pattern', 'satisfies'], incoming: [] },
   requirement: { values: ['kind'], links: [], incoming: ['satisfies'] },
   implementationPattern: { values: [], links: ['depends_on', 'works_with'], incoming: ['candidate_pattern', 'implements'] },
-  solution: { values: ['approach', 'url', 'by', 'lastReviewedAt'], links: ['implements', 'depends_on'], incoming: [] },
+  solution: { values: ['approach', 'hostedBy', 'url', 'by', 'lastReviewedAt'], links: ['implements', 'depends_on'], incoming: [] },
   resource: { values: ['kind', 'url', 'by', 'lastReviewedAt'], links: ['helps_with'], incoming: [] },
 };
 
@@ -306,7 +326,7 @@ function elementFrom(root: string, name: string, type: string, raw: Raw, targets
     ...(type === 'mission' ? { tagline: String(attributes.tagline ?? ''), principles: asList(attributes.principles).map(String) } : {}),
     ...(type === 'outcome' ? { measures: (asList(raw.measures) as Raw[]).map((m) => ({ id: String(m.id), title: String(m.title ?? ''), description: String(m.description ?? '') })) } : {}),
     ...(type === 'implementationPattern' ? { pattern: patternFrom(attributes) } : {}),
-    ...(type === 'solution' ? { pattern: statementsIn(attributes, STATEMENTS) } : {}),
+    ...(type === 'solution' ? { pattern: statementsIn(attributes, STATEMENTS), components: componentsFrom(raw, name, targets) } : {}),
     ...(type !== 'resource' ? { sources: asList(raw.sources).map(String) } : {}),
     links: Object.fromEntries(form.links.map((p) => [p, asList(raw[p]).map((entry) => linkOf(entry, p, name, targets))])),
     incoming: Object.fromEntries(form.incoming.map((p) => [p, readIncoming(root, name, p, elementId, targets)])),
@@ -373,6 +393,14 @@ function check(input: ElementFields & { id?: string }, targets: Target[], before
     if (!input.links?.implements?.length) problems.push('Choose at least one pattern it implements.');
     if (values.url?.trim() && !/^https?:\/\/\S+$/.test(values.url.trim())) problems.push('Give it a link that starts with http:// or https://.');
     if (values.lastReviewedAt && !/^\d{4}-\d{2}-\d{2}$/.test(values.lastReviewedAt)) problems.push('Say when its link was last checked, as a date.');
+    if (values.hostedBy && !hostings[values.hostedBy]) problems.push('Choose who runs it.');
+    const needs = new Set((input.links?.depends_on ?? []).map((l) => l.to));
+    for (const c of input.components ?? []) {
+      if (!c.title?.trim()) problems.push('Give each component a title.');
+      if (!componentTiers[c.tier]) problems.push(`Choose a tier for ${c.title?.trim() || 'each component'}.`);
+      if (c.exposure && !exposures[c.exposure]) problems.push(`Choose whether ${c.title?.trim() || 'each component'} is public-facing.`);
+      for (const n of c.needs ?? []) if (!needs.has(n)) problems.push(`${c.title?.trim() || 'A component'} connects to a pattern the solution doesn't need. Add it to Needs, or untick it.`);
+    }
   }
   for (const m of input.measures ?? []) if (!m.title?.trim() || !m.description?.trim()) problems.push('Give each measure a title and a description.');
 
@@ -608,6 +636,51 @@ function writtenMeasures(before: Raw | undefined, measures: MeasureFields[], tak
 
 const statementsOf = (list: string[] = []) => list.map((s) => s.trim()).filter(Boolean);
 
+/** A solution's components as its form shows them, each need as a pattern's full ID. */
+function componentsFrom(raw: Raw, packageName: string, targets: Target[]): ComponentFields[] {
+  return (asList(raw.components) as Raw[]).map((c) => ({
+    key: String(c.id),
+    id: String(c.id),
+    title: String(c.title ?? ''),
+    ...(c.description ? { description: String(c.description) } : {}),
+    tier: String(c.tier ?? ''),
+    ...(c.technology ? { technology: String(c.technology) } : {}),
+    ...(c.exposure ? { exposure: String(c.exposure) } : {}),
+    sendsTo: asList(c.sendsTo).map(String),
+    needs: asList(c.needs).map((n) => fullId(String(n).includes(':') ? String(n) : `implementationPattern:${n}`, packageName, targets)),
+  }));
+}
+
+/**
+ * Components in the form's order. A saved one keeps its ID; a new one gets one
+ * from its title, unique among its solution's. What each sends to is written
+ * by ID, and its needs as the solution's own are.
+ */
+function writtenComponents(before: Raw | undefined, components: ComponentFields[], packageName: string, targets: Target[]) {
+  const had = new Set((asList(before?.components) as Raw[]).map((c) => String(c.id)));
+  const used: string[] = [];
+  const ids = new Map<string, string>();
+  for (const c of components) {
+    const id = c.id && had.has(c.id) ? c.id : newId(c.title, [...used, ...had]);
+    used.push(id);
+    ids.set(c.key, id);
+  }
+  return components.map((c) => {
+    const sendsTo = (c.sendsTo ?? []).flatMap((k) => (ids.has(k) && k !== c.key ? [ids.get(k)!] : []));
+    const needs = (c.needs ?? []).map((n) => writtenTo({ to: n }, 'depends_on', packageName, targets));
+    return {
+      id: ids.get(c.key)!,
+      title: c.title.trim(),
+      ...(c.description?.trim() ? { description: c.description.trim() } : {}),
+      tier: c.tier,
+      ...(c.technology?.trim() ? { technology: c.technology.trim() } : {}),
+      ...(c.exposure ? { exposure: c.exposure } : {}),
+      ...(sendsTo.length ? { sendsTo } : {}),
+      ...(needs.length ? { needs } : {}),
+    };
+  });
+}
+
 /** A pattern's layer and statements, or a solution's statements, set in its attributes, which go when they're empty. */
 function setPatternAttributes(doc: Document, map: YAMLMap, pattern: PatternFields, type: string) {
   if (!isMap(map.get('attributes', true))) map.set('attributes', doc.createNode({}));
@@ -670,6 +743,7 @@ export function saveElement(root: string, input: ElementFields & { id?: string }
     setField(doc, map, 'measures', writtenMeasures(before, input.measures ?? [], taken));
   }
   if (type === 'implementationPattern' || type === 'solution') setPatternAttributes(doc, map, input.pattern ?? {}, type);
+  if (type === 'solution' && input.components !== undefined) setField(doc, map, 'components', writtenComponents(before, input.components, input.package, targets));
   for (const predicate of form.links) {
     setField(doc, map, predicate, writtenLinks(asList(before?.[predicate]), input.links?.[predicate] ?? [], predicate, input.package, targets));
   }

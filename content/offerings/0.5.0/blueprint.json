@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.7.0",
+  "schemaVersion": "0.8.0",
   "packageId": "com.example.offerings",
   "idPrefix": "example",
   "version": "0.5.0",
@@ -95,6 +95,47 @@
         "strengths": [
           "Comes configured for an Inspector General’s intake, referrals, and confidential reporters"
         ],
+        "components": [
+          {
+            "id": "intake-forms",
+            "title": "Intake forms",
+            "description": "The public reporting form and staff intake, with confidential reporters handled apart.",
+            "tier": "front",
+            "exposure": "public",
+            "sendsTo": [
+              "case-engine"
+            ]
+          },
+          {
+            "id": "case-console",
+            "title": "Case console",
+            "description": "Where staff triage, assign, and work cases, and track referrals.",
+            "tier": "front",
+            "exposure": "internal",
+            "sendsTo": [
+              "case-engine"
+            ],
+            "needs": [
+              "eb:implementationPattern:agency-sign-on"
+            ]
+          },
+          {
+            "id": "case-engine",
+            "title": "Case engine",
+            "description": "Routing, assignment, and referral rules, configured for an Inspector General.",
+            "tier": "service",
+            "sendsTo": [
+              "case-store"
+            ]
+          },
+          {
+            "id": "case-store",
+            "title": "Case store",
+            "description": "Cases, reporters’ details kept apart, and the audit trail.",
+            "tier": "data"
+          }
+        ],
+        "hostedBy": "vendor",
         "approach": "product",
         "url": "https://example.com/products/case-manager",
         "lastReviewedAt": "2026-10-30"

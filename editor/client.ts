@@ -11,12 +11,13 @@ import { idFromTitle } from '../src/lib/format.ts';
 
 interface Link { to: string; coverage?: 'partial'; note?: string }
 interface Measure { id?: string; title: string; description: string }
+interface Component { key: string; id?: string; title: string; description?: string; tier: string; technology?: string; exposure?: string; sendsTo?: string[]; needs?: string[] }
 /** A pattern's layer and statements; a solution's statements. */
 interface Pattern { layer?: string; parts?: string[]; strengths?: string[]; fitsWhen?: string[]; watchFor?: string[] }
 interface Item {
   package: string; type: string; id: string; elementId: string; title: string; description: string; status?: string; applicabilityNotes?: string;
   values?: Record<string, string>; details?: Record<string, string>; tagline?: string; principles?: string[];
-  measures?: Measure[]; pattern?: Pattern; sources?: string[]; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
+  measures?: Measure[]; pattern?: Pattern; components?: Component[]; sources?: string[]; links?: Record<string, Link[]>; incoming?: Record<string, string[]>;
 }
 interface Source { package: string; id: string; sourceId: string; packageId: string; title: string; url: string; kind: string; publicationDate?: string; lastReviewedAt: string; note?: string }
 interface Answer { key?: string; value?: string; label: string }
@@ -135,6 +136,8 @@ interface PickerOptions {
   suggest?: string[];
   /** What to search, when it isn't everything an element can link to. */
   pool?: () => Target[];
+  /** Called when the links change. */
+  onChange?: () => void;
   /** Offers making a new item, which it's then given to add. */
   create?: { label: string; open: (add: (target: Target) => void) => void };
 }
@@ -181,6 +184,7 @@ function linkPicker(state: State, links: Link[], options: PickerOptions) {
     drawChosen();
     drawSuggestions();
     search.hidden = Boolean(options.one && links.length);
+    options.onChange?.();
   };
 
   const add = (target: Target) => {
@@ -254,6 +258,50 @@ function measureRows(measures: Measure[]) {
   };
   draw();
   return rows;
+}
+
+let newKeys = 0;
+
+/**
+ * Rows of a solution's components: each one's title, tier, and details, the
+ * other parts it sends to, and which of the solution's needs it makes the
+ * connection for. `needs` gives the solution's needs as they stand.
+ */
+function componentRows(state: State, components: Component[], needs: () => Link[]) {
+  const rows = h('div', { className: 'site-editor-components' });
+  const titleOf = (id: string) => state.targets.find((t) => t.id === id)?.title ?? id;
+  const select = (choices: Choice[], value: string | undefined, label: string, set: (v: string) => void, blank?: string) =>
+    h('select', { 'aria-label': label, onchange: (e: Event) => set((e.target as HTMLSelectElement).value) },
+      ...(blank !== undefined ? [h('option', { value: '' }, blank)] : []),
+      ...choices.map((c) => h('option', { value: c.id, selected: c.id === value }, c.label)));
+  const checks = (label: string, choices: { id: string; label: string }[], chosen: () => string[], set: (list: string[]) => void) =>
+    choices.length
+      ? h('fieldset', { className: 'site-editor-components__checks' },
+          h('legend', {}, label),
+          ...choices.map((c) => h('label', { className: 'site-editor-check' },
+            h('input', { type: 'checkbox', checked: chosen().includes(c.id), onchange: (e: Event) => set((e.target as HTMLInputElement).checked ? [...chosen(), c.id] : chosen().filter((x) => x !== c.id)) }),
+            ` ${c.label}`)))
+      : undefined;
+  const draw = () => {
+    const open = needs().map((l) => l.to);
+    rows.replaceChildren(
+      ...components.map((c, i) =>
+        h('div', { className: 'site-editor-components__row' },
+          h('div', { className: 'site-editor-components__head' },
+            h('input', { value: c.title, placeholder: 'What it is, such as a public reporting portal', 'aria-label': 'Component title', oninput: (e: Event) => (c.title = (e.target as HTMLInputElement).value), onchange: draw }),
+            select(state.groups.tier, c.tier, 'Tier', (v) => (c.tier = v), 'Tier'),
+            h('button', { type: 'button', className: 'site-editor-remove', 'aria-label': `Remove ${c.title || 'this component'}`, onclick: () => { components.splice(i, 1); for (const o of components) o.sendsTo = (o.sendsTo ?? []).filter((k) => k !== c.key); draw(); } }, '✕')),
+          h('input', { value: c.description ?? '', placeholder: 'What it does, if the title doesn’t say', 'aria-label': 'Component description', oninput: (e: Event) => (c.description = (e.target as HTMLInputElement).value) }),
+          h('div', { className: 'site-editor-pair' },
+            h('input', { value: c.technology ?? '', placeholder: 'Built with, such as a product', 'aria-label': 'What it’s built with', oninput: (e: Event) => (c.technology = (e.target as HTMLInputElement).value) }),
+            select(state.groups.exposure, c.exposure, 'Who reaches it', (v) => (c.exposure = v || undefined), 'Public or internal: not said')),
+          checks('Sends to', components.filter((o) => o !== c).map((o) => ({ id: o.key, label: o.title || 'A new component' })), () => c.sendsTo ?? [], (list) => (c.sendsTo = list)),
+          checks('Makes the connection to what fills', open.map((id) => ({ id, label: titleOf(id) })), () => c.needs ?? [], (list) => (c.needs = list)))),
+      h('button', { type: 'button', className: 'site-editor-link', onclick: () => { components.push({ key: `new-${++newKeys}`, title: '', tier: '' }); draw(); } }, '+ Add a component'),
+    );
+  };
+  draw();
+  return { rows, draw };
 }
 
 const lines = (list: string[] = []) => list.join('\n');
@@ -395,19 +443,27 @@ function openForm(state: State, type: string, existing?: Item, start: Start = {}
     const url = h('input', { type: 'url', value: existing?.values?.url ?? '', placeholder: 'https://' });
     const by = h('input', { value: existing?.values?.by ?? '' });
     const checked = h('input', { type: 'date', value: existing?.values?.lastReviewedAt ?? '' });
+    const hostedBy = h('select', {}, h('option', { value: '' }, 'Not said'), ...options(state.groups.hostedBy, existing?.values?.hostedBy));
+    const components: Component[] = copy(existing?.components ?? []);
+    const needs = linksFor('depends_on');
+    const parts_ = componentRows(state, components, () => needs);
     parts.push(
       h('div', { className: 'site-editor-pair' }, approachField, field('Status', status)),
       field('Description', description, 'What it is, and how it sources the pattern, in a sentence or two.'),
       group('Implements', linkPicker(state, linksFor('implements'), { types: ['implementationPattern'], placeholder: 'Search patterns' }), 'The patterns it sources. One platform can implement several.'),
       ...said.map((f) => field(f.label, areas.get(f.id)!, `What’s particular to this solution. One to a line.`)),
-      group('Needs', linkPicker(state, linksFor('depends_on'), { types: ['implementationPattern'], placeholder: 'Search patterns', note: true }), 'Patterns it can’t work without, when it’s the one chosen.'),
+      group('Needs', linkPicker(state, needs, { types: ['implementationPattern'], placeholder: 'Search patterns', note: true, onChange: () => parts_.draw() }), 'Patterns it can’t work without, when it’s the one chosen.'),
+      field('Who runs it', hostedBy, 'Its maker as a service, the agency in its own hosting, or another agency as a shared service.'),
+      group('Components', parts_.rows, 'The parts that run separately, each in a tier, with what it sends to. Studio brings them in when it’s chosen.'),
       h('details', { open: Boolean(existing?.values?.url) },
         h('summary', {}, 'A link, for a product'),
         field('Link', url, 'Where to read about it.'),
         h('div', { className: 'site-editor-pair' }, field('By', by, 'Who makes it, if it isn’t you.'), field('Last checked', checked))),
     );
     read = () => ({
-      values: { approach: approach.value, url: url.value.trim(), by: by.value.trim(), lastReviewedAt: url.value.trim() ? checked.value || state.today : '' },
+      // A need taken off the solution comes off its components too.
+      components: components.map((c) => ({ ...c, needs: (c.needs ?? []).filter((n) => needs.some((l) => l.to === n)) })),
+      values: { approach: approach.value, hostedBy: hostedBy.value, url: url.value.trim(), by: by.value.trim(), lastReviewedAt: url.value.trim() ? checked.value || state.today : '' },
       pattern: Object.fromEntries(said.map((f) => [f.id, statements(areas.get(f.id)!.value)])),
     });
   }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.7.0",
+  "schemaVersion": "0.8.0",
   "packageId": "com.example.local-audit",
   "idPrefix": "example",
   "version": "0.5.0",

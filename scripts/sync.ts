@@ -12,6 +12,11 @@
 //                             and versions and keeps what you added.
 //   pnpm sync --tools <from>  the engine alone, from a library checkout's folder or
 //                             a Git ref, for working on the kit or the engine
+//   pnpm sync --from <where>  the library from somewhere other than its published
+//                             site, for this run only: a library dev server, such as
+//                             http://localhost:4321/, or a folder with a built copy.
+//                             For trying a release before it's published; the next
+//                             sync from the published site replaces what it took.
 //
 // Your own files are never touched: kit.yaml (but for the release and engine
 // version it names), source/, content/, your home page, and src/kit/. Each
@@ -20,7 +25,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { parse } from 'yaml';
 
@@ -33,6 +38,12 @@ const latest = args.includes('--latest');
 const toolsAt = args.indexOf('--tools');
 const tools = toolsAt !== -1;
 const from = tools && args[toolsAt + 1] && !args[toolsAt + 1].startsWith('--') ? args[toolsAt + 1] : undefined;
+const sourceAt = args.indexOf('--from');
+const source = sourceAt === -1 ? undefined : args[sourceAt + 1];
+if (sourceAt !== -1 && (!source || source.startsWith('--'))) {
+  console.error('--from needs where to read the library: a dev server, such as http://localhost:4321/, or a folder with a built copy of it.');
+  process.exit(1);
+}
 
 type Kit = { library: { url: string; release: string; engine?: string } };
 const readKit = () => parse(readFileSync('kit.yaml', 'utf8')) as Kit;
@@ -56,8 +67,22 @@ function setLibraryField(key: 'release' | 'engine', value: string, comment: stri
 }
 
 const base = (url: string) => (url.endsWith('/') ? url : `${url}/`);
-const catalogUrl = new URL('catalog.json', base(readKit().library.url));
-const catalog = JSON.parse(await get(catalogUrl.href)) as {
+// Where the library's files are read from this time: its published site, or what --from names.
+const root = source ?? readKit().library.url;
+const isWeb = /^https?:\/\//i.test(root);
+/** A file of the library's site, by its path there, such as catalog.json. */
+async function read(relative: string): Promise<string> {
+  if (isWeb) return get(new URL(relative, base(root)).href);
+  const path = join(root, ...relative.split('/'));
+  if (!existsSync(path)) throw new Error(`${path} isn't there. Is ${root} a built copy of the library, such as its dist folder?`);
+  return readFileSync(path, 'utf8');
+}
+
+// What an earlier --from took, which the published site may replace.
+const LOCAL = join('library', 'local.json');
+const local = existsSync(LOCAL) ? (JSON.parse(readFileSync(LOCAL, 'utf8')) as { from: string; release: string; files: string[] }) : undefined;
+
+const catalog = JSON.parse(await read('catalog.json')) as {
   release: string;
   vocabulary: string;
   schemas: string[];
@@ -77,20 +102,36 @@ if (!wanted.length) {
   process.exit(1);
 }
 
+const taken: string[] = [];
 for (const p of wanted) {
   // The catalog's href is packages/<name>/<version>/blueprint.json.
   const [, name] = p.href.split('/');
   const path = join('library', 'packages', name, p.version, 'blueprint.json');
-  const text = await get(new URL(p.href, catalogUrl).href);
+  const record = `library/packages/${name}/${p.version}/blueprint.json`;
+  const text = await read(p.href);
   const digest = createHash('sha256').update(text, 'utf8').digest('hex');
   if (digest !== p.sha256) throw new Error(`${p.packageId} ${p.version} doesn't match the catalog's digest.`);
-  if (existsSync(path) && readFileSync(path, 'utf8') !== text) throw new Error(`${path} differs from the published package, which never changes.`);
+  const changed = existsSync(path) && readFileSync(path, 'utf8') !== text;
+  // A package taken with --from wasn't published yet, so it may change; a published one never does.
+  if (changed && !local?.files.includes(record)) throw new Error(`${path} differs from the published package, which never changes.`);
   save(path, text);
-  console.log(`${name.padEnd(22)} ${p.version}`);
+  taken.push(record);
+  console.log(`${name.padEnd(22)} ${p.version}${changed ? `, replacing what was taken from ${local!.from}` : ''}`);
 }
-save(join('library', 'vocabulary.json'), await get(new URL(catalog.vocabulary, catalogUrl).href));
-for (const href of catalog.schemas) save(join('schemas', href.split('/').at(-1)!), await get(new URL(href, catalogUrl).href));
+save(join('library', 'vocabulary.json'), await read(catalog.vocabulary));
+for (const href of catalog.schemas) save(join('schemas', href.split('/').at(-1)!), await read(href));
 console.log(`vocabulary and ${catalog.schemas.length} schemas`);
+
+if (source) {
+  save(LOCAL, `${JSON.stringify({ from: source, release, files: taken }, null, 2)}\n`);
+  console.log(
+    `\nTaken from ${source}, not from ${readKit().library.url}. If release ${release} isn't published there yet, ` +
+      `your packages build on a release others can't get yet. Run pnpm sync once it is, which replaces these files.`,
+  );
+} else if (local && local.release === release) {
+  rmSync(LOCAL);
+  console.log(`release ${release} now comes from the published library, in place of what was taken from ${local.from}`);
+}
 
 let installNeeded = false;
 if (tools) {

@@ -395,6 +395,16 @@ This reads the library's site and the kit's files on GitHub, so your network has
 library renamed or removed something you link to, `pnpm verify` names each link that no longer resolves.
 On a site you host yourself, run `pnpm content:publish` when the new release is ready to share.
 
+**To try a library release before it's published,** read it from somewhere else for one run: the library's
+dev server, or a folder with a built copy of it.
+
+```sh
+pnpm sync --latest --from http://localhost:4321/
+```
+
+`library/local.json` records what came from there. A later `pnpm sync` from the published site replaces
+those files, even if the release changed before it was published, and then removes the record.
+
 ## License
 
 The kit's code is MIT licensed, like the library's. The sample packages use CC-BY-4.0; choose the license

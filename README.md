@@ -326,6 +326,10 @@ copy you've already started can go there too: make an empty repository and push 
 Turn Pages on, using GitHub Actions as the source, and each push to `main` runs the workflow in
 `.github/workflows/`, which checks everything, builds the site, and deploys it.
 
+A private repository on GitHub's free plan can't have Pages. The workflow still checks and builds each push
+there, and says it didn't deploy, so you can keep your work on GitHub and host the site elsewhere, or not at
+all, as Studio can read a built copy from a folder.
+
 ### Anywhere else
 
 With no GitHub involved:

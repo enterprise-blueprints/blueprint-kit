@@ -24,6 +24,8 @@ jobs:
     permissions:
       contents: read
       pages: write # lets configure-pages read the Pages settings
+    outputs:
+      pages: ${{ steps.site.outputs.on }}
     steps:
       - uses: actions/checkout@v7
 
@@ -45,11 +47,29 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # A repository without Pages, such as a private one on GitHub's free plan,
+      # is still checked and built on each push, but not deployed.
+      - name: Check whether Pages is on
+        id: site
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if answer=$(gh api "repos/${{ github.repository }}/pages" --silent 2>&1); then
+            echo "on=true" >> "$GITHUB_OUTPUT"
+          elif grep -q "HTTP 404" <<< "$answer"; then
+            echo "on=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Built, not deployed::GitHub Pages isn't on for this repository, so the site was checked and built but not deployed. To deploy it, turn Pages on in Settings, with GitHub Actions as the source."
+          else
+            echo "$answer"
+            exit 1
+          fi
+
       # Reads the repository's Pages settings to find the base path:
       # "" for an organization site, "/repo-name" for a project site.
       - name: Configure Pages
         id: pages
-        if: github.event_name != 'pull_request'
+        if: steps.site.outputs.on == 'true'
         uses: actions/configure-pages@v6
 
       - name: Build
@@ -59,15 +79,16 @@ jobs:
           SITE_URL: ${{ steps.pages.outputs.origin }}
 
       - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
+        if: steps.site.outputs.on == 'true'
         uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
-  # Deploys a push to main, or a run started by hand on main, but never a pull request.
+  # Deploys a push to main, or a run started by hand on main, but never a pull
+  # request, and only when Pages is on.
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.build.outputs.pages == 'true'
     needs: build
     runs-on: ubuntu-latest
     permissions:

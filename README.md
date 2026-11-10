@@ -136,6 +136,20 @@ The sample's two packages:
 
 ## Make it yours
 
+The quick way is one command, which asks for your organization's name, its website, and a short word of
+your own for your items' IDs:
+
+```sh
+pnpm kit:init
+```
+
+It names your site, puts a package of your own in place of the sample's, with its `packageId` made from
+your website, removes the sample's mission and built `content/`, and takes the setup notice off your About
+page. Then add your first solution or resource, and run `pnpm content:build` and `pnpm verify`. It only runs
+on a copy that still has the sample.
+
+Or by hand:
+
 1. In `kit.yaml`, set your site's title, description, and color.
 2. In each `source/<package>/package.yaml`, set your `packageId` (a reverse domain name you own, such as
    `com.yourfirm.offerings`), your `idPrefix` (a short word of your own, such as `yourfirm`; `eb` is the
@@ -293,6 +307,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 
 | Command | What it does |
 | --- | --- |
+| `pnpm kit:init` | Makes a fresh copy yours: your site's name and color, and your own package in place of the sample's. |
 | `pnpm content:build` | Builds `content/` from `source/`, at your next release when anything changed. |
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |

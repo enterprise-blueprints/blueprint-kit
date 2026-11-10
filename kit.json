@@ -7,6 +7,7 @@
     "astro.config.mjs",
     "kit.json",
     "scripts/content.ts",
+    "scripts/init.ts",
     "scripts/sync.ts",
     "src/pages/catalog.json.ts",
     "src/pages/packages/[name]/[version]/blueprint.json.sha256.ts",

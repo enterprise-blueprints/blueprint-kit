@@ -113,7 +113,8 @@ describe('publishing without a Git remote', () => {
     expect(run('publish').stdout).toContain('Release 0.1.0 is already published');
 
     edit('Second');
-    run('build');
+    // It says why the changes start a new release.
+    expect(run('build').stdout).toContain('Release 0.1.0 is published, and a published version never changes, so your changes start release 0.2.0.');
     edit('Third');
     run('build');
     expect(versions()).toEqual(['0.1.0', '0.2.0']);
@@ -147,5 +148,51 @@ describe('publishing without a Git remote', () => {
     expect(versions()).toHaveLength(before.length + 1);
     expect(before.map(packageText)).toEqual(texts);
     expect(Object.keys(record()[name]).sort()).toEqual(before);
+  });
+});
+
+// Only a copy that still has the sample can be made someone's own.
+const isSample = existsSync('source/offerings/package.yaml') && readFileSync('source/offerings/package.yaml', 'utf8').includes('packageId: com.example.offerings');
+describe.runIf(isSample)('making a copy yours', () => {
+  let dir: string;
+  const node = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', ...args], { cwd: dir, encoding: 'utf8' });
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'kit-'));
+    for (const path of ['kit.yaml', 'package.json', 'source', 'content', 'library', 'schemas', 'scripts', 'src/lib', 'src/pages/about.astro']) cpSync(path, join(dir, path), { recursive: true });
+    symlinkSync(resolve('node_modules'), join(dir, 'node_modules'), 'junction');
+  });
+  afterEach(() => {
+    unlinkSync(join(dir, 'node_modules'));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('puts your site and package in place of the sample’s, ready to build, and only once', { timeout: 60_000 }, () => {
+    const init = node('scripts/init.ts', '--org', 'Example Co', '--url', 'https://www.example.co', '--prefix', 'exco', '--package', 'exco-offerings');
+    expect(init.status, init.stderr).toBe(0);
+    expect(init.stdout).toContain('source/exco-offerings/ is your package, co.example.exco-offerings');
+    expect(readFileSync(join(dir, 'kit.yaml'), 'utf8')).toContain('title: "Example Co Blueprints"');
+    expect(readdirSync(join(dir, 'source'))).toEqual(['exco-offerings']);
+    const pkg = readFileSync(join(dir, 'source', 'exco-offerings', 'package.yaml'), 'utf8');
+    expect(pkg).toContain('packageId: co.example.exco-offerings');
+    expect(pkg).toContain('idPrefix: exco');
+    expect(existsSync(join(dir, 'content'))).toBe(false);
+    expect(readFileSync(join(dir, 'src', 'pages', 'about.astro'), 'utf8')).not.toContain('make-it-yours');
+
+    // Your package builds as it is, empty, ready for your first solution or resource.
+    const build = node('scripts/content.ts', 'build');
+    expect(build.status, build.stderr).toBe(0);
+    expect(readdirSync(join(dir, 'content'))).toEqual(['exco-offerings']);
+
+    // And kit:init leaves a copy that's yours alone.
+    const again = node('scripts/init.ts', '--org', 'Other', '--url', 'https://other.org', '--prefix', 'other');
+    expect(again.status).toBe(1);
+    expect(again.stderr).toContain('already yours');
+  });
+
+  it('refuses a prefix that isn’t yours', { timeout: 60_000 }, () => {
+    const init = node('scripts/init.ts', '--org', 'Example Co', '--url', 'https://example.co', '--prefix', 'eb');
+    expect(init.status).toBe(1);
+    expect(init.stderr).toContain('"eb" is the library’s');
   });
 });

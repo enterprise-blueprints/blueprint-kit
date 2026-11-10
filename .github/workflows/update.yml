@@ -113,6 +113,13 @@ jobs:
           draft=$([ "$OUTCOME" = "success" ] || echo --draft)
           if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
             gh pr edit "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          elif ! out=$(gh pr create --head "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md" $draft 2>&1); then
+            echo "$out"
+            # The usual reason: the repository doesn't let workflows open pull requests yet.
+            if grep -qi "not permitted to create or approve pull requests" <<< "$out"; then
+              echo "::error title=Couldn't open the pull request::The update is on the branch $branch. To let this workflow open pull requests, turn on Settings → Actions → General → Allow GitHub Actions to create and approve pull requests, then run it again. Or open a pull request from that branch yourself."
+            fi
+            exit 1
           else
-            gh pr create --head "$branch" --title "$title" --body-file "$RUNNER_TEMP/body.md" $draft
+            echo "$out"
           fi

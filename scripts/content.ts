@@ -154,6 +154,16 @@ const inRelease = steps.filter((s) => !s.retired);
 const version = inRelease[0]?.version;
 const draftNote = `\nRelease ${version} is a draft, so it can still change. Run pnpm content:publish when it's ready to share.`;
 const isDraft = () => !hasRemote && inRelease.some((s) => !inRecord(s.name, s.version));
+// With a remote, a release is published when it's pushed to origin/main, so until then it's a draft too.
+const unpushed = () => hasRemote && inRelease.some((s) => !isPublished(s.name, s.version));
+// The published release a new one follows, such as one a push published, so a build can say why it moved on.
+const followed = (() => {
+  for (const s of steps.filter((x) => x.write && !content[x.name]?.[x.version])) {
+    const earlier = Object.keys(content[s.name] ?? {}).filter((v) => isPublished(s.name, v));
+    if (earlier.length) return earlier.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).at(-1);
+  }
+  return undefined;
+})();
 
 if (mode === 'check') {
   if (behind.length) {
@@ -182,6 +192,10 @@ if (mode === 'publish') {
   console.log(fresh.length ? `\nPublished release ${version}. It won't change from here; your next changes go in the release after it.` : `\nRelease ${version} is already published.`);
   console.log('Run pnpm verify to check everything and build the site.');
 } else {
+  if (followed && followed !== version) {
+    console.log(`\nRelease ${followed} is published${hasRemote ? ', since it’s on origin/main' : ''}, and a published version never changes, so your changes start release ${version}.`);
+  }
   if (behind.length) console.log('\nNow run pnpm verify to check everything and build the site.');
   if (isDraft()) console.log(draftNote);
+  else if (unpushed()) console.log(`\nRelease ${version} is a draft until you push it to origin/main, which publishes it.`);
 }

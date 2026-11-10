@@ -637,7 +637,7 @@ function openSource(state: State, existing?: Source, start: { package?: string; 
 }
 
 /** The form for a set's title and description. A new set starts from openQuestion. */
-function openSet(state: State, set: QuestionSet) {
+function openSet(_state: State, set: QuestionSet) {
   const title = h('input', { value: set.title, required: true });
   const description = h('textarea', { rows: '3', value: set.description ?? '' });
   plainForm({

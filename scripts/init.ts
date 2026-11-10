@@ -30,7 +30,7 @@ if (!existsSync(join(SAMPLE, 'package.yaml')) || !readFileSync(join(SAMPLE, 'pac
 async function ask(): Promise<Record<'org' | 'url' | 'prefix' | 'name' | 'package' | 'color', string>> {
   const given = { org: flag('org'), url: flag('url'), prefix: flag('prefix'), name: flag('name'), package: flag('package'), color: flag('color') };
   const prompt = process.stdin.isTTY ? createInterface({ input: process.stdin, output: process.stdout }) : null;
-  const get = async (key: keyof typeof given, question: string, fallback?: string) => {
+  const get = async (key: keyof typeof given, question: string, fallback?: string): Promise<string> => {
     if (given[key]) return given[key]!;
     if (!prompt) {
       if (fallback !== undefined) return fallback;

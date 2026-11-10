@@ -3,6 +3,7 @@ import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, sym
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 import { elements, elementsOfType, helpsWith, inUse, isOwn, ownPackages, packages, release, upstream } from '../src/lib/library';
 import { plan, readSources, type Resolved } from '../src/lib/compile';
 import type { BlueprintPackage } from '../src/lib/package';
@@ -194,5 +195,68 @@ describe.runIf(isSample)('making a copy yours', () => {
     const init = node('scripts/init.ts', '--org', 'Example Co', '--url', 'https://example.co', '--prefix', 'eb');
     expect(init.status).toBe(1);
     expect(init.stderr).toContain('"eb" is the library’s');
+  });
+});
+
+// Saving a solution another tool designed, such as Solution Studio's, into a copy's package.
+describe('saving a solution from a file', () => {
+  let dir: string;
+  const node = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', ...args], { cwd: dir, encoding: 'utf8' });
+  const pkg = readdirSync('source').sort()[0];
+  const solutions = () => readFileSync(join(dir, 'source', pkg, 'solutions.yaml'), 'utf8');
+  const save = (handoff: object) => {
+    writeFileSync(join(dir, 'handoff.json'), JSON.stringify({ package: pkg, ...handoff }));
+    return node('scripts/save-solution.ts', 'handoff.json');
+  };
+  const hotline = {
+    id: 'hotline-on-our-platform',
+    title: 'Hotline on our platform',
+    description: 'A reporting form and a hotline queue on the case platform.',
+    approach: 'platform',
+    implements: ['eb:implementationPattern:confidential-hotline-intake'],
+    components: [
+      { key: 'form', title: 'Reporting form', tier: 'front', exposure: 'public', sendsTo: ['queue'] },
+      { key: 'queue', title: 'Hotline queue', tier: 'service', technology: 'Our workflow' },
+    ],
+  };
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'kit-'));
+    for (const path of ['kit.yaml', 'package.json', 'source', 'content', 'published.json', 'library', 'schemas', 'scripts', 'editor', 'src/lib']) {
+      if (existsSync(path)) cpSync(path, join(dir, path), { recursive: true });
+    }
+    symlinkSync(resolve('node_modules'), join(dir, 'node_modules'), 'junction');
+  });
+  afterEach(() => {
+    unlinkSync(join(dir, 'node_modules'));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('adds it, with its parts connected, changes it when saved again, and refuses one the release won’t take', { timeout: 120_000 }, () => {
+    const first = save(hotline);
+    expect(first.status, first.stderr).toBe(0);
+    const result = JSON.parse(first.stdout.split('\n').find((l) => l.startsWith('RESULT '))!.slice(7));
+    expect(result).toMatchObject({ package: pkg, id: 'hotline-on-our-platform', updated: false });
+    expect(result.elementId).toMatch(/:solution:hotline-on-our-platform$/);
+    expect(solutions()).toContain('title: Hotline on our platform');
+    // Parts get IDs from their names, and what each sends to follows.
+    const saved = (parse(solutions()) as { id: string; components?: { id: string; sendsTo?: string[]; exposure?: string }[] }[]).find((x) => x.id === 'hotline-on-our-platform')!;
+    expect(saved.components!.map((c) => [c.id, c.sendsTo ?? [], c.exposure ?? null])).toEqual([
+      ['reporting-form', ['hotline-queue'], 'public'],
+      ['hotline-queue', [], null],
+    ]);
+
+    // The same ID again changes it, rather than adding another.
+    const again = save({ ...hotline, title: 'Hotline on the agency platform' });
+    expect(again.status, again.stderr).toBe(0);
+    expect(again.stdout).toContain('"updated":true');
+    expect(solutions().match(/id: hotline-on-our-platform/g)).toHaveLength(1);
+    expect(solutions()).toContain('Hotline on the agency platform');
+
+    // A pattern the library doesn't have: nothing is saved.
+    const before = solutions();
+    const refused = save({ ...hotline, id: 'nowhere', title: 'Nowhere', implements: ['eb:implementationPattern:no-such-pattern'] });
+    expect(refused.status).toBe(1);
+    expect(solutions()).toBe(before);
   });
 });

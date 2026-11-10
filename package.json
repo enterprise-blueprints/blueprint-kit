@@ -16,6 +16,7 @@
     "check": "astro check",
     "test": "vitest run",
     "kit:init": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/init.ts",
+    "kit:save-solution": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/save-solution.ts",
     "sync": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync.ts",
     "content:build": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/content.ts build",
     "content:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/content.ts check",

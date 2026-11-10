@@ -256,6 +256,10 @@ the library's patterns, beside the library's own example solutions on each patte
 
 Tools that read the library, such as Solution Studio, offer it wherever its patterns are in play.
 
+It works the other way too: a solution an architect designs in Studio, with its parts, can be saved into one of
+your packages from Studio, which runs `pnpm kit:save-solution` here with the same checks as the editor. It
+lands in your next release, for you to review and publish.
+
 ## Edit in the browser
 
 Instead of editing the YAML by hand, you can work on the site itself:
@@ -308,6 +312,7 @@ capabilities point to needs another pattern, one of the mission's capabilities h
 | Command | What it does |
 | --- | --- |
 | `pnpm kit:init` | Makes a fresh copy yours: your site's name and color, and your own package in place of the sample's. |
+| `pnpm kit:save-solution <file>` | Saves a solution from a file another tool wrote, such as Solution Studio, the way the editor would, then builds your next release. `--build` builds the site too. |
 | `pnpm content:build` | Builds `content/` from `source/`, at your next release when anything changed. |
 | `pnpm content:check` | Fails if `content/` is behind `source/`, without writing anything. |
 | `pnpm content:publish` | Builds, then freezes the release in `published.json`, for a site you host yourself. |
